@@ -6,6 +6,7 @@ import {
 } from "@/modules/missions/infrastructure/in-memory-boss-repository";
 import type { QuestionRepository } from "@/modules/questions/domain/question-repository";
 import type { PlayerRepository } from "@/modules/players/domain/player-repository";
+import type { Player } from "@/modules/players/domain/player";
 import type { BossEncounterService } from "@/modules/missions/application/boss-encounter.service";
 
 class EmptyQuestionRepository implements QuestionRepository {
@@ -27,7 +28,7 @@ class EmptyQuestionRepository implements QuestionRepository {
 }
 
 class StaticPlayerRepository implements PlayerRepository {
-  async getById(id: string) {
+  async getById(id: string): Promise<Player | null> {
     return {
       id,
       name: "Adventurer",
@@ -36,6 +37,11 @@ class StaticPlayerRepository implements PlayerRepository {
       masteryPoints: 0,
       currentSubjectId: null,
       currentRegionId: null,
+      lastActiveAt: null,
+      lastReturnBonusClaimedAt: null,
+      selectedTitle: null,
+      selectedTheme: null,
+      workshopTier: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

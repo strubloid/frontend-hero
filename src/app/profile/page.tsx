@@ -158,6 +158,9 @@ export default function ProfilePage() {
         <Link href="/subjects" className="nav-link">
           Subjects
         </Link>
+        <Link href="/collections" className="nav-link">
+          Collections
+        </Link>
       </nav>
 
       {/* Player Stats Card */}
@@ -213,8 +216,16 @@ export default function ProfilePage() {
             <span className="detail-stat-label">Correct Answers</span>
           </div>
           <div className="detail-stat">
+            <span className="detail-stat-value">{stats.currentStreak}</span>
+            <span className="detail-stat-label">Current Day Streak</span>
+          </div>
+          <div className="detail-stat">
             <span className="detail-stat-value">{stats.longestStreak}</span>
-            <span className="detail-stat-label">Longest Streak</span>
+            <span className="detail-stat-label">Best Answer Streak</span>
+          </div>
+          <div className="detail-stat">
+            <span className="detail-stat-value">{stats.graceDaysRemaining}</span>
+            <span className="detail-stat-label">Grace Days Left</span>
           </div>
           <div className="detail-stat">
             <span className="detail-stat-value">{stats.speedDemonAnswers}</span>
@@ -264,7 +275,7 @@ export default function ProfilePage() {
           Achievements ({achievements.filter((a) => a.earnedAt).length}/{achievements.length})
         </h2>
         {achievements.length === 0 ? (
-          <p className="empty-text">No achievements defined yet.</p>
+          <p className="empty-text">No achievements earned yet. Keep learning!</p>
         ) : (
           <div className="achievements-grid">
             {achievements.map((ach) => (
@@ -285,6 +296,9 @@ export default function ProfilePage() {
             ))}
           </div>
         )}
+        <Link href="/collections" className="collections-link" style={{ display: "block", marginTop: "0.75rem", color: "#f59e0b", textDecoration: "none", fontSize: "0.85rem" }}>
+          View all collections →
+        </Link>
       </div>
 
       {/* Recent Activity */}

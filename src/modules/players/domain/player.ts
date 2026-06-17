@@ -8,6 +8,11 @@ export interface Player extends Entity {
   masteryPoints: number;
   currentSubjectId: string | null;
   currentRegionId: string | null;
+  lastActiveAt: Date | null;
+  lastReturnBonusClaimedAt: Date | null;
+  selectedTitle: string | null;
+  selectedTheme: string | null;
+  workshopTier: number;
   createdAt: Date;
   updatedAt: Date;
 }

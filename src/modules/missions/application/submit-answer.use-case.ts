@@ -18,10 +18,16 @@ export interface SubmitAnswerResult {
   correctIndex: number;
   explanation: string;
   xpAwarded: number;
+  returnBonusApplied: boolean;
+  returnBonusXp: number;
+  welcomeBackMessage: string | null;
   updatedMastery: number;
   score: number;
   maxScore: number;
 }
+
+const RETURN_BONUS_MULTIPLIER = 1.5;
+const RETURN_BONUS_ABSENCE_MS = 7 * 24 * 60 * 60 * 1000;
 
 export class SubmitAnswerUseCase {
   constructor(
@@ -93,7 +99,7 @@ export class SubmitAnswerUseCase {
     );
     const consecutiveCorrect = existingMastery?.consecutiveCorrectAnswers ?? 0;
 
-    const xpAwarded = calculateAnswerXp(
+    const baseXpAwarded = calculateAnswerXp(
       evaluation.isCorrect,
       question.difficulty,
       consecutiveCorrect,
@@ -102,9 +108,19 @@ export class SubmitAnswerUseCase {
     );
 
     const now = new Date();
+    const returnBonusApplied =
+      !!player.lastActiveAt &&
+      now.getTime() - player.lastActiveAt.getTime() >= RETURN_BONUS_ABSENCE_MS;
+    const xpAwarded = returnBonusApplied
+      ? Math.round(baseXpAwarded * RETURN_BONUS_MULTIPLIER)
+      : baseXpAwarded;
+    const returnBonusXp = xpAwarded - baseXpAwarded;
+
     const updatedPlayer = {
       ...player,
       experiencePoints: player.experiencePoints + xpAwarded,
+      lastActiveAt: now,
+      lastReturnBonusClaimedAt: returnBonusApplied ? now : player.lastReturnBonusClaimedAt,
       updatedAt: now,
     };
     await this.playerRepository.save(updatedPlayer);
@@ -144,6 +160,11 @@ export class SubmitAnswerUseCase {
       correctIndex: evaluation.correctIndex,
       explanation: evaluation.explanation,
       xpAwarded,
+      returnBonusApplied,
+      returnBonusXp,
+      welcomeBackMessage: returnBonusApplied
+        ? "Welcome back, Architect. The realms held. Here is your return bonus."
+        : null,
       updatedMastery: updatedMasteryResult.mastery.masteryScore,
       score: updatedMission.score,
       maxScore: updatedMission.maxScore,

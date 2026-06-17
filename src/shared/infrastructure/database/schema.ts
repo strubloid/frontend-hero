@@ -10,6 +10,11 @@ export const players = sqliteTable("players", {
   masteryPoints: integer("masteryPoints").default(0).notNull(),
   currentSubjectId: text("currentSubjectId"),
   currentRegionId: text("currentRegionId"),
+  lastActiveAt: text("lastActiveAt"),
+  lastReturnBonusClaimedAt: text("lastReturnBonusClaimedAt"),
+  selectedTitle: text("selectedTitle"),
+  selectedTheme: text("selectedTheme"),
+  workshopTier: integer("workshopTier").default(1).notNull(),
   createdAt: text("createdAt").notNull(),
   updatedAt: text("updatedAt").notNull(),
 });

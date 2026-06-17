@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getWorldMap } from "@/app/actions/world-map";
 import { OnboardingFlow } from "@/components/onboarding-flow";
@@ -79,6 +79,9 @@ export default function WorldMapPage() {
         </Link>
         <Link href="/subjects" className="nav-link">
           Subjects
+        </Link>
+        <Link href="/collections" className="nav-link">
+          Collections
         </Link>
       </nav>
 
@@ -159,11 +162,15 @@ export default function WorldMapPage() {
             </div>
           )}
 
+          {/* Animated particles background */}
+          <canvas ref={canvasRef} className="world-particles" />
+
           <div className="world-map-grid">
-            {regions.map((region) => (
+            {regions.map((region, idx) => (
               <div
                 key={region.id}
                 className={`region-card region-${region.status}`}
+                style={{ animationDelay: `${idx * 0.08}s` }}
                 onClick={() => region.status !== "locked" && setSelectedRegion(region.id)}
                 role={region.status !== "locked" ? "button" : undefined}
                 tabIndex={region.status !== "locked" ? 0 : undefined}

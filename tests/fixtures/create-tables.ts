@@ -15,6 +15,11 @@ export function createTables(sqlite: Database.Database) {
       masteryPoints INTEGER DEFAULT 0,
       currentSubjectId TEXT,
       currentRegionId TEXT,
+      lastActiveAt TEXT,
+      lastReturnBonusClaimedAt TEXT,
+      selectedTitle TEXT,
+      selectedTheme TEXT,
+      workshopTier INTEGER DEFAULT 1,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL
     );

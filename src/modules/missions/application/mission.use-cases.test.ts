@@ -262,6 +262,11 @@ function createTestPlayer(): Player {
     masteryPoints: 0,
     currentSubjectId: null,
     currentRegionId: null,
+    lastActiveAt: new Date(),
+    lastReturnBonusClaimedAt: null,
+    selectedTitle: null,
+    selectedTheme: null,
+    workshopTier: 1,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
   };
@@ -541,5 +546,51 @@ describe("SubmitAnswerUseCase", () => {
     // Verify player XP is not zero (existing 50 + 5 = 55)
     const updatedPlayer = await playerRepo.getById(player.id);
     expect(updatedPlayer!.experiencePoints).toBe(55);
+  });
+
+  it("awards a one-time 50% return bonus after 7 days away", async () => {
+    const { player, question, mission } = await setupTestData();
+    player.lastActiveAt = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
+
+    const playerRepo = new MockPlayerRepository();
+    playerRepo.set(player);
+
+    const missionRepo = new MockMissionRepository();
+    missionRepo.set(mission);
+
+    const missionAttemptRepo = new MockMissionAttemptRepository();
+
+    const questionRepo = new MockQuestionRepository();
+    questionRepo.set(question);
+
+    const masteryRepo = new MockMasteryRepository();
+
+    const useCase = new SubmitAnswerUseCase(
+      playerRepo,
+      missionRepo,
+      missionAttemptRepo,
+      questionRepo,
+      masteryRepo,
+      new MockReviewRepository(),
+      new AnswerEvaluator(),
+    );
+
+    const input: SubmitAnswerInput = {
+      missionId: mission.id,
+      playerId: player.id,
+      questionId: question.id,
+      selectedIndex: 0,
+      timeSpentSeconds: 10,
+    };
+
+    const result = await useCase.execute(input);
+
+    expect(result.returnBonusApplied).toBe(true);
+    expect(result.returnBonusXp).toBeGreaterThan(0);
+    expect(result.welcomeBackMessage).toContain("Welcome back");
+
+    const updatedPlayer = await playerRepo.getById(player.id);
+    expect(updatedPlayer!.lastReturnBonusClaimedAt).not.toBeNull();
+    expect(updatedPlayer!.experiencePoints).toBe(result.xpAwarded);
   });
 });

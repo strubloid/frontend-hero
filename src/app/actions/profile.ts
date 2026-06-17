@@ -1,6 +1,7 @@
 "use server";
 
 import type { PlayerRepository } from "@/modules/players/domain/player-repository";
+import type { AchievementCategory } from "@/modules/rewards/domain/achievement";
 import type { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
 import { InMemoryMasteryRepository } from "@/modules/mastery/infrastructure/in-memory-mastery-repository";
 import type {
@@ -12,6 +13,7 @@ import { InMemoryAchievementRepository } from "@/modules/rewards/infrastructure/
 import { AchievementService } from "@/modules/rewards/application/achievement-service";
 import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
 import type { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
+import { StreakStatusService } from "@/modules/players/application/streak-status.service";
 
 // ---------------------------------------------------------------------------
 // Shared repositories (singletons)
@@ -21,6 +23,7 @@ let playerRepository: PlayerRepository | null = null;
 const masteryRepository = new InMemoryMasteryRepository();
 const subjectRepository = new InMemorySubjectRepository();
 const achievementRepository: AchievementRepository = new InMemoryAchievementRepository();
+const streakStatusService = new StreakStatusService();
 
 // These will be wired from the missions action module at runtime
 let missionRepository: MissionRepository | null = null;
@@ -86,6 +89,7 @@ export interface PlayerProfileData {
     totalXp: number;
     accuracy: number;
     currentStreak: number;
+    graceDaysRemaining: number;
     bossesDefeated: number;
     regionsUnlocked: number;
     regionsCompleted: number;
@@ -113,6 +117,19 @@ export interface PlayerProfileData {
     label: string;
     timestamp: string;
   }>;
+  progression: {
+    weeklyConsistencyDays: number;
+    weeklyConsistencyTarget: number;
+    recoveryMissionAvailable: boolean;
+    returnBonusEligible: boolean;
+    returnBonusMultiplier: number;
+    welcomeBackMessage: string | null;
+    unlockedTitles: string[];
+    equippedTitle: string;
+    selectedTheme: string;
+    workshopTier: number;
+    nextCosmeticUnlock: string;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -128,6 +145,24 @@ function getLevelTitle(level: number): string {
   if (level <= 70) return "React Archmage";
   if (level <= 90) return "Frontend Guardian";
   return "Realms Master";
+}
+
+function getUnlockedTitles(level: number, streakDays: number): string[] {
+  const titles = ["Apprentice Adventurer"];
+  if (level >= 5) titles.push("Journey Coder");
+  if (level >= 10) titles.push("Script Knight");
+  if (level >= 20) titles.push("Component Lord");
+  if (level >= 35) titles.push("Framework Sage");
+  if (streakDays >= 7) titles.push("Consistent Architect");
+  if (streakDays >= 30) titles.push("Phoenix Engineer");
+  return titles;
+}
+
+function getNextCosmeticUnlock(level: number): string {
+  if (level < 5) return "Theme pack unlock at Level 5";
+  if (level < 10) return "Workshop glow at Level 10";
+  if (level < 20) return "Map hologram style at Level 20";
+  return "Legend title variants and aura cosmetics";
 }
 
 async function ensureSubjectLoaded(): Promise<void> {
@@ -190,6 +225,7 @@ export async function getPlayerProfile(playerId: string): Promise<PlayerProfileD
         totalXp: 0,
         accuracy: 0,
         currentStreak: 0,
+        graceDaysRemaining: 3,
         bossesDefeated: 0,
         regionsUnlocked: 0,
         regionsCompleted: 0,
@@ -199,6 +235,19 @@ export async function getPlayerProfile(playerId: string): Promise<PlayerProfileD
       achievements: [],
       masteryByDomain: [],
       recentActivity: [],
+      progression: {
+        weeklyConsistencyDays: 0,
+        weeklyConsistencyTarget: 5,
+        recoveryMissionAvailable: false,
+        returnBonusEligible: false,
+        returnBonusMultiplier: 1,
+        welcomeBackMessage: null,
+        unlockedTitles: ["Apprentice Adventurer"],
+        equippedTitle: "Apprentice Adventurer",
+        selectedTheme: "Default Realm",
+        workshopTier: 1,
+        nextCosmeticUnlock: "Theme pack unlock at Level 5",
+      },
     };
   }
 
@@ -223,24 +272,33 @@ export async function getPlayerProfile(playerId: string): Promise<PlayerProfileD
   const totalAttempts = allAttempts.length;
   const accuracy = totalAttempts > 0 ? Math.round((correctAnswers / totalAttempts) * 100) : 0;
 
-  // Longest + current streak
+  // Longest answer streak
   let longestStreak = 0;
-  let currentStreak = 0;
+  let currentAnswerStreak = 0;
   const sortedAttempts = [...allAttempts].sort(
     (a, b) => a.attemptedAt.getTime() - b.attemptedAt.getTime(),
   );
   for (const attempt of sortedAttempts) {
     if (attempt.isCorrect) {
-      currentStreak++;
-      longestStreak = Math.max(longestStreak, currentStreak);
+      currentAnswerStreak++;
+      longestStreak = Math.max(longestStreak, currentAnswerStreak);
     } else {
-      currentStreak = 0;
+      currentAnswerStreak = 0;
     }
   }
+
+  const streakStatus = streakStatusService.calculate(
+    missionsCompleted
+      .map((mission) => mission.completedAt)
+      .filter((completedAt): completedAt is Date => completedAt instanceof Date),
+  );
 
   const speedDemonAnswers = allAttempts.filter(
     (a) => a.isCorrect && a.timeSpentSeconds <= 3,
   ).length;
+  const unlockedTitles = getUnlockedTitles(player.level, streakStatus.currentStreakDays);
+  const equippedTitle = player.selectedTitle ?? unlockedTitles[unlockedTitles.length - 1];
+  const selectedTheme = player.selectedTheme ?? "Default Realm";
 
   // Achievements
   let playerAchievements: Array<{
@@ -323,7 +381,7 @@ export async function getPlayerProfile(playerId: string): Promise<PlayerProfileD
       experiencePoints: player.experiencePoints,
       experienceToNextLevel,
       experienceProgress,
-      title: getLevelTitle(player.level),
+      title: equippedTitle,
     },
     stats: {
       conceptsMastered,
@@ -334,7 +392,8 @@ export async function getPlayerProfile(playerId: string): Promise<PlayerProfileD
       speedDemonAnswers,
       totalXp: player.experiencePoints,
       accuracy,
-      currentStreak,
+      currentStreak: streakStatus.currentStreakDays,
+      graceDaysRemaining: streakStatus.graceDaysRemaining,
       bossesDefeated: 0,
       regionsUnlocked: 0,
       regionsCompleted: 0,
@@ -344,5 +403,121 @@ export async function getPlayerProfile(playerId: string): Promise<PlayerProfileD
     achievements: playerAchievements,
     masteryByDomain,
     recentActivity,
+    progression: {
+      weeklyConsistencyDays: streakStatus.weeklyConsistencyDays,
+      weeklyConsistencyTarget: streakStatus.weeklyConsistencyTarget,
+      recoveryMissionAvailable: streakStatus.recoveryMissionAvailable,
+      returnBonusEligible: streakStatus.returnBonusEligible,
+      returnBonusMultiplier: streakStatus.returnBonusMultiplier,
+      welcomeBackMessage: streakStatus.welcomeBackMessage,
+      unlockedTitles,
+      equippedTitle,
+      selectedTheme,
+      workshopTier: player.workshopTier,
+      nextCosmeticUnlock: getNextCosmeticUnlock(player.level),
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Collections data (shared singletons via wireDependencies)
+// ---------------------------------------------------------------------------
+
+export interface CollectionItem {
+  id: string;
+  name: string;
+  description: string;
+  category: AchievementCategory;
+  iconId: string;
+  hidden: boolean;
+  earned: boolean;
+  earnedAt: string | null;
+  rewardType: string | null;
+  rewardValue: string | null;
+}
+
+export interface CollectionsData {
+  all: CollectionItem[];
+  earned: number;
+  total: number;
+  categories: {
+    category: AchievementCategory;
+    label: string;
+    items: CollectionItem[];
+  }[];
+}
+
+const CATEGORY_LABELS: Record<AchievementCategory, string> = {
+  milestone: "Milestones",
+  mastery: "Mastery",
+  streak: "Streaks",
+  challenge: "Challenges",
+  exploration: "Exploration",
+  hidden: "Secrets",
+};
+
+export async function getCollections(playerId: string): Promise<CollectionsData> {
+  const allAchievements = await achievementRepository.getAllAchievements();
+  const playerAchievements = await achievementRepository.getPlayerAchievements(playerId);
+  const earnedMap = new Set(playerAchievements.map((pa) => pa.achievementId));
+  const earnedAtMap = new Map(
+    playerAchievements.map((pa) => [pa.achievementId, pa.earnedAt.toISOString()]),
+  );
+
+  const items: CollectionItem[] = allAchievements.map((a) => ({
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    category: a.category,
+    iconId: a.iconId,
+    hidden: a.hidden,
+    earned: earnedMap.has(a.id),
+    earnedAt: earnedAtMap.get(a.id) ?? null,
+    rewardType: a.reward?.type ?? null,
+    rewardValue: a.reward?.value ?? null,
+  }));
+
+  const categoryOrder: AchievementCategory[] = [
+    "milestone",
+    "mastery",
+    "streak",
+    "challenge",
+    "exploration",
+    "hidden",
+  ];
+  const categories = categoryOrder
+    .map((category) => ({
+      category,
+      label: CATEGORY_LABELS[category],
+      items: items.filter((i) => i.category === category),
+    }))
+    .filter((c) => c.items.length > 0);
+
+  return {
+    all: items,
+    earned: items.filter((i) => i.earned).length,
+    total: items.length,
+    categories,
+  };
+}
+
+export async function getAchievementProgress(playerId: string): Promise<{
+  earned: number;
+  total: number;
+  recentEarned: CollectionItem[];
+}> {
+  const data = await getCollections(playerId);
+  const recentEarned = data.all
+    .filter((i) => i.earned)
+    .sort(
+      (a, b) =>
+        new Date(b.earnedAt ?? 0).getTime() - new Date(a.earnedAt ?? 0).getTime(),
+    )
+    .slice(0, 3);
+
+  return {
+    earned: data.earned,
+    total: data.total,
+    recentEarned,
   };
 }

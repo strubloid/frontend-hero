@@ -53,6 +53,13 @@ export class DrizzlePlayerRepository implements PlayerRepository {
       masteryPoints: row.masteryPoints,
       currentSubjectId: row.currentSubjectId ?? null,
       currentRegionId: row.currentRegionId ?? null,
+      lastActiveAt: row.lastActiveAt ? new Date(row.lastActiveAt) : null,
+      lastReturnBonusClaimedAt: row.lastReturnBonusClaimedAt
+        ? new Date(row.lastReturnBonusClaimedAt)
+        : null,
+      selectedTitle: row.selectedTitle ?? null,
+      selectedTheme: row.selectedTheme ?? null,
+      workshopTier: row.workshopTier,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };
@@ -67,6 +74,11 @@ export class DrizzlePlayerRepository implements PlayerRepository {
       masteryPoints: player.masteryPoints,
       currentSubjectId: player.currentSubjectId,
       currentRegionId: player.currentRegionId,
+      lastActiveAt: player.lastActiveAt?.toISOString() ?? null,
+      lastReturnBonusClaimedAt: player.lastReturnBonusClaimedAt?.toISOString() ?? null,
+      selectedTitle: player.selectedTitle,
+      selectedTheme: player.selectedTheme,
+      workshopTier: player.workshopTier,
       createdAt: player.createdAt.toISOString(),
       updatedAt: player.updatedAt.toISOString(),
     };

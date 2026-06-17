@@ -233,6 +233,11 @@ describe("Walking skeleton — full flow", () => {
       masteryPoints: 0,
       currentSubjectId: null,
       currentRegionId: null,
+      lastActiveAt: null,
+      lastReturnBonusClaimedAt: null,
+      selectedTitle: null,
+      selectedTheme: null,
+      workshopTier: 1,
       createdAt: now,
       updatedAt: now,
     });

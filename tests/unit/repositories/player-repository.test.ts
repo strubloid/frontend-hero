@@ -19,16 +19,20 @@ describe("DrizzlePlayerRepository", () => {
   });
 
   const createSamplePlayer = (overrides: Partial<Player> = {}): Player => ({
-    id: "player-1",
-    name: "Test Hero",
-    level: 5,
-    experiencePoints: 1200,
-    masteryPoints: 350,
-    currentSubjectId: "nextjs",
-    currentRegionId: "region-1",
-    createdAt: new Date("2025-01-15T10:00:00Z"),
-    updatedAt: new Date("2025-01-15T10:00:00Z"),
-    ...overrides,
+    id: overrides.id ?? "player-1",
+    name: overrides.name ?? "Test Hero",
+    level: overrides.level ?? 5,
+    experiencePoints: overrides.experiencePoints ?? 1200,
+    masteryPoints: overrides.masteryPoints ?? 350,
+    currentSubjectId: overrides.currentSubjectId ?? "nextjs",
+    currentRegionId: overrides.currentRegionId ?? "region-1",
+    lastActiveAt: overrides.lastActiveAt ?? null,
+    lastReturnBonusClaimedAt: overrides.lastReturnBonusClaimedAt ?? null,
+    selectedTitle: overrides.selectedTitle ?? null,
+    selectedTheme: overrides.selectedTheme ?? null,
+    workshopTier: overrides.workshopTier ?? 1,
+    createdAt: overrides.createdAt ?? new Date("2025-01-15T10:00:00Z"),
+    updatedAt: overrides.updatedAt ?? new Date("2025-01-15T10:00:00Z"),
   });
 
   describe("create", () => {
