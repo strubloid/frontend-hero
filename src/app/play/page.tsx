@@ -1,12 +1,13 @@
 "use client";
 
 import { Suspense } from "react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   startMission as startMissionAction,
   submitAnswer as submitAnswerAction,
 } from "@/app/actions/missions";
+import { useToast } from "@/components/toast-provider";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,6 +69,8 @@ function PlayPageInner() {
   const subjectId = searchParams.get("subject") ?? "nextjs";
   const [phase, setPhase] = useState<Phase>({ state: "loading" });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const { addToast } = useToast();
+  const xpToastRef = useRef(false);
 
   // On mount: check for active mission
   const checkActiveMission = useCallback(async () => {
@@ -97,6 +100,23 @@ function PlayPageInner() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     checkActiveMission();
   }, [checkActiveMission]);
+
+  // Toast for XP feedback
+  useEffect(() => {
+    if (phase.state === "feedback" && phase.feedback.xpAwarded > 0 && !xpToastRef.current) {
+      xpToastRef.current = true;
+      addToast({
+        type: phase.feedback.isCorrect ? "info" : "error",
+        title: phase.feedback.isCorrect ? `+${phase.feedback.xpAwarded} XP` : "Incorrect",
+        description: phase.feedback.isCorrect
+          ? `Mastery: ${Math.round(phase.feedback.updatedMastery * 100)}%`
+          : "Review the explanation and try again.",
+        duration: 2500,
+      });
+    } else if (phase.state !== "feedback") {
+      xpToastRef.current = false;
+    }
+  }, [phase, addToast]);
 
   // Start a new mission
   const handleStart = async () => {

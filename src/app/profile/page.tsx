@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getPlayerProfile } from "@/app/actions/profile";
 import type { PlayerProfileData } from "@/app/actions/profile";
+import { useToast } from "@/components/toast-provider";
 
 const TYPE_ICONS: Record<string, string> = {
   mission: "✓",
@@ -14,6 +15,55 @@ const TYPE_ICONS: Record<string, string> = {
 export default function ProfilePage() {
   const [profile, setProfile] = useState<PlayerProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { addToast } = useToast();
+  const notifiedRef = useRef(false);
+
+  // Detect new achievements and level-ups on first load
+  useEffect(() => {
+    if (!profile || notifiedRef.current) return;
+    const lastSeen = typeof window !== "undefined"
+      ? sessionStorage.getItem("hermes-last-profile")
+      : null;
+    notifiedRef.current = true;
+
+    const prev = lastSeen ? JSON.parse(lastSeen) : null;
+
+    // Level-up detection
+    if (prev && prev.level < profile.player.level) {
+      addToast({
+        type: "level-up",
+        title: `Level ${profile.player.level}!`,
+        description: `You advanced from level ${prev.level}. Keep it up!`,
+      });
+    }
+
+    // Achievement detection
+    if (profile.achievements && profile.achievements.length > 0) {
+      const prevCount = prev?.achievementCount ?? 0;
+      const newAchievements = profile.achievements.filter(
+        (_, i) => i >= prevCount && i < profile.achievements!.length,
+      );
+      if (prev && newAchievements.length > 0) {
+        for (const a of newAchievements.slice(0, 3)) {
+          addToast({
+            type: "achievement",
+            title: `Achievement: ${a.name}`,
+            description: a.description,
+            icon: a.icon ?? undefined,
+          });
+        }
+      }
+    }
+
+    // Save current state for next visit
+    sessionStorage.setItem(
+      "hermes-last-profile",
+      JSON.stringify({
+        level: profile.player.level,
+        achievementCount: profile.achievements?.length ?? 0,
+      }),
+    );
+  }, [profile, addToast]);
 
   useEffect(() => {
     async function load() {
