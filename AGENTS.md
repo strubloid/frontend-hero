@@ -56,22 +56,22 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 0 — Research and Product Definition (Complete)**
+**Current Phase: Phase 3 — Learning Engine (Complete)**
 
-Phase 0 delivered all research documents, product vision, game design docs, architecture docs, testing strategy, and this AGENTS.md. No implementation code has been written beyond the initial Next.js scaffold.
+Phase 3 delivered the full learning engine: mastery module (score, confidence, retention, weakness detection), reviews module (SM-2 spaced repetition), upgraded mission selector (4-tier priority pipeline), difficulty adaptation, and repetition control. 170 tests pass.
 
-**Next Phase: Phase 1 — Walking Skeleton**
+**Next Phase: Phase 4 — Game Foundation**
 
-Build the smallest complete vertical flow: load subject → parse concept → create question → start mission → submit answer → evaluate → save → display feedback. See `docs/project-status.md` for detailed task breakdown.
+Build the game world: world map, regions, mission chains, XP/level system, rewards, narrative, achievements, boss encounters, player profile. See `docs/project-status.md` for detailed task breakdown.
 
 ### Phase Overview
 
 | Phase   | Name                            | Status      |
 | ------- | ------------------------------- | ----------- |
 | Phase 0 | Research and Product Definition | ✅ Complete |
-| Phase 1 | Walking Skeleton                | ⏳ Planned  |
-| Phase 2 | Subject Engine                  | ⏳ Planned  |
-| Phase 3 | Learning Engine                 | ⏳ Planned  |
+| Phase 1 | Walking Skeleton                | ✅ Complete |
+| Phase 2 | Subject Engine                  | ✅ Complete |
+| Phase 3 | Learning Engine                 | ✅ Complete |
 | Phase 4 | Game Foundation                 | ⏳ Planned  |
 | Phase 5 | Big Pickle Integration          | ⏳ Planned  |
 | Phase 6 | Challenge Variety               | ⏳ Planned  |
@@ -188,7 +188,8 @@ module-name/
 - **missions** owns mission lifecycle — must NOT persist player data.
 - **mastery** owns mastery calculation — must NOT generate questions.
 - **questions** owns question models — must NOT call AI directly.
-- **reviews** owns review scheduling — must NOT calculate mastery.
+- **mastery** owns all concept mastery scoring, confidence, retention, and weakness detection — must NOT depend on reviews or questions.
+- **reviews** owns review scheduling and SM-2 algorithm — must NOT calculate mastery.
 - **rewards** owns XP and achievements — must NOT define progression rules.
 - **subjects** owns file parsing — must NOT depend on any other module's domain.
 - See `docs/architecture/module-boundaries.md` for complete rules.
@@ -521,14 +522,15 @@ See `docs/architecture/extension-points.md` for the complete Drag-and-Drop examp
 
 ## 11. Current Limitations
 
-### Project-Level Limitations
+### Current Limitations
 
-1. **No implementation exists yet** beyond the Next.js scaffold. The architecture is fully documented but not coded. All `src/modules/` directories are empty.
-2. **`subjects/nextjs.md` is empty** — needs concept content before Phase 1 can begin.
-3. **No test runner configured** — Vitest needs to be installed and configured.
-4. **No database schema or migrations** — needs to be created in Phase 1.
-5. **No CI/CD pipeline** — GitHub Actions workflows need to be created.
-6. **No Docker or Fly.io configuration** — `Dockerfile`, `fly.toml`, scripts are not yet created.
+1. **No world map or game UI** — The game world is still flat routes (`/`, `/subjects`, `/play`). No world map, regions, mission chains, or visual game environment exists yet.
+2. **No XP/level system** — Player progression is tracked through mastery and review schedules but there's no XP accumulation, level-up, or reward system.
+3. **No Big Pickle integration** — All questions come from subject file seeds. AI generation and evaluation (Phase 5) is not yet implemented.
+4. **No persistent database** — All data uses in-memory repositories. Phase 8 will add a real database.
+5. **No Docker or Fly.io** — Containerization and deployment configuration (Dockerfile, fly.toml) are documented requirements but not yet implemented.
+6. **No CI/CD pipeline** — GitHub Actions workflows need to be created.
+7. **`subjects/nextjs.md` is still sparse** — needs more concept content for a richer learning experience.
 
 ### Architectural Limitations (by Design)
 
