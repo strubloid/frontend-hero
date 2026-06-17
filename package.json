@@ -1,0 +1,43 @@
+{
+  "name": "frontend-realms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "test": "echo 'TODO: add test runner' && exit 0",
+    "test:unit": "echo 'TODO: add unit tests' && exit 0",
+    "test:integration": "echo 'TODO: add integration tests' && exit 0",
+    "verify": "npm run format:check && npm run lint && npm run type-check && npm run build",
+    "verify:full": "npm run verify && npm run test",
+    "docker:build": "docker build -t frontend-realms .",
+    "docker:run": "docker run --rm -p 3000:3000 frontend-realms",
+    "docker:verify": "node scripts/verify-docker-image.mjs",
+    "fly:validate": "fly config validate",
+    "fly:deploy": "fly deploy",
+    "fly:status": "fly status",
+    "fly:logs": "fly logs"
+  },
+  "dependencies": {
+    "next": "16.2.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.4",
+    "sass": "^1.101.0",
+    "typescript": "^5"
+  }
+}

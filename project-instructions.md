@@ -272,7 +272,9 @@ Unlock or schedule the next relevant challenge
 ### Required Mission Types
 
 #### 4.1 Knowledge Encounters
+
 Short questions assessing precise concepts:
+
 - Multiple choice
 - Multiple selection
 - True or false with justification
@@ -282,7 +284,9 @@ Short questions assessing precise concepts:
 - Identify the incorrect statement
 
 #### 4.2 Code Forensics
+
 The player inspects code and determines:
+
 - What happens
 - Why it happens
 - What is broken
@@ -292,7 +296,9 @@ The player inspects code and determines:
 - Which architectural principle is violated
 
 #### 4.3 Bug Hunts
+
 Present realistic Next.js defects such as:
+
 - Hydration mismatches
 - Incorrect server/client boundaries
 - Stale caching
@@ -308,7 +314,9 @@ Present realistic Next.js defects such as:
 - Test instability
 
 #### 4.4 Refactoring Missions
+
 The player improves weak code while preserving behaviour. Assess:
+
 - Naming
 - Cohesion
 - Coupling
@@ -322,7 +330,9 @@ The player improves weak code while preserving behaviour. Assess:
 - Accessibility
 
 #### 4.5 Architecture Council
+
 Present several valid-looking designs and ask the player to select or construct the most appropriate one. The player must explain trade-offs involving:
+
 - Server Components
 - Client Components
 - Rendering strategy
@@ -339,7 +349,9 @@ Present several valid-looking designs and ask the player to select or construct 
 - Failure recovery
 
 #### 4.6 Production Incidents
+
 Simulate a production incident with:
+
 - Symptoms
 - Logs
 - Metrics
@@ -352,9 +364,11 @@ Simulate a production incident with:
 The player must diagnose and resolve the incident in stages.
 
 #### 4.7 Boss Battles
+
 A boss tests several connected concepts, not one memorized answer.
 
 Examples:
+
 - The Hydration Hydra
 - The Cache Phantom
 - The Bundle Behemoth
@@ -365,6 +379,7 @@ Examples:
 - The Production Outage
 
 Phases:
+
 ```
 Phase 1: Recognize the symptoms
 Phase 2: Identify the cause
@@ -374,7 +389,9 @@ Phase 5: Prevent regression with tests
 ```
 
 #### 4.8 Build Quests
+
 The player gradually constructs real features inside a controlled project. Examples:
+
 - Typed search interface
 - Server-rendered product page
 - Authentication
@@ -389,7 +406,9 @@ The player gradually constructs real features inside a controlled project. Examp
 - End-to-end tests
 
 #### 4.9 Interview Arenas
+
 Simulate senior frontend interviews:
+
 - Concise verbal questions
 - Follow-up questions
 - Architecture discussions
@@ -400,6 +419,7 @@ Simulate senior frontend interviews:
 - Time-limited rounds where appropriate
 
 Evaluate more than keyword matching. Assess:
+
 - Accuracy
 - Completeness
 - Clarity
@@ -409,7 +429,9 @@ Evaluate more than keyword matching. Assess:
 - Communication quality
 
 #### 4.10 Prediction Challenges
+
 Show code and ask the player to predict:
+
 - Render behaviour
 - Execution order
 - Event-loop order
@@ -420,7 +442,9 @@ Show code and ask the player to predict:
 - Server/client execution boundaries
 
 #### 4.11 Explain-It Challenges
+
 Ask the player to explain a concept simply, as they would in an interview. Evaluate whether the response is:
+
 - Technically correct
 - Clear
 - Properly scoped
@@ -473,12 +497,14 @@ Ask the player to explain a concept simply, as they would in an interview. Evalu
 ### Mastery-Based Progression
 
 **XP and mastery are different.**
+
 - XP = engagement and completed activity
 - Mastery = demonstrated understanding over time
 
 Unlock advanced content primarily through mastery. A concept should not be marked mastered after one correct answer.
 
 Evidence required for mastery:
+
 - Correct answers over multiple sessions
 - Confidence level
 - Time since last review
@@ -492,6 +518,7 @@ Evidence required for mastery:
 ### Humane Streaks
 
 Support:
+
 - Grace days
 - Streak recovery missions
 - Weekly consistency goals
@@ -502,6 +529,7 @@ Support:
 ### Reward Design
 
 Rewards should include:
+
 - New world areas
 - New mission types
 - Character or workspace cosmetics
@@ -526,25 +554,26 @@ Track each concept independently:
 
 ```ts
 export interface ConceptMastery {
-    conceptId: string;
-    subjectId: string;
-    masteryScore: number;
-    confidenceScore: number;
-    retentionScore: number;
-    difficultyRating: number;
-    correctAttempts: number;
-    incorrectAttempts: number;
-    consecutiveCorrectAnswers: number;
-    lastAttemptedAt: Date | null;
-    nextReviewAt: Date | null;
-    demonstratedContexts: DemonstratedContext[];
-    commonMistakes: string[];
+  conceptId: string;
+  subjectId: string;
+  masteryScore: number;
+  confidenceScore: number;
+  retentionScore: number;
+  difficultyRating: number;
+  correctAttempts: number;
+  incorrectAttempts: number;
+  consecutiveCorrectAnswers: number;
+  lastAttemptedAt: Date | null;
+  nextReviewAt: Date | null;
+  demonstratedContexts: DemonstratedContext[];
+  commonMistakes: string[];
 }
 ```
 
 ### Decision Engine
 
 The engine must decide whether to:
+
 - Introduce a prerequisite
 - Teach a new concept
 - Review a decaying concept
@@ -591,6 +620,7 @@ Present mission
 ### Foundation Areas
 
 #### HTML & CSS
+
 - Semantic HTML
 - Accessibility (WCAG)
 - CSS fundamentals
@@ -598,6 +628,7 @@ Present mission
 - SCSS architecture
 
 #### JavaScript Fundamentals
+
 - Scope
 - Closures
 - Objects
@@ -608,6 +639,7 @@ Present mission
 - Error handling
 
 #### Asynchronous JavaScript
+
 - Event loop
 - Call stack
 - Microtasks and macrotasks
@@ -615,6 +647,7 @@ Present mission
 - Async/await
 
 #### Browser & Web
+
 - Browser APIs
 - HTTP
 - REST
@@ -623,6 +656,7 @@ Present mission
 - Security fundamentals
 
 #### TypeScript
+
 - Fundamentals
 - Generics
 - Unions
@@ -892,6 +926,7 @@ Question and mission engine
 ### Storage Requirements
 
 Store for each question:
+
 - Generated question text
 - Normalized concept
 - Challenge type
@@ -947,11 +982,11 @@ Create a central class named `BigPickle` implementing the `ArtificialIntelligenc
 
 ```ts
 export interface ArtificialIntelligenceGateway {
-    generateQuestion(request: GenerateQuestionRequest): Promise<GenerateQuestionResult>;
-    evaluateAnswer(request: EvaluateAnswerRequest): Promise<EvaluateAnswerResult>;
-    generateExplanation(request: GenerateExplanationRequest): Promise<GenerateExplanationResult>;
-    generateHint(request: GenerateHintRequest): Promise<GenerateHintResult>;
-    generateMission(request: GenerateMissionRequest): Promise<GenerateMissionResult>;
+  generateQuestion(request: GenerateQuestionRequest): Promise<GenerateQuestionResult>;
+  evaluateAnswer(request: EvaluateAnswerRequest): Promise<EvaluateAnswerResult>;
+  generateExplanation(request: GenerateExplanationRequest): Promise<GenerateExplanationResult>;
+  generateHint(request: GenerateHintRequest): Promise<GenerateHintResult>;
+  generateMission(request: GenerateMissionRequest): Promise<GenerateMissionResult>;
 }
 ```
 
@@ -1028,6 +1063,7 @@ Never send the entire large subject file when only one concept is needed. Use a 
 ### Output Validation
 
 Validate every generated question for:
+
 - Required fields
 - Correct-answer consistency
 - Duplicate options
@@ -1060,24 +1096,24 @@ The application must boot even when Big Pickle is unavailable, provided approved
 
 ### Required
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Latest stable Next.js (verify against official docs) |
-| Router | App Router (unless current official recommendations say otherwise) |
-| Language | TypeScript with strict mode |
-| UI | React |
-| Styling | SCSS + CSS Modules where appropriate |
-| Backend | Next.js server-side functionality |
-| Database | Relational database with ORM / typed database layer |
-| Schema validation | Dedicated validation library |
-| Unit testing | Standard framework |
-| Integration testing | Standard framework |
-| Component testing | Standard framework |
-| E2E testing | Standard framework |
-| Linting | ESLint |
-| Formatting | Prettier |
-| Accessibility testing | axe or equivalent |
-| CI | GitHub Actions or equivalent |
+| Layer                 | Technology                                                         |
+| --------------------- | ------------------------------------------------------------------ |
+| Framework             | Latest stable Next.js (verify against official docs)               |
+| Router                | App Router (unless current official recommendations say otherwise) |
+| Language              | TypeScript with strict mode                                        |
+| UI                    | React                                                              |
+| Styling               | SCSS + CSS Modules where appropriate                               |
+| Backend               | Next.js server-side functionality                                  |
+| Database              | Relational database with ORM / typed database layer                |
+| Schema validation     | Dedicated validation library                                       |
+| Unit testing          | Standard framework                                                 |
+| Integration testing   | Standard framework                                                 |
+| Component testing     | Standard framework                                                 |
+| E2E testing           | Standard framework                                                 |
+| Linting               | ESLint                                                             |
+| Formatting            | Prettier                                                           |
+| Accessibility testing | axe or equivalent                                                  |
+| CI                    | GitHub Actions or equivalent                                       |
 
 ### Architecture Layers
 
@@ -1132,6 +1168,7 @@ QuestionEvaluator
 ```
 
 Adding a new question type requires:
+
 - A new question type object
 - A new evaluator
 - A new renderer
@@ -1158,23 +1195,27 @@ A use case should read like a sequence of business actions:
 
 ```ts
 export class StartMissionUseCase {
-    constructor(
-        private readonly playerRepository: PlayerRepository,
-        private readonly curriculumRepository: CurriculumRepository,
-        private readonly missionSelector: MissionSelector,
-        private readonly questionProvider: QuestionProvider,
-        private readonly missionRepository: MissionRepository
-    ) {}
+  constructor(
+    private readonly playerRepository: PlayerRepository,
+    private readonly curriculumRepository: CurriculumRepository,
+    private readonly missionSelector: MissionSelector,
+    private readonly questionProvider: QuestionProvider,
+    private readonly missionRepository: MissionRepository,
+  ) {}
 
-    async execute(request: StartMissionRequest): Promise<StartMissionResult> {
-        const player = await this.playerRepository.getById(request.playerId);
-        const curriculum = await this.curriculumRepository.getBySubjectId(request.subjectId);
-        const missionPlan = this.missionSelector.select({ player, curriculum, requestedMode: request.mode });
-        const questions = await this.questionProvider.provideFor(missionPlan);
-        const mission = missionPlan.createMission(questions);
-        await this.missionRepository.save(mission);
-        return StartMissionResult.from(mission);
-    }
+  async execute(request: StartMissionRequest): Promise<StartMissionResult> {
+    const player = await this.playerRepository.getById(request.playerId);
+    const curriculum = await this.curriculumRepository.getBySubjectId(request.subjectId);
+    const missionPlan = this.missionSelector.select({
+      player,
+      curriculum,
+      requestedMode: request.mode,
+    });
+    const questions = await this.questionProvider.provideFor(missionPlan);
+    const mission = missionPlan.createMission(questions);
+    await this.missionRepository.save(mission);
+    return StartMissionResult.from(mission);
+  }
 }
 ```
 
@@ -1321,6 +1362,7 @@ Do not create empty architectural folders without a real need. Add folders incre
 ### Modular Extension System
 
 Design extension points for:
+
 - New subjects
 - New question types
 - New mission types
@@ -1337,9 +1379,9 @@ Use registries or dependency injection where appropriate:
 
 ```ts
 export interface QuestionTypeModule {
-    getType(): QuestionType;
-    createEvaluator(): QuestionEvaluator;
-    createValidator(): QuestionValidator;
+  getType(): QuestionType;
+  createEvaluator(): QuestionEvaluator;
+  createValidator(): QuestionValidator;
 }
 ```
 
@@ -1365,6 +1407,7 @@ The application must look and feel like a premium game interface. **Do not creat
 ### Visual Direction
 
 Create a coherent visual world:
+
 - Futuristic digital-realm environment
 - Dark atmospheric base
 - Layered depth
@@ -1406,6 +1449,7 @@ The design must remain professional enough for an experienced developer while st
 ### Animation Principles
 
 Use animation to clarify:
+
 - Correct reasoning
 - Incorrect reasoning
 - Region unlocking
@@ -1416,6 +1460,7 @@ Use animation to clarify:
 - Review readiness
 
 Animations must not delay the user unnecessarily. Provide:
+
 - Reduced motion mode
 - Keyboard navigation
 - Screen-reader labels
@@ -1435,6 +1480,7 @@ styles/
 ```
 
 Feature-specific SCSS stays near the feature. Use design tokens for:
+
 - Spacing
 - Typography
 - Elevation
@@ -1469,12 +1515,14 @@ The first session must not assume the player is a complete beginner. Create an e
 ### Adaptive Diagnostic
 
 The diagnostic must be adaptive:
+
 - Do not make the user answer hundreds of questions before playing
 - Use confidence and follow-up questions to estimate initial mastery
 
 ### Diagnostic Output
 
 The diagnostic should produce:
+
 - Skill map
 - Strong areas
 - Weak areas
@@ -1492,6 +1540,7 @@ Allow the user to challenge the placement by attempting a region gate.
 ### Feedback Quality
 
 Never respond only with "Correct" / "Incorrect". Feedback should explain:
+
 - Why the answer is correct or incorrect
 - What concept was being tested
 - Why the mistake is common
@@ -1514,6 +1563,7 @@ Using hints may reduce immediate mission rewards but must not prevent learning p
 ### Repair Actions
 
 After an incorrect answer, allow a repair action:
+
 - Try again with a smaller hint
 - Explain the correction
 - Solve a related example
@@ -1647,6 +1697,7 @@ npm run verify
 ```
 
 Must run in fail-fast order:
+
 1. Environment validation
 2. Formatting check
 3. Lint
@@ -1663,6 +1714,7 @@ Provide `npm run verify:full` for exhaustive checks (includes full E2E, Docker b
 ### Testing Integrity
 
 Do not fix tests by:
+
 - Deleting them
 - Weakening assertions
 - Adding broad skips
@@ -1723,6 +1775,7 @@ Production runtime
 ```
 
 Requirements:
+
 - Use a supported Node.js LTS image (alpine variant preferred)
 - Run as a non-root user
 - Deterministic package installation (`npm ci`)
@@ -1740,7 +1793,7 @@ Next.js config for standalone output (verify against current docs):
 
 ```ts
 const nextConfig = {
-    output: "standalone"
+  output: "standalone",
 };
 ```
 
@@ -1749,6 +1802,7 @@ The production server must use `PORT` from the environment — never assume port
 ### Fly.io Configuration (`fly.toml`)
 
 Must configure:
+
 - Application name (via deployment config)
 - Primary region
 - Internal application port
@@ -1765,6 +1819,7 @@ Must configure:
 - Persistent volumes (only when truly required)
 
 **Do not store secrets in `fly.toml`.** Use `fly secrets set` for:
+
 - Database URLs
 - Authentication secrets
 - Big Pickle / OpenCode credentials
@@ -1776,24 +1831,26 @@ Must configure:
 
 Implement dedicated health endpoints:
 
-| Endpoint | Purpose | Dependencies |
-|----------|---------|-------------|
-| `/api/health/live` | Process is running | None (must not depend on external services) |
+| Endpoint            | Purpose             | Dependencies                                |
+| ------------------- | ------------------- | ------------------------------------------- |
+| `/api/health/live`  | Process is running  | None (must not depend on external services) |
 | `/api/health/ready` | Can receive traffic | Database, config, subjects (NOT Big Pickle) |
 
 Response format:
+
 ```json
 {
-    "status": "healthy",
-    "checks": {
-        "application": "healthy",
-        "database": "healthy",
-        "subjects": "healthy"
-    }
+  "status": "healthy",
+  "checks": {
+    "application": "healthy",
+    "database": "healthy",
+    "subjects": "healthy"
+  }
 }
 ```
 
 Requirements:
+
 - JSON responses
 - Appropriate HTTP status codes
 - No secrets or internal stack traces exposed
@@ -1814,6 +1871,7 @@ Requirements:
 Start with one web process. Do not introduce separate workers until asynchronous workload requires it.
 
 Potential future process groups:
+
 ```
 web
 question-generation-worker
@@ -1822,6 +1880,7 @@ content-validation-worker
 ```
 
 When workers are introduced:
+
 - Use Fly.io process groups, separate Fly applications, or Machines
 - Keep every process narrowly responsible
 - Use a durable queue, idempotent jobs, retry limits, dead-letter handling
@@ -1848,6 +1907,7 @@ Startup must fail clearly when mandatory production configuration is missing. Er
 ### Graceful Shutdown
 
 On shutdown:
+
 1. Stop accepting new work
 2. Complete or cancel in-flight operations safely
 3. Close database connections
@@ -1862,15 +1922,15 @@ Long-running AI requests must support cancellation. Do not allow shutdown to lea
 
 ```json
 {
-    "scripts": {
-        "docker:build": "docker build -t frontend-realms .",
-        "docker:run": "docker run --rm -p 3000:3000 frontend-realms",
-        "docker:verify": "node scripts/verify-docker-image.mjs",
-        "fly:validate": "fly config validate",
-        "fly:deploy": "fly deploy",
-        "fly:status": "fly status",
-        "fly:logs": "fly logs"
-    }
+  "scripts": {
+    "docker:build": "docker build -t frontend-realms .",
+    "docker:run": "docker run --rm -p 3000:3000 frontend-realms",
+    "docker:verify": "node scripts/verify-docker-image.mjs",
+    "fly:validate": "fly config validate",
+    "fly:deploy": "fly deploy",
+    "fly:status": "fly status",
+    "fly:logs": "fly logs"
+  }
 }
 ```
 
@@ -1912,6 +1972,7 @@ Production deployment must not occur when tests fail. Do not store Fly.io API to
 ### Rollback Strategy
 
 Document how to:
+
 - Inspect releases
 - Inspect Machine status
 - View logs
@@ -1925,6 +1986,7 @@ Application changes and database migrations should support rollback whenever pra
 ### Observability
 
 Prepare for production diagnosis:
+
 - Structured logs
 - Request correlation identifiers
 - Error reporting
@@ -1937,6 +1999,7 @@ Prepare for production diagnosis:
 - Question-validation rejection metrics
 
 Logs must include useful context but **exclude**:
+
 - Passwords
 - Access tokens
 - Session tokens
@@ -1963,6 +2026,7 @@ Next.js web Machines → Durable job queue → Question-generation worker Machin
 ### Deployment Definition of Done
 
 Fly.io preparation is complete only when:
+
 - [ ] Production Docker image builds successfully
 - [ ] Container runs as a non-root user
 - [ ] Application listens on configured host and port
@@ -1997,6 +2061,7 @@ Create persistent project skills in `.opencode/skills/`:
 ### Project Architecture Skill
 
 Instruct every agent to:
+
 - Preserve module boundaries
 - Follow SOLID
 - Keep readable orchestration flows
@@ -2012,6 +2077,7 @@ Instruct every agent to:
 ### Testing Skill
 
 Instruct every agent to:
+
 1. Identify affected behaviour
 2. Add or update tests before or with the implementation
 3. Run focused tests during development
@@ -2025,6 +2091,7 @@ Instruct every agent to:
 ### Subject Authoring Skill
 
 Explain:
+
 - Subject schema
 - Concept identifiers
 - Prerequisite rules
@@ -2039,6 +2106,7 @@ Explain:
 ### Game Design Skill
 
 Enforce:
+
 - Meaningful progression
 - Variety
 - Learning-first rewards
@@ -2052,6 +2120,7 @@ Enforce:
 ### Big Pickle Skill
 
 Enforce:
+
 - Calls through `BigPickle`
 - Server-only credentials
 - Structured output
@@ -2066,6 +2135,7 @@ Enforce:
 ### Change Validation Skill
 
 Before completing any change, review:
+
 ```
 Does the change preserve the readable main flow?
 Did a class gain more than one responsibility?
@@ -2086,6 +2156,7 @@ Did the change preserve subject independence?
 ### AGENTS.md
 
 The primary entry point for any future AI agent. Must explain:
+
 - Product purpose
 - Current implementation phase
 - Architecture
@@ -2137,6 +2208,7 @@ docs/decisions/
 ```
 
 Each ADR includes:
+
 - Context
 - Decision
 - Alternatives considered
@@ -2152,6 +2224,7 @@ Do not create an ADR for trivial implementation details.
 ### Phase 0 — Research and Product Definition
 
 Deliver:
+
 - Market analysis
 - Learning-science analysis
 - Differentiated product concept
@@ -2190,6 +2263,7 @@ Include authentication only when required for persistence. Include tests.
 ### Phase 2 — Subject Engine
 
 Implement:
+
 - Subject schema
 - Parser
 - Validator
@@ -2202,6 +2276,7 @@ Implement:
 ### Phase 3 — Learning Engine
 
 Implement:
+
 - Mastery
 - Confidence
 - Review scheduling
@@ -2213,6 +2288,7 @@ Implement:
 ### Phase 4 — Game Foundation
 
 Implement:
+
 - World map
 - Regions
 - Missions
@@ -2226,6 +2302,7 @@ Implement:
 ### Phase 5 — Big Pickle Integration
 
 Implement:
+
 - `BigPickle` class and `ArtificialIntelligenceGateway` interface
 - Configuration
 - Structured requests and responses
@@ -2238,6 +2315,7 @@ Implement:
 ### Phase 6 — Challenge Variety
 
 Add challenge types one at a time:
+
 1. Knowledge encounter
 2. Code prediction
 3. Bug hunt
@@ -2252,6 +2330,7 @@ Each requires: domain model, evaluator, renderer, validation, tests, registratio
 ### Phase 7 — Advanced Game Experience
 
 Add:
+
 - Animated world
 - Story progression
 - Collections
@@ -2265,6 +2344,7 @@ Add:
 ### Phase 8 — Production Readiness
 
 Add:
+
 - Security review
 - Performance profiling
 - Accessibility audit
@@ -2278,6 +2358,7 @@ Add:
 ### Phase-End Checklist
 
 At the end of each phase:
+
 1. Run focused tests
 2. Run `npm run verify`
 3. Run relevant end-to-end scenarios
@@ -2351,16 +2432,16 @@ For every requested change:
 
 ## 29. Project Name & Folder
 
-| Field | Value |
-|-------|-------|
-| Project name | `frontend-realms` (provisional; may evolve) |
-| Project folder | `frontend-hero/` (current working directory — may be renamed to match project name) |
-| Initial subject | `subjects/nextjs.md` |
-| Initial region set | The Frontend Realms (13 regions listed in section 2) |
-| AI provider | Big Pickle via OpenCode Zen (configuration-driven) |
-| Deployment | Fly.io via Docker (no Kubernetes) |
-| Database | PostgreSQL-compatible managed service (production); SQLite acceptable for local dev/test only |
+| Field              | Value                                                                                         |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| Project name       | `frontend-realms` (provisional; may evolve)                                                   |
+| Project folder     | `frontend-hero/` (current working directory — may be renamed to match project name)           |
+| Initial subject    | `subjects/nextjs.md`                                                                          |
+| Initial region set | The Frontend Realms (13 regions listed in section 2)                                          |
+| AI provider        | Big Pickle via OpenCode Zen (configuration-driven)                                            |
+| Deployment         | Fly.io via Docker (no Kubernetes)                                                             |
+| Database           | PostgreSQL-compatible managed service (production); SQLite acceptable for local dev/test only |
 
 ---
 
-*End of project instructions. This document is the single source of truth for all implementation agents. When in doubt, revisit this file before making architectural decisions.*
+_End of project instructions. This document is the single source of truth for all implementation agents. When in doubt, revisit this file before making architectural decisions._
