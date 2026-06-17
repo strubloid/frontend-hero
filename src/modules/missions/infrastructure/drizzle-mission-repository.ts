@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import * as schema from "@/shared/infrastructure/database/schema";
 import type {
   MissionRepository,
@@ -50,6 +50,7 @@ export class DrizzleMissionRepository implements MissionRepository {
       .select()
       .from(schema.missions)
       .where(and(eq(schema.missions.playerId, playerId), eq(schema.missions.status, "active")))
+      .orderBy(desc(schema.missions.startedAt))
       .limit(1);
 
     if (rows.length === 0) {

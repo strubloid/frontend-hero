@@ -8,7 +8,8 @@ Frontend Realms now has an idempotent SQLite bootstrap path for durable Fly.io v
 - Runtime SQLite connections create missing parent directories and bootstrap the schema through `src/shared/infrastructure/database/connection.ts`.
 - Local and production migration/bootstrap command: `npm run db:migrate`.
 - Fly.io config mounts a persistent volume at `/data` and sets `DB_PATH=/data/frontend-realms.db`.
-- Some gameplay flows still use server-side in-memory repository singletons and must be migrated before real multi-user launch.
+- Mission gameplay now persists players, missions, mission attempts, and generated questions through Drizzle/SQLite-backed repositories.
+- Subject, mastery, review, achievement, quest, mission-chain, boss, and progression stores still use server-side in-memory repository singletons and must be migrated before real multi-user launch.
 - Production PostgreSQL remains the future managed-database target once repository coverage is complete.
 
 ## Production Database Target

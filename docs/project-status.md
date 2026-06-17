@@ -614,9 +614,11 @@ Delivered:
 3. [x] Added `npm run db:migrate` via `scripts/migrate-database.ts` to make local/Fly database initialization an explicit operational command.
 4. [x] Fly.io config now mounts `frontend_realms_data` at `/data` and sets `DB_PATH=/data/frontend-realms.db` for durable SQLite volume storage.
 5. [x] Disposable database tests cover first-open bootstrap and idempotent repeat bootstrap.
-6. [ ] Wire all gameplay app actions to durable repositories instead of in-memory singleton stores.
-7. [ ] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
-8. [ ] Run a real backup/restore drill against the Fly volume or future managed database.
+6. [x] Mission gameplay action now uses Drizzle/SQLite-backed repositories for player, mission, mission-attempt, and question persistence.
+7. [x] Mission repository returns the latest active mission when multiple active rows exist, preserving the previous in-memory active-mission behavior.
+8. [ ] Wire subject, mastery, review, achievement, quest, mission-chain, boss, and progression app-action stores to durable repositories.
+9. [ ] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
+10. [ ] Run a real backup/restore drill against the Fly volume or future managed database.
 
 Files created:
 
@@ -626,6 +628,9 @@ Files created:
 
 Files updated:
 
+- `src/app/actions/missions.ts` — mission gameplay now uses durable Drizzle/SQLite-backed player, mission, mission-attempt, and question repositories.
+- `src/modules/missions/infrastructure/drizzle-mission-repository.ts` — active mission lookup now returns the most recently started active mission.
+- `tests/unit/repositories/mission-repository.test.ts` — covers latest-active mission selection.
 - `src/shared/infrastructure/database/connection.ts` — runtime parent-directory creation and automatic table bootstrap.
 - `tests/fixtures/create-tables.ts` — test fixture now delegates to shared schema bootstrap.
 - `package.json` — added `db:migrate` script.

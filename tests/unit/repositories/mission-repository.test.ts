@@ -103,6 +103,20 @@ describe("DrizzleMissionRepository", () => {
       expect(result!.status).toBe("active");
     });
 
+    it("returns the most recently started active mission when several exist", async () => {
+      await repository.create(
+        createSampleMission({ id: "mission-old", startedAt: new Date("2025-01-15T10:00:00Z") }),
+      );
+      await repository.create(
+        createSampleMission({ id: "mission-new", startedAt: new Date("2025-01-15T11:00:00Z") }),
+      );
+
+      const result = await repository.getActiveByPlayer("player-1");
+
+      expect(result).not.toBeNull();
+      expect(result!.id).toBe("mission-new");
+    });
+
     it("returns null when player has no active mission", async () => {
       await repository.create(
         createSampleMission({ id: "mission-completed", status: "completed" }),
