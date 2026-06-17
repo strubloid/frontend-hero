@@ -41,5 +41,6 @@ export interface PlayerMissionChainProgress {
   completedStepIds: string[];
   startedAt: Date;
   completedAt: Date | null;
+  updatedAt: Date;
   isActive: boolean;
 }

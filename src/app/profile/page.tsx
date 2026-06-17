@@ -37,9 +37,37 @@ export default function ProfilePage() {
             ← Home
           </Link>
         </nav>
-        <div className="profile-loading">
-          <div className="loading-spinner" />
-          <p>Loading profile...</p>
+        <div className="profile-skeleton">
+          <div className="skeleton-header-row">
+            <div className="skeleton-avatar pulse" />
+            <div className="skeleton-header-text">
+              <div className="skeleton-line skeleton-name pulse" />
+              <div className="skeleton-line skeleton-title pulse" />
+            </div>
+          </div>
+          <div className="skeleton-stats-grid">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="skeleton-stat-box pulse" />
+            ))}
+          </div>
+          <div className="skeleton-card">
+            <div className="skeleton-line skeleton-section-title pulse" />
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="skeleton-mastery-row">
+                <div className="skeleton-line skeleton-label pulse" />
+                <div className="skeleton-bar pulse" />
+                <div className="skeleton-line skeleton-pct pulse" />
+              </div>
+            ))}
+          </div>
+          <div className="skeleton-card">
+            <div className="skeleton-line skeleton-section-title pulse" />
+            <div className="skeleton-achievements-grid">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="skeleton-achievement-card pulse" />
+              ))}
+            </div>
+          </div>
         </div>
         <style>{profileStyles}</style>
       </main>
@@ -497,5 +525,101 @@ const profileStyles = `
     font-size: 0.75rem;
     color: #475569;
     white-space: nowrap;
+  }
+
+  /* Skeleton loading */
+  .profile-skeleton {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .skeleton-header-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .skeleton-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #334155;
+  }
+  .skeleton-header-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .skeleton-line {
+    background: #334155;
+    border-radius: 4px;
+    height: 14px;
+  }
+  .skeleton-name {
+    width: 180px;
+    height: 18px;
+  }
+  .skeleton-title {
+    width: 120px;
+  }
+  .skeleton-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .skeleton-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .skeleton-stat-box {
+    height: 64px;
+    background: #334155;
+    border-radius: 8px;
+  }
+  .skeleton-section-title {
+    width: 160px;
+    height: 18px;
+    margin-bottom: 0.25rem;
+  }
+  .skeleton-mastery-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .skeleton-label {
+    width: 100px;
+  }
+  .skeleton-bar {
+    flex: 1;
+    height: 6px;
+    background: #334155;
+    border-radius: 3px;
+  }
+  .skeleton-pct {
+    width: 32px;
+  }
+  .skeleton-achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.75rem;
+  }
+  .skeleton-achievement-card {
+    height: 56px;
+    background: #334155;
+    border-radius: 8px;
+  }
+  .pulse {
+    animation: sk-pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes sk-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
   }
 `;

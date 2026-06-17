@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getWorldMap } from "@/app/actions/world-map";
+import { OnboardingFlow } from "@/components/onboarding-flow";
 
 interface RegionDisplay {
   id: string;
@@ -42,6 +43,10 @@ export default function WorldMapPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [onboardingDone, setOnboardingDone] = useState(false);
+
+  const hasStarted = regions.some((r) => r.status === "in-progress" || r.status === "completed");
+  const showOnboarding = !loading && !onboardingDone && !hasStarted;
 
   useEffect(() => {
     async function load() {
@@ -62,6 +67,9 @@ export default function WorldMapPage() {
 
   return (
     <main className="world-map-page">
+      {showOnboarding && (
+        <OnboardingFlow hasStarted={hasStarted} onDismiss={() => setOnboardingDone(true)} />
+      )}
       <nav className="world-map-nav">
         <Link href="/" className="nav-link">
           ← Home
@@ -75,9 +83,20 @@ export default function WorldMapPage() {
       </nav>
 
       {loading ? (
-        <div className="world-map-loading">
-          <div className="loading-spinner" />
-          <p>Loading the Frontend Realms...</p>
+        <div className="world-map-skeleton">
+          <div className="skeleton-header">
+            <div className="skeleton-line skeleton-title-wide pulse" />
+            <div className="skeleton-line skeleton-subtitle pulse" />
+          </div>
+          <div className="skeleton-regions-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="skeleton-region-card pulse">
+                <div className="skeleton-region-icon pulse" />
+                <div className="skeleton-line skeleton-region-name pulse" />
+                <div className="skeleton-bar pulse" />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <>
@@ -396,6 +415,43 @@ export default function WorldMapPage() {
         }
         .region-play-btn:hover {
           background: #1d4ed8;
+        }
+
+        /* Skeleton loading */
+        .world-map-skeleton {
+          max-width: 720px;
+          margin: 0 auto;
+        }
+        .skeleton-header {
+          margin-bottom: 2rem;
+        }
+        .skeleton-regions-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 1rem;
+        }
+        .skeleton-region-card {
+          background: #1e293b;
+          border: 1px solid #334155;
+          border-radius: 12px;
+          padding: 1.25rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .skeleton-region-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: #334155;
+        }
+        .pulse {
+          animation: sk-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes sk-pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.7; }
         }
       `}</style>
     </main>

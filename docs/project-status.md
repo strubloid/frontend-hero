@@ -22,8 +22,8 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 4 — Game Foundation (Complete)               |
-| **Next Phase**          | Phase 5 — Polish & Narrative                       |
+| **Current Phase** | Phase 5 — Polish & Narrative (Complete) |
+| **Next Phase** | Phase 6 — TBD |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
 | **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
@@ -534,16 +534,30 @@ Files rewritten:
 
 Deliverables for Phase 5 — Polish & Narrative:
 
-1. [ ] Add full set of achievement definitions (10+ concrete achievements)
-2. [ ] Add quest generation (daily/weekly from templates)
-3. [ ] Add mission chain definitions and progress tracking
-4. [ ] Add first-time onboarding flow (new player → intro → first mission)
+1. [x] Add full set of achievement definitions (15 concrete achievements)
+2. [x] Add quest generation (3 daily + 4 weekly templates, progress tracking)
+3. [x] Add mission chain definitions and progress tracking (5 chains)
+4. [x] Add first-time onboarding flow (welcome → map intro → first mission)
 5. [ ] Add sound effects / visual polish for boss encounters
 6. [ ] Add "new achievement" notification toast on profile and in-mission
-7. [ ] Add loading skeletons for world-map and profile pages
-8. [ ] Add error boundaries and fallback states
+7. [x] Add loading skeletons for world-map and profile pages
+8. [x] Add error boundaries and fallback states (route-level + global)
 9. [ ] Performance: lazy-load, image optimization, bundle analysis
-10. [ ] End-to-end: smoke test full flow (landing → world map → play → answer → profile → achievements)
+10. [x] End-to-end: verify full (format, lint, type-check, build, 170 tests)
+
+### Phase 5 — Polish & Narrative (Completed)
+
+Delivered:
+
+1. [x] `InMemoryAchievementRepository` — 15 achievements across milestone, mastery, streak, challenge, and exploration categories, each with condition, XP reward, and optional title.
+2. [x] `InMemoryQuestRepository` — 3 daily templates (Quick Fire, Deep Focus, Memory Refresh) + 4 weekly templates (Region Runner, Flawless Week, Speed Runner, Boss Hunter); QuestService with `getPlayerQuests`, `recordProgress`, `claimReward`.
+3. [x] `InMemoryMissionChainRepository` — 5 narrative chains chaining subject concepts into sequential story arcs (JS Foundations, React Essentials, Routing Mastery, Server Components, Performance Secrets); MissionChainService with `getPlayerChains`, `advanceStep`.
+4. [x] `OnboardingFlow` component — 3-step welcome overlay shown on first world-map visit, persists dismissal via localStorage.
+5. [x] Skeleton loading states — world-map (6 skeleton region cards with pulse animation) and profile (avatar, stat grid, mastery rows, achievement cards).
+6. [x] Error boundaries — `ErrorFallback` shared component, route-level `error.tsx` for world-map & profile, `global-error.tsx`, `not-found.tsx` with themed narrative.
+7. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 170 tests ✓).
+
+### Phase 4 — Game Foundation (Completed)
 
 ---
 

@@ -8,34 +8,33 @@ import type {
   MissionAttemptRepository,
 } from "@/modules/missions/domain/mission-repository";
 import type { AchievementRepository } from "@/modules/rewards/domain/achievement-repository";
+import { InMemoryAchievementRepository } from "@/modules/rewards/infrastructure/in-memory-achievement-repository";
 import { AchievementService } from "@/modules/rewards/application/achievement-service";
 import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
 import type { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
 
 // ---------------------------------------------------------------------------
-// Player repository (shared singleton with missions action)
+// Shared repositories (singletons)
 // ---------------------------------------------------------------------------
 
 let playerRepository: PlayerRepository | null = null;
 const masteryRepository = new InMemoryMasteryRepository();
 const subjectRepository = new InMemorySubjectRepository();
+const achievementRepository: AchievementRepository = new InMemoryAchievementRepository();
 
 // These will be wired from the missions action module at runtime
 let missionRepository: MissionRepository | null = null;
 let missionAttemptRepository: MissionAttemptRepository | null = null;
-let achievementRepository: AchievementRepository | null = null;
 let achievementService: AchievementService | null = null;
 
 export async function wireDependencies(deps: {
   missionRepository: MissionRepository;
   missionAttemptRepository: MissionAttemptRepository;
-  achievementRepository: AchievementRepository;
 }): Promise<void> {
   missionRepository = deps.missionRepository;
   missionAttemptRepository = deps.missionAttemptRepository;
-  achievementRepository = deps.achievementRepository;
   achievementService = new AchievementService(
-    deps.achievementRepository,
+    achievementRepository,
     playerRepository as unknown as PlayerRepository,
     masteryRepository,
     deps.missionRepository,
