@@ -56,11 +56,11 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 3 — Learning Engine (Complete)**
+**Current Phase: Phase 4 — Game Foundation (Complete)**
 
-Phase 3 delivered the full learning engine: mastery module (score, confidence, retention, weakness detection), reviews module (SM-2 spaced repetition), upgraded mission selector (4-tier priority pipeline), difficulty adaptation, and repetition control. 170 tests pass.
+Phase 4 delivered the complete game foundation: game-world module with regions, world map, narrative, unlock logic; progression system with XP/levels; rewards module with achievements/titles; StartMissionUseCase upgraded with PrerequisiteGraphBuilder + mastery/review integration; SubmitAnswerUseCase upgraded with new MasteryCalculator and ReviewAlgorithm; world map UI page (`/world-map`) and player profile page (`/profile`); mission chain, boss encounter, and daily/weekly quest domain entities.
 
-**Next Phase: Phase 4 — Game Foundation**
+**Next Phase: Phase 5 — Big Pickle Integration**
 
 Build the game world: world map, regions, mission chains, XP/level system, rewards, narrative, achievements, boss encounters, player profile. See `docs/project-status.md` for detailed task breakdown.
 

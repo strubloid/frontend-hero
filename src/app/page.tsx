@@ -19,6 +19,12 @@ export default function Home() {
           <Link href="/subjects" className="landing-btn landing-btn-primary">
             Enter the Realms
           </Link>
+          <Link href="/world-map" className="landing-btn landing-btn-secondary">
+            World Map
+          </Link>
+          <Link href="/profile" className="landing-btn landing-btn-secondary">
+            Profile
+          </Link>
           <Link href="/play" className="landing-btn landing-btn-secondary">
             Continue Last Session
           </Link>

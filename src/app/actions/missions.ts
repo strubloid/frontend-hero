@@ -8,7 +8,11 @@ import {
   MissionAttemptRepository,
 } from "@/modules/missions/domain/mission-repository";
 import { QuestionRepository } from "@/modules/questions/domain/question-repository";
-import { ConceptMasteryRepository } from "@/modules/progression/domain/concept-mastery-repository";
+import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
+import { InMemoryMasteryRepository } from "@/modules/mastery/infrastructure/in-memory-mastery-repository";
+import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
+import { InMemoryReviewRepository } from "@/modules/reviews/infrastructure/in-memory-review-repository";
+import { PrerequisiteGraphBuilder } from "@/modules/subjects/application/prerequisite-graph-builder";
 import { MissionSelector } from "@/modules/missions/application/mission-selector";
 import { AnswerEvaluator } from "@/modules/missions/application/answer-evaluator";
 import { QuestionProvider } from "@/modules/questions/application/question-provider";
@@ -24,7 +28,6 @@ import { StartMissionInput, SubmitAnswerInput, Mission } from "@/modules/mission
 import { Player } from "@/modules/players/domain/player";
 import { Subject } from "@/modules/subjects/domain/subject";
 import { Question } from "@/modules/questions/domain/question";
-import { ConceptMastery } from "@/modules/progression/domain/mastery";
 import { MissionAttempt } from "@/modules/missions/domain/mission";
 
 // ---------------------------------------------------------------------------
@@ -123,19 +126,6 @@ class InMemoryQuestionRepository implements QuestionRepository {
   }
 }
 
-class InMemoryConceptMasteryRepository implements ConceptMasteryRepository {
-  private store = new Map<string, ConceptMastery>();
-
-  async getByPlayerAndConcept(playerId: string, conceptId: string): Promise<ConceptMastery | null> {
-    return this.store.get(`${playerId}:${conceptId}`) ?? null;
-  }
-
-  async save(mastery: ConceptMastery): Promise<ConceptMastery> {
-    this.store.set(`${mastery.playerId}:${mastery.conceptId}`, mastery);
-    return mastery;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Singleton instances
 // ---------------------------------------------------------------------------
@@ -145,7 +135,10 @@ const subjectRepository = new InMemorySubjectRepository();
 const missionRepository = new InMemoryMissionRepository();
 const missionAttemptRepository = new InMemoryMissionAttemptRepository();
 const questionRepository = new InMemoryQuestionRepository();
-const conceptMasteryRepository = new InMemoryConceptMasteryRepository();
+
+const masteryRepository = new InMemoryMasteryRepository();
+const reviewRepository = new InMemoryReviewRepository();
+const graphBuilder = new PrerequisiteGraphBuilder();
 
 const missionSelector = new MissionSelector();
 const answerEvaluator = new AnswerEvaluator();
@@ -157,6 +150,9 @@ const startMissionUseCase = new StartMissionUseCase(
   missionRepository,
   missionSelector,
   questionProvider,
+  graphBuilder,
+  masteryRepository,
+  reviewRepository,
 );
 
 const submitAnswerUseCase = new SubmitAnswerUseCase(
@@ -164,7 +160,8 @@ const submitAnswerUseCase = new SubmitAnswerUseCase(
   missionRepository,
   missionAttemptRepository,
   questionRepository,
-  conceptMasteryRepository,
+  masteryRepository,
+  reviewRepository,
   answerEvaluator,
 );
 

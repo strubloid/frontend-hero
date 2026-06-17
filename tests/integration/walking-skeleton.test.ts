@@ -11,8 +11,10 @@ import {
   MissionRepository,
   MissionAttemptRepository,
 } from "@/modules/missions/domain/mission-repository";
-import { ConceptMastery } from "@/modules/progression/domain/mastery";
-import { ConceptMasteryRepository } from "@/modules/progression/domain/concept-mastery-repository";
+import { ConceptMastery } from "@/modules/mastery/domain/concept-mastery";
+import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
+import { ReviewSchedule } from "@/modules/reviews/domain/review-schedule";
+import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
 import { MissionSelector } from "@/modules/missions/application/mission-selector";
 import { AnswerEvaluator } from "@/modules/missions/application/answer-evaluator";
 import { QuestionProvider } from "@/modules/questions/application/question-provider";
@@ -132,15 +134,45 @@ class InMemoryQuestionRepository implements QuestionRepository {
   }
 }
 
-class InMemoryConceptMasteryRepository implements ConceptMasteryRepository {
+class InMemoryMasteryRepository implements MasteryRepository {
   private store = new Map<string, ConceptMastery>();
   async getByPlayerAndConcept(playerId: string, conceptId: string) {
     return this.store.get(`${playerId}:${conceptId}`) ?? null;
+  }
+  async getByPlayer(playerId: string): Promise<ConceptMastery[]> {
+    return Array.from(this.store.values()).filter((m) => m.playerId === playerId);
+  }
+  async getByPlayerAndSubject(playerId: string, subjectId: string): Promise<ConceptMastery[]> {
+    return Array.from(this.store.values()).filter(
+      (m) => m.playerId === playerId && m.subjectId === subjectId,
+    );
   }
   async save(mastery: ConceptMastery) {
     this.store.set(`${mastery.playerId}:${mastery.conceptId}`, mastery);
     return mastery;
   }
+  async delete(playerId: string, conceptId: string): Promise<void> {
+    this.store.delete(`${playerId}:${conceptId}`);
+  }
+}
+
+class InMemoryReviewRepository implements ReviewRepository {
+  async getByPlayerAndConcept(_p: string, _c: string) {
+    return null;
+  }
+  async getByPlayerAndSubject(_p: string, _s: string) {
+    return [];
+  }
+  async getOverdueReviews(_p: string, _b: Date) {
+    return [];
+  }
+  async getDueReviews(_p: string, _b: Date) {
+    return [];
+  }
+  async save(s: ReviewSchedule) {
+    return s;
+  }
+  async delete(_p: string, _c: string) {}
 }
 
 // ---------------------------------------------------------------------------
@@ -161,7 +193,7 @@ describe("Walking skeleton — full flow", () => {
     const missionRepo = new InMemoryMissionRepository();
     const missionAttemptRepo = new InMemoryMissionAttemptRepository();
     const questionRepo = new InMemoryQuestionRepository();
-    const masteryRepo = new InMemoryConceptMasteryRepository();
+    const masteryRepo = new InMemoryMasteryRepository();
 
     // 2. Import the subject from the file system
     const subjectImportService = new SubjectImportService(
@@ -211,6 +243,8 @@ describe("Walking skeleton — full flow", () => {
     const questions = await questionRepo.getByConceptId(firstConcept!.id);
     expect(questions.length).toBeGreaterThan(0);
 
+    const reviewRepo = new InMemoryReviewRepository();
+
     // 5. Start a mission
     const startMissionUseCase = new StartMissionUseCase(
       playerRepo,
@@ -218,6 +252,9 @@ describe("Walking skeleton — full flow", () => {
       missionRepo,
       new MissionSelector(),
       new QuestionProvider(questionRepo),
+      new PrerequisiteGraphBuilder(),
+      masteryRepo,
+      reviewRepo,
     );
 
     const missionResult = await startMissionUseCase.execute({
@@ -245,6 +282,7 @@ describe("Walking skeleton — full flow", () => {
       missionAttemptRepo,
       questionRepo,
       masteryRepo,
+      reviewRepo,
       new AnswerEvaluator(),
     );
 
@@ -297,8 +335,10 @@ describe("Walking skeleton — full flow", () => {
     const subjectRepo = new InMemorySubjectRepository();
     const missionRepo = new InMemoryMissionRepository();
     const questionRepo = new InMemoryQuestionRepository();
-    const masteryRepo = new InMemoryConceptMasteryRepository();
+    const masteryRepo = new InMemoryMasteryRepository();
     const missionAttemptRepo = new InMemoryMissionAttemptRepository();
+
+    const reviewRepo = new InMemoryReviewRepository();
 
     const useCase = new StartMissionUseCase(
       playerRepo,
@@ -306,6 +346,9 @@ describe("Walking skeleton — full flow", () => {
       missionRepo,
       new MissionSelector(),
       new QuestionProvider(questionRepo),
+      new PrerequisiteGraphBuilder(),
+      masteryRepo,
+      reviewRepo,
     );
 
     await expect(

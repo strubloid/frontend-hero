@@ -5,10 +5,12 @@ import {
   MissionAttemptRepository,
 } from "@/modules/missions/domain/mission-repository";
 import { QuestionRepository } from "@/modules/questions/domain/question-repository";
-import { ConceptMasteryRepository } from "@/modules/progression/domain/concept-mastery-repository";
+import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
+import { MasteryCalculator, MasteryUpdateInput } from "@/modules/mastery/domain/mastery-calculator";
+import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
+import { ReviewAlgorithm, ReviewInput } from "@/modules/reviews/domain/review-algorithm";
 import { AnswerEvaluator } from "./answer-evaluator";
-import { XpCalculator } from "@/modules/progression/domain/xp-calculator";
-import { MasteryCalculator } from "@/modules/progression/domain/mastery-calculator";
+import { calculateAnswerXp } from "@/modules/progression/domain/player-progression";
 import { SubmitAnswerInput, MissionAttempt, Mission } from "@/modules/missions/domain/mission";
 
 export interface SubmitAnswerResult {
@@ -27,8 +29,11 @@ export class SubmitAnswerUseCase {
     private readonly missionRepository: MissionRepository,
     private readonly missionAttemptRepository: MissionAttemptRepository,
     private readonly questionRepository: QuestionRepository,
-    private readonly conceptMasteryRepository: ConceptMasteryRepository,
+    private readonly masteryRepository: MasteryRepository,
+    private readonly reviewRepository: ReviewRepository,
     private readonly answerEvaluator: AnswerEvaluator,
+    private readonly masteryCalculator: MasteryCalculator = new MasteryCalculator(),
+    private readonly reviewAlgorithm: ReviewAlgorithm = new ReviewAlgorithm(),
   ) {}
 
   async execute(input: SubmitAnswerInput): Promise<SubmitAnswerResult> {
@@ -47,14 +52,14 @@ export class SubmitAnswerUseCase {
       throw new Error(`Player not found: ${input.playerId}`);
     }
 
-    // Evaluate the answer
+    // --- Phase 1: Evaluate the answer ---
     const evaluation = this.answerEvaluator.evaluate(
       input.selectedIndex,
       question.correctIndex,
       question.explanation,
     );
 
-    // Create and persist mission attempt
+    // --- Phase 2: Create and persist mission attempt ---
     const attempt: MissionAttempt = {
       id: uuid(),
       missionId: input.missionId,
@@ -68,7 +73,7 @@ export class SubmitAnswerUseCase {
     };
     await this.missionAttemptRepository.create(attempt);
 
-    // Update mission score and check completion
+    // --- Phase 3: Update mission score and completion ---
     const updatedMission: Mission = {
       ...mission,
       score: evaluation.isCorrect ? mission.score + 1 : mission.score,
@@ -81,52 +86,65 @@ export class SubmitAnswerUseCase {
     }
     await this.missionRepository.save(updatedMission);
 
-    // Calculate and award XP
-    const xpAwarded = XpCalculator.calculate(evaluation.isCorrect, question.difficulty, 0);
-    const updatedPlayer = {
-      ...player,
-      experiencePoints: player.experiencePoints + xpAwarded,
-      updatedAt: new Date(),
-    };
-    await this.playerRepository.save(updatedPlayer);
-
-    // Calculate and update concept mastery
-    const existingMastery = await this.conceptMasteryRepository.getByPlayerAndConcept(
+    // --- Phase 4: Award XP using new formula ---
+    const existingMastery = await this.masteryRepository.getByPlayerAndConcept(
       input.playerId,
       question.conceptId,
     );
-    const currentMasteryValue = existingMastery?.masteryScore ?? 0;
-    const updatedMasteryValue = MasteryCalculator.calculate(
-      currentMasteryValue,
+    const consecutiveCorrect = existingMastery?.consecutiveCorrectAnswers ?? 0;
+
+    const xpAwarded = calculateAnswerXp(
       evaluation.isCorrect,
       question.difficulty,
+      consecutiveCorrect,
+      0, // hintsUsed (not yet tracked in submissions)
+      input.timeSpentSeconds * 1000, // convert to ms for consistency
     );
 
     const now = new Date();
-    const updatedMastery = {
-      id: existingMastery?.id ?? uuid(),
+    const updatedPlayer = {
+      ...player,
+      experiencePoints: player.experiencePoints + xpAwarded,
+      updatedAt: now,
+    };
+    await this.playerRepository.save(updatedPlayer);
+
+    // --- Phase 5: Update concept mastery using new MasteryCalculator ---
+    const masteryInput: MasteryUpdateInput = {
       playerId: input.playerId,
       conceptId: question.conceptId,
       subjectId: question.subjectId,
-      masteryScore: updatedMasteryValue,
-      confidenceScore: existingMastery?.confidenceScore ?? 0,
-      retentionScore: existingMastery?.retentionScore ?? 0,
-      correctAttempts: (existingMastery?.correctAttempts ?? 0) + (evaluation.isCorrect ? 1 : 0),
-      incorrectAttempts: (existingMastery?.incorrectAttempts ?? 0) + (evaluation.isCorrect ? 0 : 1),
-      consecutiveCorrectAnswers: evaluation.isCorrect
-        ? (existingMastery?.consecutiveCorrectAnswers ?? 0) + 1
-        : 0,
-      lastAttemptedAt: now,
-      nextReviewAt: existingMastery?.nextReviewAt ?? null,
+      missionType: mission.type,
+      isCorrect: evaluation.isCorrect,
+      difficulty: question.difficulty,
+      responseTimeMs: input.timeSpentSeconds * 1000,
+      currentMastery: existingMastery ?? null,
     };
-    await this.conceptMasteryRepository.save(updatedMastery);
+    const updatedMasteryResult = this.masteryCalculator.update(masteryInput);
+    await this.masteryRepository.save(updatedMasteryResult.mastery);
+
+    // --- Phase 6: Update review schedule using SM-2 algorithm ---
+    const existingSchedule = await this.reviewRepository.getByPlayerAndConcept(
+      input.playerId,
+      question.conceptId,
+    );
+    const reviewInput: ReviewInput = {
+      playerId: input.playerId,
+      conceptId: question.conceptId,
+      subjectId: question.subjectId,
+      isCorrect: evaluation.isCorrect,
+      masteryScore: updatedMasteryResult.mastery.masteryScore,
+      currentSchedule: existingSchedule ?? null,
+    };
+    const updatedSchedule = this.reviewAlgorithm.apply(reviewInput);
+    await this.reviewRepository.save(updatedSchedule.schedule);
 
     return {
       isCorrect: evaluation.isCorrect,
       correctIndex: evaluation.correctIndex,
       explanation: evaluation.explanation,
       xpAwarded,
-      updatedMastery: updatedMasteryValue,
+      updatedMastery: updatedMasteryResult.mastery.masteryScore,
       score: updatedMission.score,
       maxScore: updatedMission.maxScore,
     };

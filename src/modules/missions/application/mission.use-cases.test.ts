@@ -20,8 +20,15 @@ import {
   MissionAttemptRepository,
 } from "@/modules/missions/domain/mission-repository";
 import { QuestionRepository } from "@/modules/questions/domain/question-repository";
-import { ConceptMasteryRepository } from "@/modules/progression/domain/concept-mastery-repository";
-import { ConceptMastery } from "@/modules/progression/domain/mastery";
+import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
+import { ConceptMastery } from "@/modules/mastery/domain/concept-mastery";
+import { MasteryCalculator } from "@/modules/mastery/domain/mastery-calculator";
+import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
+import { ReviewSchedule } from "@/modules/reviews/domain/review-schedule";
+import {
+  PrerequisiteGraphBuilder,
+  PrerequisiteGraph,
+} from "@/modules/subjects/application/prerequisite-graph-builder";
 
 // ---------------------------------------------------------------------------
 // Mock implementations
@@ -159,7 +166,7 @@ class MockQuestionRepository implements QuestionRepository {
   }
 }
 
-class MockConceptMasteryRepository implements ConceptMasteryRepository {
+class MockMasteryRepository implements MasteryRepository {
   private store = new Map<string, ConceptMastery>();
 
   set(mastery: ConceptMastery): void {
@@ -170,9 +177,61 @@ class MockConceptMasteryRepository implements ConceptMasteryRepository {
     return this.store.get(`${playerId}:${conceptId}`) ?? null;
   }
 
+  async getByPlayer(_playerId: string): Promise<ConceptMastery[]> {
+    return Array.from(this.store.values()).filter((m) => m.playerId === _playerId);
+  }
+
   async save(mastery: ConceptMastery): Promise<ConceptMastery> {
     this.store.set(`${mastery.playerId}:${mastery.conceptId}`, mastery);
     return mastery;
+  }
+
+  async getByPlayerAndSubject(playerId: string, subjectId: string): Promise<ConceptMastery[]> {
+    return Array.from(this.store.values()).filter(
+      (m) => m.playerId === playerId && m.subjectId === subjectId,
+    );
+  }
+
+  async delete(_playerId: string, _conceptId: string): Promise<void> {
+    this.store.delete(`${_playerId}:${_conceptId}`);
+  }
+}
+
+class MockReviewRepository implements ReviewRepository {
+  async getByPlayerAndConcept(
+    _playerId: string,
+    _conceptId: string,
+  ): Promise<ReviewSchedule | null> {
+    return null;
+  }
+  async getByPlayerAndSubject(_playerId: string, _subjectId: string): Promise<ReviewSchedule[]> {
+    return [];
+  }
+  async getOverdueReviews(_playerId: string, _before: Date): Promise<ReviewSchedule[]> {
+    return [];
+  }
+  async getDueReviews(_playerId: string, _before: Date): Promise<ReviewSchedule[]> {
+    return [];
+  }
+  async save(schedule: ReviewSchedule): Promise<ReviewSchedule> {
+    return schedule;
+  }
+  async delete(_playerId: string, _conceptId: string): Promise<void> {
+    // no-op
+  }
+}
+
+class MockPrerequisiteGraphBuilder extends PrerequisiteGraphBuilder {
+  build(_concepts: Concept[]): PrerequisiteGraph {
+    const conceptIds = _concepts.map((c) => c.id);
+    return {
+      getPrerequisites: () => [],
+      getDependents: () => [],
+      getAvailableConcepts: (_mastered: Set<string>) => conceptIds,
+      getAllConceptIds: () => conceptIds,
+      getTopologicalOrder: () => conceptIds,
+      getDepth: () => 0,
+    };
   }
 }
 
@@ -279,6 +338,7 @@ describe("StartMissionUseCase", () => {
       missionRepo,
       missionSelector,
       questionProvider,
+      new MockPrerequisiteGraphBuilder(),
     );
 
     const input: StartMissionInput = {
@@ -311,6 +371,7 @@ describe("StartMissionUseCase", () => {
       missionRepo,
       new MissionSelector(),
       new QuestionProvider(new MockQuestionRepository()),
+      new MockPrerequisiteGraphBuilder(),
     );
 
     const input: StartMissionInput = {
@@ -385,7 +446,7 @@ describe("SubmitAnswerUseCase", () => {
     const questionRepo = new MockQuestionRepository();
     questionRepo.set(question);
 
-    const masteryRepo = new MockConceptMasteryRepository();
+    const masteryRepo = new MockMasteryRepository();
 
     const useCase = new SubmitAnswerUseCase(
       playerRepo,
@@ -393,6 +454,7 @@ describe("SubmitAnswerUseCase", () => {
       missionAttemptRepo,
       questionRepo,
       masteryRepo,
+      new MockReviewRepository(),
       new AnswerEvaluator(),
     );
 
@@ -436,7 +498,7 @@ describe("SubmitAnswerUseCase", () => {
     const questionRepo = new MockQuestionRepository();
     questionRepo.set(question);
 
-    const masteryRepo = new MockConceptMasteryRepository();
+    const masteryRepo = new MockMasteryRepository();
 
     const useCase = new SubmitAnswerUseCase(
       playerRepo,
@@ -444,6 +506,7 @@ describe("SubmitAnswerUseCase", () => {
       missionAttemptRepo,
       questionRepo,
       masteryRepo,
+      new MockReviewRepository(),
       new AnswerEvaluator(),
     );
 

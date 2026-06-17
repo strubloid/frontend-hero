@@ -6,6 +6,7 @@ import { QuestionProvider } from "@/modules/questions/application/question-provi
 import { MissionSelector, MissionPlan } from "./mission-selector";
 import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
 import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
+import { PrerequisiteGraphBuilder } from "@/modules/subjects/application/prerequisite-graph-builder";
 import { StartMissionInput, Mission } from "@/modules/missions/domain/mission";
 
 export interface StartMissionResult {
@@ -19,6 +20,7 @@ export class StartMissionUseCase {
     private readonly missionRepository: MissionRepository,
     private readonly missionSelector: MissionSelector,
     private readonly questionProvider: QuestionProvider,
+    private readonly graphBuilder: PrerequisiteGraphBuilder,
     private readonly masteryRepository?: MasteryRepository,
     private readonly reviewRepository?: ReviewRepository,
   ) {}
@@ -34,23 +36,30 @@ export class StartMissionUseCase {
       throw new Error(`Subject not found: ${input.subjectId}`);
     }
 
-    // Load mastery and review data if repositories are available
+    // Load mastery data if repository is available
     const masteries = this.masteryRepository
       ? await this.masteryRepository.getByPlayerAndSubject(input.playerId, input.subjectId)
       : [];
+
+    // Load review schedules if repository is available
     const schedules = this.reviewRepository
       ? await this.reviewRepository.getByPlayerAndSubject(input.playerId, input.subjectId)
       : [];
 
-    // All concept IDs in the subject (prerequisite-unlocked filtering comes later)
-    const allConceptIds = subject.domains.flatMap((d) => d.concepts.map((c) => c.id));
+    // Build prerequisite graph to determine which concepts are available
+    const allConcepts = subject.domains.flatMap((d) => d.concepts);
+    const graph = this.graphBuilder.build(allConcepts);
+    const masteredConceptIds = new Set(
+      masteries.filter((m) => m.masteryScore >= 0.5).map((m) => m.conceptId),
+    );
+    const availableConceptIds = graph.getAvailableConcepts(masteredConceptIds);
 
     const missionPlan: MissionPlan = this.missionSelector.select({
       subject,
       masteries,
       schedules,
       recentConceptIds: [], // will be populated from session history in future
-      availableConceptIds: allConceptIds,
+      availableConceptIds,
     });
 
     const questions = await this.questionProvider.provideFor(missionPlan, subject);

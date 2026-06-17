@@ -22,7 +22,7 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 3 — Learning Engine (Complete)                |
+| **Current Phase**       | Phase 3 — Learning Engine (Complete)               |
 | **Next Phase**          | Phase 4 — Game Foundation                          |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
@@ -498,6 +498,7 @@ Files created:
 - `src/modules/missions/application/start-mission.use-case.ts` — upgraded (mastery + review injection)
 - `src/modules/questions/application/question-provider.ts` — upgraded (difficulty adaptation + repetition control)
 - `src/modules/*/domain/__tests__/` — 7 test files with 56 tests
+
 9. [x] Tests — 114 passing across 9 test files (18 graph, 16 migration, 14 repository, 29 parser, 4 mission, 2 integration, 12+13+6 other).
 10. [x] Verified — `npm run verify:full` passes (format, lint, type-check, build, 114 tests).
 
