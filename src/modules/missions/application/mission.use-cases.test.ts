@@ -348,7 +348,7 @@ describe("SubmitAnswerUseCase", () => {
     const questionRepo = new MockQuestionRepository();
     const questionProvider = new QuestionProvider(questionRepo);
     const questions = await questionProvider.provideFor(
-      { subjectId, conceptId, type: "encounter" },
+      { subjectId, conceptId, type: "encounter", reason: "test" },
       subject,
     );
 
