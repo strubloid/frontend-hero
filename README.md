@@ -4,7 +4,9 @@ A gamified learning platform that takes developers from foundational frontend kn
 
 ## Status
 
-**Phase 0 — Research and Product Definition** ✅ Complete
+**Phase 8 — Production Readiness** ✅ Complete
+
+**Post-launch hardening** 🚧 In progress
 
 ## Quick Start
 
@@ -17,6 +19,7 @@ npm run dev
 
 ```bash
 npm run verify
+npm run db:migrate
 ```
 
 ## Documentation

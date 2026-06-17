@@ -56,27 +56,28 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 4 — Game Foundation (Complete)**
+**Current Phase: Post-launch Hardening — Durable Persistence (In Progress)**
 
-Phase 4 delivered the complete game foundation: game-world module with regions, world map, narrative, unlock logic; progression system with XP/levels; rewards module with achievements/titles; StartMissionUseCase upgraded with PrerequisiteGraphBuilder + mastery/review integration; SubmitAnswerUseCase upgraded with new MasteryCalculator and ReviewAlgorithm; world map UI page (`/world-map`) and player profile page (`/profile`); mission chain, boss encounter, and daily/weekly quest domain entities.
+Phase 8 delivered production readiness: CI, Docker/Fly deployment, security headers, production audits, health checks, runbooks, backup/migration documentation, and production metadata. Post-launch hardening is now closing the durable-persistence gap by moving from in-memory runtime state toward SQLite-backed storage on a Fly volume, with a future PostgreSQL target once repository coverage is complete.
 
-**Next Phase: Phase 5 — Big Pickle Integration**
+**Next Phase: Complete durable repository wiring and restore drill**
 
-Build the game world: world map, regions, mission chains, XP/level system, rewards, narrative, achievements, boss encounters, player profile. See `docs/project-status.md` for detailed task breakdown.
+Finish durable repository implementations for gameplay state, wire app actions away from in-memory singleton stores, add persistence coverage for every repository path, and run a real backup/restore drill. See `docs/project-status.md` and `docs/backups-and-migrations.md` for detailed task breakdown.
 
 ### Phase Overview
 
-| Phase   | Name                            | Status      |
-| ------- | ------------------------------- | ----------- |
-| Phase 0 | Research and Product Definition | ✅ Complete |
-| Phase 1 | Walking Skeleton                | ✅ Complete |
-| Phase 2 | Subject Engine                  | ✅ Complete |
-| Phase 3 | Learning Engine                 | ✅ Complete |
-| Phase 4 | Game Foundation                 | ⏳ Planned  |
-| Phase 5 | Big Pickle Integration          | ⏳ Planned  |
-| Phase 6 | Challenge Variety               | ⏳ Planned  |
-| Phase 7 | Advanced Game Experience        | ⏳ Planned  |
-| Phase 8 | Production Readiness            | ⏳ Planned  |
+| Phase       | Name                            | Status         |
+| ----------- | ------------------------------- | -------------- |
+| Phase 0     | Research and Product Definition | ✅ Complete    |
+| Phase 1     | Walking Skeleton                | ✅ Complete    |
+| Phase 2     | Subject Engine                  | ✅ Complete    |
+| Phase 3     | Learning Engine                 | ✅ Complete    |
+| Phase 4     | Game Foundation                 | ✅ Complete    |
+| Phase 5     | Polish & Narrative              | ✅ Complete    |
+| Phase 6     | Experience & Integration        | ✅ Complete    |
+| Phase 7     | Advanced Game Experience        | ✅ Complete    |
+| Phase 8     | Production Readiness            | ✅ Complete    |
+| Post-launch | Durable Persistence Hardening   | 🚧 In Progress |
 
 ---
 

@@ -1,13 +1,15 @@
 # Backups and Migration Documentation
 
-Frontend Realms currently uses in-memory repositories for local gameplay flows and includes database infrastructure for future PostgreSQL-backed persistence. This document records the production data-readiness plan for Phase 8.
+Frontend Realms now has an idempotent SQLite bootstrap path for durable Fly.io volume storage. Gameplay actions are still being migrated away from in-memory repository singletons, so this document records both the active SQLite baseline and the future PostgreSQL target.
 
 ## Current Persistence State
 
-- Gameplay data in current app actions is held in server-side in-memory repository singletons.
-- Database schema exists under `src/shared/infrastructure/database/schema.ts`.
-- SQLite dev/test connection support exists under `src/shared/infrastructure/database/connection.ts`.
-- Production deployment config expects future PostgreSQL to be provided through `DATABASE_URL` as a Fly secret.
+- SQLite application tables are created idempotently by `src/shared/infrastructure/database/create-tables.ts`.
+- Runtime SQLite connections create missing parent directories and bootstrap the schema through `src/shared/infrastructure/database/connection.ts`.
+- Local and production migration/bootstrap command: `npm run db:migrate`.
+- Fly.io config mounts a persistent volume at `/data` and sets `DB_PATH=/data/frontend-realms.db`.
+- Some gameplay flows still use server-side in-memory repository singletons and must be migrated before real multi-user launch.
+- Production PostgreSQL remains the future managed-database target once repository coverage is complete.
 
 ## Production Database Target
 
@@ -78,8 +80,8 @@ For destructive schema changes:
 
 Before real user persistence launches, complete the following:
 
+- Add concrete repository implementations for mastery, reviews, progression, rewards, quests, mission chains, and boss state.
 - Wire app actions to durable repositories instead of in-memory singletons.
-- Add migration scripts and document exact commands.
 - Add staging database and staging migration rehearsal.
-- Add tests covering repository persistence against a disposable database.
+- Add tests covering every repository persistence path against a disposable database.
 - Confirm backups and restore procedure with an actual restore drill.

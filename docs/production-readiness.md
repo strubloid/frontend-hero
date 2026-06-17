@@ -53,7 +53,14 @@ npm run fly:logs
 
 ## Required Runtime Environment
 
-Current app has no mandatory secrets for the in-memory gameplay path.
+SQLite durable-storage baseline:
+
+```bash
+fly volumes create frontend_realms_data --region iad --size 1
+npm run db:migrate
+```
+
+`fly.toml` sets `DB_PATH=/data/frontend-realms.db` and mounts `/data` from the `frontend_realms_data` volume.
 
 Future PostgreSQL production wiring should use secrets, not public env vars:
 

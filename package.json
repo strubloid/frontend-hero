@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "db:migrate": "tsx scripts/migrate-database.ts",
     "audit:production": "node scripts/production-audit.mjs",
     "audit:dependencies": "npm audit --audit-level=high",
     "verify": "npm run format:check && npm run lint && npm run type-check && npm run audit:production && npm run audit:dependencies && npm run build",

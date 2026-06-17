@@ -18,20 +18,20 @@
 
 ## 1. Project Overview
 
-| Field                   | Value                                              |
-| ----------------------- | -------------------------------------------------- |
-| **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
-| **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 8 — Production Readiness (Completed)         |
-| **Next Phase**          | Post-launch hardening and durable persistence      |
-| **Framework**           | Next.js 16.2.9 (App Router)                        |
-| **Language**            | TypeScript (strict mode)                           |
-| **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
-| **Production Database** | PostgreSQL (managed service)                       |
-| **Dev/Test Database**   | SQLite                                             |
-| **Deployment**          | Docker → Fly.io                                    |
-| **Initial Subject**     | `subjects/nextjs.md`                               |
-| **World Regions**       | 13 Realms (see game-design docs)                   |
+| Field                   | Value                                                       |
+| ----------------------- | ----------------------------------------------------------- |
+| **Project Name**        | Frontend Realms (package: `frontend-realms`)                |
+| **Project Folder**      | `/home/strubloid/apps/frontend-hero`                        |
+| **Current Phase**       | Post-launch hardening and durable persistence (In Progress) |
+| **Next Phase**          | Complete durable repository wiring and restore drill        |
+| **Framework**           | Next.js 16.2.9 (App Router)                                 |
+| **Language**            | TypeScript (strict mode)                                    |
+| **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven)          |
+| **Production Database** | PostgreSQL (managed service)                                |
+| **Dev/Test Database**   | SQLite                                                      |
+| **Deployment**          | Docker → Fly.io                                             |
+| **Initial Subject**     | `subjects/nextjs.md`                                        |
+| **World Regions**       | 13 Realms (see game-design docs)                            |
 
 ---
 
@@ -604,6 +604,34 @@ Delivered:
 6. [x] Backups and migration documentation — backup policy, migration checklist, migration record template, rollback strategy, and durable persistence launch gap documented.
 7. [x] Metadata cleanup — replaced scaffold metadata with Frontend Realms production metadata.
 8. [x] Verification — `npm run verify:full`, `npm run fly:validate`, and `npm run docker:verify` pass.
+
+### Post-launch Hardening — Durable Persistence (In Progress)
+
+Delivered:
+
+1. [x] SQLite schema bootstrap extracted to `src/shared/infrastructure/database/create-tables.ts` so runtime, scripts, and tests share one idempotent table-creation path.
+2. [x] Database connection now creates missing parent directories, enables WAL + foreign keys, and bootstraps application tables on first open.
+3. [x] Added `npm run db:migrate` via `scripts/migrate-database.ts` to make local/Fly database initialization an explicit operational command.
+4. [x] Fly.io config now mounts `frontend_realms_data` at `/data` and sets `DB_PATH=/data/frontend-realms.db` for durable SQLite volume storage.
+5. [x] Disposable database tests cover first-open bootstrap and idempotent repeat bootstrap.
+6. [ ] Wire all gameplay app actions to durable repositories instead of in-memory singleton stores.
+7. [ ] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
+8. [ ] Run a real backup/restore drill against the Fly volume or future managed database.
+
+Files created:
+
+- `src/shared/infrastructure/database/create-tables.ts` — shared idempotent SQLite schema bootstrap.
+- `src/shared/infrastructure/database/connection.test.ts` — disposable database bootstrap regression tests.
+- `scripts/migrate-database.ts` — operational database bootstrap command.
+
+Files updated:
+
+- `src/shared/infrastructure/database/connection.ts` — runtime parent-directory creation and automatic table bootstrap.
+- `tests/fixtures/create-tables.ts` — test fixture now delegates to shared schema bootstrap.
+- `package.json` — added `db:migrate` script.
+- `fly.toml` — added durable volume mount and production DB path.
+- `docs/production-readiness.md` / `docs/backups-and-migrations.md` — updated durable persistence runbooks.
+- `README.md` / `docs/project-status.md` — current phase status updated.
 
 Files created:
 

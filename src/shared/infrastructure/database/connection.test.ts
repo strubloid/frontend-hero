@@ -1,0 +1,56 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import { openSqliteDatabase } from "./connection";
+
+const REQUIRED_TABLES = [
+  "conceptMastery",
+  "concepts",
+  "missionAttempts",
+  "missions",
+  "players",
+  "questions",
+  "subjects",
+];
+
+describe("database connection bootstrap", () => {
+  it("creates parent directories and application tables for a new SQLite database", () => {
+    const directory = mkdtempSync(join(tmpdir(), "frontend-realms-db-"));
+    const dbPath = join(directory, "nested", "frontend-realms.db");
+
+    try {
+      const sqlite = openSqliteDatabase(dbPath);
+      const tableRows = sqlite
+        .prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
+        .all() as { name: string }[];
+
+      expect(tableRows.map((row) => row.name)).toEqual(REQUIRED_TABLES);
+      sqlite.close();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("is idempotent when bootstrap runs more than once against the same file", () => {
+    const directory = mkdtempSync(join(tmpdir(), "frontend-realms-db-"));
+    const dbPath = join(directory, "frontend-realms.db");
+
+    try {
+      const first = openSqliteDatabase(dbPath);
+      first.close();
+
+      const second = openSqliteDatabase(dbPath);
+      const count = (
+        second
+          .prepare("SELECT COUNT(*) AS value FROM sqlite_master WHERE type = 'table'")
+          .get() as { value: number }
+      ).value;
+
+      expect(count).toBe(REQUIRED_TABLES.length);
+      second.close();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+});
