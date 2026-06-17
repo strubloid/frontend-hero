@@ -1,0 +1,63 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getActiveMission, getDefaultSubject, getQuestion } from "@/app/actions/missions";
+
+function serializeDates<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  if (obj instanceof Date) return obj.toISOString() as unknown as T;
+  if (Array.isArray(obj)) return obj.map(serializeDates) as unknown as T;
+  if (typeof obj === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      result[key] = serializeDates(value);
+    }
+    return result as T;
+  }
+  return obj;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const playerId = request.nextUrl.searchParams.get("playerId") ?? "default-player";
+    const mission = await getActiveMission(playerId);
+    const subject = await getDefaultSubject();
+
+    if (!mission) {
+      return NextResponse.json({
+        hasActiveMission: false,
+        subjectName: subject?.title ?? null,
+        mission: null,
+        currentQuestion: null,
+      });
+    }
+
+    // Fetch the current question
+    const idx = mission.currentQuestionIndex;
+    const questionId = mission.questionIds[idx] ?? null;
+    let currentQuestion = null;
+
+    if (questionId) {
+      const question = await getQuestion(questionId);
+      if (question) {
+        currentQuestion = {
+          index: idx,
+          total: mission.questionIds.length,
+          questionId: question.id,
+          stem: question.stem,
+          options: question.options,
+          type: question.type,
+          difficulty: question.difficulty,
+        };
+      }
+    }
+
+    return NextResponse.json({
+      hasActiveMission: mission.status === "active",
+      subjectName: subject?.title ?? null,
+      mission: serializeDates(mission),
+      currentQuestion,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to fetch mission state";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
