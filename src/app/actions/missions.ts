@@ -2,6 +2,7 @@
 
 import { PlayerRepository } from "@/modules/players/domain/player-repository";
 import { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
+import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
 import {
   MissionRepository,
   MissionAttemptRepository,
@@ -45,18 +46,6 @@ class InMemoryPlayerRepository implements PlayerRepository {
   async save(player: Player): Promise<Player> {
     this.store.set(player.id, player);
     return player;
-  }
-}
-
-class InMemorySubjectRepository implements SubjectRepository {
-  private store = new Map<string, Subject>();
-
-  set(subject: Subject): void {
-    this.store.set(subject.id, subject);
-  }
-
-  async getById(id: string): Promise<Subject | null> {
-    return this.store.get(id) ?? null;
   }
 }
 

@@ -22,8 +22,8 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 1 — Walking Skeleton (Complete)              |
-| **Next Phase**          | Phase 2 — Subject Engine                           |
+| **Current Phase**       | Phase 2 — Subject Engine (Complete)                |
+| **Next Phase**          | Phase 3 — Learning Engine                          |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
 | **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
@@ -448,26 +448,32 @@ frontend-hero/                    <-- Project root
 
 ## 7. Next Actions
 
-### Immediate (Phase 2 — Subject Engine)
+### Immediate (Phase 3 — Learning Engine)
 
-1. [ ] Implement subject schema versioning and migration support
-2. [ ] Add subject repository persistence layer for the subject file cache
-3. [ ] Build subject selection UI (list available subjects)
-4. [ ] Add validation for additional subject files beyond `nextjs.md`
-5. [ ] Create architecture tests for module boundaries
+1. [ ] Implement mastery engine — concept mastery scoring, confidence, retention
+2. [ ] Build review scheduling — spaced repetition with SM-2 or similar algorithm
+3. [ ] Implement difficulty adaptation — adjust question difficulty based on performance
+4. [ ] Build mission selector — pick concepts, mission types, and questions based on player state
+5. [ ] Implement repetition control — semantic deduplication, variety management
+6. [ ] Connect learning engine to AI provider (Big Pickle) for dynamic content generation
+7. [ ] Tests for all learning engine components
+8. [ ] Verify with `npm run verify:full`
+9. [ ] Update documentation
 
-### Phase 2 Kickoff
+### Phase 2 — Subject Engine (Completed)
 
-1. [ ] Subject schema — formalize the frontmatter + section + concept schema (Phase 2 deliverable).
-2. [ ] Subject parser v2 — robust error handling, line numbers, recovery.
-3. [ ] Subject validator — validate subject files with detailed error messages.
-4. [ ] Prerequisite graph — build the DAG and implement prerequisite checking.
-5. [ ] Subject version migration — handle format upgrades.
-6. [ ] Subject repository persistence — cache parsed subjects.
-7. [ ] Subject selection — let the player choose which subject to study.
-8. [ ] Tests for all of the above.
-9. [ ] Verify with `npm run verify:full`.
-10. [ ] Update documentation.
+Delivered:
+
+1. [x] Subject schema — formalized frontmatter + section + concept with versioning (`schemaVersion`, `version`, frontmatter validation).
+2. [x] Subject parser v2 — line-number tracking via `ParseError`, `ParseResult<T>` types with severity/code/section/context.
+3. [x] Subject validator — 15+ edge cases: duplicate IDs, invalid levels, difficulty range, unknown prerequisites, self-prerequisites, insufficient options, missing correctIndex, empty domains/knowledge.
+4. [x] Prerequisite graph — DAG with Kahn's algorithm topological sort, DFS cycle detection, depth computation, `getAvailableConcepts()`.
+5. [x] Subject version migration — `SubjectVersionMigrationService` with chain verification, v1→v2 migration step.
+6. [x] Subject repository — expanded `SubjectRepository` interface (`findAll`, `save`, `create`, `delete`, `exists`), reusable `InMemorySubjectRepository` module.
+7. [x] Subject selection UI — `/subjects` page with card grid, title/version/domain count/concept count per subject; `/play?subject=...` accepts query parameter.
+8. [x] Navigation — landing page (`/`) with "Enter the Realms" link to subjects, "Continue Last Session" to play; `/play` has "← Subjects" back button.
+9. [x] Tests — 114 passing across 9 test files (18 graph, 16 migration, 14 repository, 29 parser, 4 mission, 2 integration, 12+13+6 other).
+10. [x] Verified — `npm run verify:full` passes (format, lint, type-check, build, 114 tests).
 
 ---
 

@@ -1,6 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   startMission as startMissionAction,
   submitAnswer as submitAnswerAction,
@@ -45,10 +47,25 @@ type Phase =
   | { state: "error"; message: string };
 
 // ---------------------------------------------------------------------------
-// Component
+// Wrapper with Suspense boundary
 // ---------------------------------------------------------------------------
 
 export default function PlayPage() {
+  return (
+    <Suspense fallback={<div className="play-loading">Loading game…</div>}>
+      <PlayPageInner />
+    </Suspense>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Inner Component
+// ---------------------------------------------------------------------------
+
+function PlayPageInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const subjectId = searchParams.get("subject") ?? "nextjs";
   const [phase, setPhase] = useState<Phase>({ state: "loading" });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -87,7 +104,7 @@ export default function PlayPage() {
     try {
       const result = await startMissionAction({
         playerId: "default-player",
-        subjectId: "nextjs",
+        subjectId,
         type: "encounter",
       });
 
@@ -189,7 +206,26 @@ export default function PlayPage() {
         minHeight: "100vh",
       }}
     >
-      <h1 style={{ fontSize: "1.75rem", marginBottom: "1rem", color: "#fff" }}>Frontend Realms</h1>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+        <button
+          onClick={() => router.push("/subjects")}
+          style={{
+            background: "none",
+            border: "1px solid #333",
+            color: "#888",
+            padding: "0.3rem 0.7rem",
+            borderRadius: 4,
+            cursor: "pointer",
+            fontSize: "0.8rem",
+          }}
+          aria-label="Back to subjects"
+        >
+          &larr; Subjects
+        </button>
+        <h1 style={{ fontSize: "1.75rem", color: "#fff", margin: 0 }}>
+          {subjectId === "nextjs" ? "Next.js" : subjectId}
+        </h1>
+      </div>
 
       <PhaseRenderer
         phase={phase}

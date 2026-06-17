@@ -59,6 +59,26 @@ class MockSubjectRepository implements SubjectRepository {
   async getById(id: string): Promise<Subject | null> {
     return this.store.get(id) ?? null;
   }
+
+  async findAll(): Promise<Subject[]> {
+    return Array.from(this.store.values());
+  }
+
+  async save(subject: Subject): Promise<void> {
+    this.store.set(subject.id, { ...subject, updatedAt: new Date() });
+  }
+
+  async create(subject: Subject): Promise<void> {
+    this.store.set(subject.id, subject);
+  }
+
+  async delete(id: string): Promise<void> {
+    this.store.delete(id);
+  }
+
+  async exists(id: string): Promise<boolean> {
+    return this.store.has(id);
+  }
 }
 
 class MockMissionRepository implements MissionRepository {
