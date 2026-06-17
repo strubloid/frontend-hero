@@ -116,6 +116,12 @@ class MockMissionRepository implements MissionRepository {
     if (!id) return null;
     return this.store.get(id) ?? null;
   }
+
+  async getCompletedByPlayer(playerId: string): Promise<Mission[]> {
+    return Array.from(this.store.values()).filter(
+      (m) => m.playerId === playerId && m.status === "completed",
+    );
+  }
 }
 
 class MockMissionAttemptRepository implements MissionAttemptRepository {
@@ -128,6 +134,10 @@ class MockMissionAttemptRepository implements MissionAttemptRepository {
 
   async getByMission(missionId: string): Promise<MissionAttempt[]> {
     return Array.from(this.store.values()).filter((a) => a.missionId === missionId);
+  }
+
+  async getByPlayer(playerId: string): Promise<MissionAttempt[]> {
+    return Array.from(this.store.values()).filter((a) => a.playerId === playerId);
   }
 }
 

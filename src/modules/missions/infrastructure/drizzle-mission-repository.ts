@@ -59,6 +59,15 @@ export class DrizzleMissionRepository implements MissionRepository {
     return this.toDomain(rows[0]);
   }
 
+  async getCompletedByPlayer(playerId: string): Promise<Mission[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.missions)
+      .where(and(eq(schema.missions.playerId, playerId), eq(schema.missions.status, "completed")));
+
+    return rows.map((row) => this.toDomain(row));
+  }
+
   private toDomain(row: typeof schema.missions.$inferSelect): Mission {
     return {
       id: row.id,
@@ -113,6 +122,15 @@ export class DrizzleMissionAttemptRepository implements MissionAttemptRepository
       .select()
       .from(schema.missionAttempts)
       .where(eq(schema.missionAttempts.missionId, missionId));
+
+    return rows.map((row) => this.toDomain(row));
+  }
+
+  async getByPlayer(playerId: string): Promise<MissionAttempt[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.missionAttempts)
+      .where(eq(schema.missionAttempts.playerId, playerId));
 
     return rows.map((row) => this.toDomain(row));
   }

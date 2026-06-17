@@ -5,9 +5,11 @@ export interface MissionRepository {
   create(mission: Mission): Promise<Mission>;
   save(mission: Mission): Promise<Mission>;
   getActiveByPlayer(playerId: string): Promise<Mission | null>;
+  getCompletedByPlayer(playerId: string): Promise<Mission[]>;
 }
 
 export interface MissionAttemptRepository {
   create(attempt: MissionAttempt): Promise<MissionAttempt>;
   getByMission(missionId: string): Promise<MissionAttempt[]>;
+  getByPlayer(playerId: string): Promise<MissionAttempt[]>;
 }

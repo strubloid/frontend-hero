@@ -92,6 +92,11 @@ class InMemoryMissionRepository implements MissionRepository {
     if (!id) return null;
     return this.store.get(id) ?? null;
   }
+  async getCompletedByPlayer(playerId: string) {
+    return Array.from(this.store.values()).filter(
+      (m) => m.playerId === playerId && m.status === "completed",
+    );
+  }
 }
 
 class InMemoryMissionAttemptRepository implements MissionAttemptRepository {
@@ -102,6 +107,9 @@ class InMemoryMissionAttemptRepository implements MissionAttemptRepository {
   }
   async getByMission(missionId: string) {
     return Array.from(this.store.values()).filter((a) => a.missionId === missionId);
+  }
+  async getByPlayer(playerId: string) {
+    return Array.from(this.store.values()).filter((a) => a.playerId === playerId);
   }
 }
 

@@ -22,8 +22,8 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 3 — Learning Engine (Complete)               |
-| **Next Phase**          | Phase 4 — Game Foundation                          |
+| **Current Phase**       | Phase 4 — Game Foundation (Complete)               |
+| **Next Phase**          | Phase 5 — Polish & Narrative                       |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
 | **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
@@ -501,6 +501,49 @@ Files created:
 
 9. [x] Tests — 114 passing across 9 test files (18 graph, 16 migration, 14 repository, 29 parser, 4 mission, 2 integration, 12+13+6 other).
 10. [x] Verified — `npm run verify:full` passes (format, lint, type-check, build, 114 tests).
+
+### Phase 4 — Game Foundation (Completed)
+
+Delivered:
+
+1. [x] ProgressionRepository — interface + `InMemoryProgressionRepository` for player level and XP tracking.
+2. [x] World map server action (`src/app/actions/world-map.ts`) — maps subject domains to 13 narrative regions, evaluates unlock status from concept masteries, returns region progress/order/flavor text.
+3. [x] World map page (`/world-map`) — rewired from static sample data to live server action; clickable regions with detail panel, flavor narrative, progress bars, "Enter Region" play link.
+4. [x] Achievement service (`src/modules/rewards/application/achievement-service.ts`) — aggregates player stats from masteries, missions, attempts; checks all defined achievements; awards new achievements automatically.
+5. [x] Profile server action (`src/app/actions/profile.ts`) — returns player name/level/title, XP bar, stats grid, mastery-by-domain breakdown, achievement list, recent activity.
+6. [x] Profile page (`/profile`) — rewired from static mock data to live server action; shows real mastery data, achievements, stats, recent activity.
+7. [x] Boss encounter service (`src/modules/missions/application/boss-encounter.service.ts`) — multi-phase boss battles with phase tracking, question collection by concept, phase pass/fail evaluation, XP awards, retreat support.
+8. [x] Landing page (`/`) — updated narrative intro, refined feature grid (6 items), "Enter the Realms" → world map, "Continue Last Session" accent button.
+9. [x] Infrastructure alignment — `getCompletedByPlayer` and `getByPlayer` methods added to `MissionRepository`/`MissionAttemptRepository` interfaces and all implementations (Drizzle, 2 in-memory, 2 mock repos).
+10. [x] `npm run verify:full` — format ✓ lint ✓ type-check ✓ build ✓ tests ✓
+
+Files created:
+
+- `src/modules/progression/domain/progression-repository.ts` — interface
+- `src/modules/progression/infrastructure/in-memory-progression-repository.ts` — in-memory impl
+- `src/app/actions/world-map.ts` — world map server action (13 region mapping)
+- `src/app/actions/profile.ts` — profile server action
+- `src/modules/rewards/application/achievement-service.ts` — achievement awarding
+- `src/modules/missions/application/boss-encounter.service.ts` — boss battle engine
+
+Files rewritten:
+
+- `src/app/page.tsx` — narrative + refined actions
+- `src/app/world-map/page.tsx` — live data, detail panel, play link
+- `src/app/profile/page.tsx` — live data, real mastery/achievements
+
+Deliverables for Phase 5 — Polish & Narrative:
+
+1. [ ] Add full set of achievement definitions (10+ concrete achievements)
+2. [ ] Add quest generation (daily/weekly from templates)
+3. [ ] Add mission chain definitions and progress tracking
+4. [ ] Add first-time onboarding flow (new player → intro → first mission)
+5. [ ] Add sound effects / visual polish for boss encounters
+6. [ ] Add "new achievement" notification toast on profile and in-mission
+7. [ ] Add loading skeletons for world-map and profile pages
+8. [ ] Add error boundaries and fallback states
+9. [ ] Performance: lazy-load, image optimization, bundle analysis
+10. [ ] End-to-end: smoke test full flow (landing → world map → play → answer → profile → achievements)
 
 ---
 
