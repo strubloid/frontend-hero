@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { getPlayerProfile } from "@/app/actions/profile";
+import { equipTitle, getPlayerProfile, setTheme } from "@/app/actions/profile";
 import type { PlayerProfileData } from "@/app/actions/profile";
 import { useToast } from "@/components/toast-provider";
 
@@ -11,6 +11,14 @@ const TYPE_ICONS: Record<string, string> = {
   achievement: "★",
   "level-up": "⬆",
 };
+
+const THEME_OPTIONS = [
+  { id: "default", name: "Default Realm", icon: "🏰", description: "Classic dark theme" },
+  { id: "forest", name: "Enchanted Forest", icon: "🌲", description: "Green-tinted accents" },
+  { id: "volcano", name: "Fire Peak", icon: "🌋", description: "Warm orange/red glow" },
+  { id: "frost", name: "Frost Valley", icon: "❄", description: "Cool blue tones" },
+  { id: "cosmic", name: "Cosmic Void", icon: "🌌", description: "Deep purple galaxy" },
+];
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<PlayerProfileData | null>(null);
@@ -142,9 +150,58 @@ export default function ProfilePage() {
     );
   }
 
-  const { player, stats, achievements, masteryByDomain, recentActivity } = profile;
+  const currentProfile = profile;
+  const { player, stats, achievements, masteryByDomain, recentActivity, progression } =
+    currentProfile;
   const accuracy =
     stats.totalAttempts > 0 ? Math.round((stats.correctAnswers / stats.totalAttempts) * 100) : 0;
+
+  async function handleTitleSelect(title: string) {
+    const previous = currentProfile;
+    setProfile({
+      ...currentProfile,
+      player: { ...currentProfile.player, title },
+      progression: { ...currentProfile.progression, equippedTitle: title },
+    });
+    try {
+      await equipTitle(player.id, title);
+      addToast({
+        type: "info",
+        title: "Title equipped",
+        description: `Now displaying “${title}”.`,
+      });
+    } catch {
+      setProfile(previous);
+      addToast({
+        type: "error",
+        title: "Could not equip title",
+        description: "Please try again.",
+      });
+    }
+  }
+
+  async function handleThemeSelect(theme: string) {
+    const previous = currentProfile;
+    setProfile({
+      ...currentProfile,
+      progression: { ...currentProfile.progression, selectedTheme: theme },
+    });
+    try {
+      await setTheme(player.id, theme);
+      addToast({
+        type: "info",
+        title: "Theme selected",
+        description: `${theme} is now active on your profile.`,
+      });
+    } catch {
+      setProfile(previous);
+      addToast({
+        type: "error",
+        title: "Could not select theme",
+        description: "Please try again.",
+      });
+    }
+  }
 
   return (
     <main className="profile-page">
@@ -234,6 +291,67 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* Title & Cosmetic Selection */}
+      <div className="profile-card cosmetics-card">
+        <h2 className="section-title">Title & Cosmetics</h2>
+        <p className="cosmetics-help">
+          Choose how your adventurer appears across the realms. Titles unlock from level, streak,
+          and achievement milestones.
+        </p>
+
+        <div className="cosmetics-section">
+          <div className="cosmetics-section-header">
+            <span className="cosmetics-icon">🎖</span>
+            <div>
+              <h3 className="cosmetics-heading">Display Title</h3>
+              <p className="cosmetics-subtext">Current: {progression.equippedTitle}</p>
+            </div>
+          </div>
+          <div className="title-options">
+            {progression.unlockedTitles.map((title) => (
+              <button
+                key={title}
+                className={`title-chip ${title === progression.equippedTitle ? "selected" : ""}`}
+                onClick={() => handleTitleSelect(title)}
+                disabled={title === progression.equippedTitle}
+              >
+                {title === progression.equippedTitle ? "✓ " : ""}
+                {title}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="cosmetics-section">
+          <div className="cosmetics-section-header">
+            <span className="cosmetics-icon">🎨</span>
+            <div>
+              <h3 className="cosmetics-heading">Realm Theme</h3>
+              <p className="cosmetics-subtext">Current: {progression.selectedTheme}</p>
+            </div>
+          </div>
+          <div className="theme-options">
+            {THEME_OPTIONS.map((theme) => (
+              <button
+                key={theme.id}
+                className={`theme-card ${theme.name === progression.selectedTheme ? "selected" : ""}`}
+                onClick={() => handleThemeSelect(theme.name)}
+                disabled={theme.name === progression.selectedTheme}
+              >
+                <span className="theme-icon">{theme.icon}</span>
+                <span className="theme-name">{theme.name}</span>
+                <span className="theme-desc">{theme.description}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="next-cosmetic-unlock">
+          <span>Next unlock</span>
+          <strong>{progression.nextCosmeticUnlock}</strong>
+        </div>
+      </div>
+
       {/* Mastery Overview */}
       <div className="profile-card">
         <h2 className="section-title">Mastery Overview</h2>
@@ -296,7 +414,17 @@ export default function ProfilePage() {
             ))}
           </div>
         )}
-        <Link href="/collections" className="collections-link" style={{ display: "block", marginTop: "0.75rem", color: "#f59e0b", textDecoration: "none", fontSize: "0.85rem" }}>
+        <Link
+          href="/collections"
+          className="collections-link"
+          style={{
+            display: "block",
+            marginTop: "0.75rem",
+            color: "#f59e0b",
+            textDecoration: "none",
+            fontSize: "0.85rem",
+          }}
+        >
           View all collections →
         </Link>
       </div>
@@ -680,6 +808,126 @@ const profileStyles = `
   }
   .pulse {
     animation: sk-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Cosmetics */
+  .cosmetics-card {
+    border-color: #7c3aed55;
+    background: linear-gradient(135deg, #1e293b, #1e1b4b);
+  }
+  .cosmetics-help {
+    margin: -0.25rem 0 1rem;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .cosmetics-section {
+    padding: 1rem;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.5);
+    margin-bottom: 1rem;
+  }
+  .cosmetics-section-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.85rem;
+  }
+  .cosmetics-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #0f172a;
+    font-size: 1.35rem;
+  }
+  .cosmetics-heading {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+  }
+  .cosmetics-subtext {
+    margin: 0.15rem 0 0;
+    color: #94a3b8;
+    font-size: 0.78rem;
+  }
+  .title-options,
+  .theme-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .title-chip,
+  .theme-card {
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: #cbd5e1;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s, background 0.15s;
+  }
+  .title-chip {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .title-chip:hover:not(:disabled),
+  .theme-card:hover:not(:disabled) {
+    border-color: #a78bfa;
+    transform: translateY(-1px);
+  }
+  .title-chip.selected,
+  .theme-card.selected {
+    border-color: #a78bfa;
+    background: #312e81;
+    color: #f5f3ff;
+    cursor: default;
+  }
+  .theme-card {
+    min-width: 145px;
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "icon name"
+      "icon desc";
+    column-gap: 0.55rem;
+    row-gap: 0.15rem;
+    text-align: left;
+  }
+  .theme-icon {
+    grid-area: icon;
+    font-size: 1.45rem;
+    align-self: center;
+  }
+  .theme-name {
+    grid-area: name;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .theme-desc {
+    grid-area: desc;
+    color: #94a3b8;
+    font-size: 0.7rem;
+  }
+  .next-cosmetic-unlock {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #94a3b8;
+    font-size: 0.8rem;
+  }
+  .next-cosmetic-unlock strong {
+    color: #fbbf24;
+    text-align: right;
   }
   @keyframes sk-pulse {
     0%, 100% { opacity: 0.3; }

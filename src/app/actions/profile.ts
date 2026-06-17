@@ -509,10 +509,7 @@ export async function getAchievementProgress(playerId: string): Promise<{
   const data = await getCollections(playerId);
   const recentEarned = data.all
     .filter((i) => i.earned)
-    .sort(
-      (a, b) =>
-        new Date(b.earnedAt ?? 0).getTime() - new Date(a.earnedAt ?? 0).getTime(),
-    )
+    .sort((a, b) => new Date(b.earnedAt ?? 0).getTime() - new Date(a.earnedAt ?? 0).getTime())
     .slice(0, 3);
 
   return {
@@ -520,4 +517,31 @@ export async function getAchievementProgress(playerId: string): Promise<{
     total: data.total,
     recentEarned,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Title & cosmetic selection
+// ---------------------------------------------------------------------------
+
+const THEME_OPTIONS = [
+  { id: "default", name: "Default Realm", icon: "🏰", description: "Classic dark theme" },
+  { id: "forest", name: "Enchanted Forest", icon: "🌲", description: "Green-tinted accents" },
+  { id: "volcano", name: "Fire Peak", icon: "🌋", description: "Warm orange/red glow" },
+  { id: "frost", name: "Frost Valley", icon: "❄", description: "Cool blue tones" },
+  { id: "cosmic", name: "Cosmic Void", icon: "🌌", description: "Deep purple galaxy" },
+];
+
+export async function equipTitle(playerId: string, title: string): Promise<void> {
+  const player = await playerRepository?.getById(playerId);
+  if (!player) return;
+  player.selectedTitle = title;
+  await playerRepository?.save(player);
+}
+
+export async function setTheme(playerId: string, theme: string): Promise<void> {
+  const player = await playerRepository?.getById(playerId);
+  if (!player) return;
+  const validTheme = THEME_OPTIONS.some((option) => option.name === theme);
+  player.selectedTheme = validTheme ? theme : "Default Realm";
+  await playerRepository?.save(player);
 }

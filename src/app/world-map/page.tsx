@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getWorldMap } from "@/app/actions/world-map";
 import { OnboardingFlow } from "@/components/onboarding-flow";
+import { StoryProgression } from "@/components/story-banner";
 
 interface RegionDisplay {
   id: string;
@@ -62,6 +63,126 @@ export default function WorldMapPage() {
     }
     load();
   }, []);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const connSvgRef = useRef<SVGSVGElement>(null);
+  const particlesRef = useRef<
+    { x: number; y: number; vx: number; vy: number; r: number; a: number }[]
+  >([]);
+
+  // Particle animation loop for atmospheric background
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    function resize() {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = document.querySelector(".world-map-page")?.scrollHeight ?? window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Seed particles
+    const count = 60;
+    particlesRef.current = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2.5 + 0.5,
+      a: Math.random() * 0.4 + 0.1,
+    }));
+
+    let animId: number;
+    function draw() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const p of particlesRef.current) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(148, 163, 184, ${p.a})`;
+        ctx.fill();
+      }
+      animId = requestAnimationFrame(draw);
+    }
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  // Draw connection lines between sequential region cards
+  useEffect(() => {
+    const svg = connSvgRef.current;
+    if (!svg || regions.length < 2) return;
+    const parent = svg.parentElement;
+    if (!parent) return;
+
+    function drawLines() {
+      const svgEl = svg!;
+      const parentEl = parent!;
+      const parentRect = parentEl.getBoundingClientRect();
+      let html = "";
+
+      // Sort by order and find card elements
+      const sorted = [...regions].sort((a, b) => a.order - b.order);
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const fromEl = parentEl.querySelector(
+          `[data-region-id="${sorted[i].id}"]`,
+        ) as HTMLElement | null;
+        const toEl = parentEl.querySelector(
+          `[data-region-id="${sorted[i + 1].id}"]`,
+        ) as HTMLElement | null;
+        if (!fromEl || !toEl) continue;
+
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+
+        const x1 = fromRect.right - parentRect.left;
+        const y1 = fromRect.top + fromRect.height / 2 - parentRect.top;
+        const x2 = toRect.left - parentRect.left;
+        const y2 = toRect.top + toRect.height / 2 - parentRect.top;
+
+        // Determine edge class
+        let edgeClass = "";
+        if (
+          sorted[i].status === "completed" &&
+          (sorted[i + 1].status === "available" || sorted[i + 1].status === "in-progress")
+        ) {
+          edgeClass = "active-edge";
+        } else if (sorted[i].status === "completed" || sorted[i + 1].status === "completed") {
+          edgeClass = "completed-edge";
+        }
+
+        html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${edgeClass}" />`;
+      }
+
+      svgEl.innerHTML = html;
+    }
+
+    drawLines();
+    window.addEventListener("resize", drawLines);
+    // Re-draw after a brief delay to ensure layout settled
+    const tid = setTimeout(drawLines, 300);
+
+    return () => {
+      window.removeEventListener("resize", drawLines);
+      clearTimeout(tid);
+    };
+  }, [regions]);
 
   const currentRegion = regions.find((r) => r.id === progress?.currentRegionId);
 
@@ -165,10 +286,17 @@ export default function WorldMapPage() {
           {/* Animated particles background */}
           <canvas ref={canvasRef} className="world-particles" />
 
+          {/* Story progression: milestone events */}
+          <StoryProgression playerId="player-1" />
+
+          {/* Connection paths between sequential regions */}
+          <svg className="world-connections" ref={connSvgRef} />
+
           <div className="world-map-grid">
             {regions.map((region, idx) => (
               <div
                 key={region.id}
+                data-region-id={region.id}
                 className={`region-card region-${region.status}`}
                 style={{ animationDelay: `${idx * 0.08}s` }}
                 onClick={() => region.status !== "locked" && setSelectedRegion(region.id)}
@@ -509,6 +637,137 @@ export default function WorldMapPage() {
           }
           .region-detail-icon {
             font-size: 2.4rem;
+          }
+        }
+
+        /* ── Animated World ── */
+
+        /* Particle canvas sits behind everything */
+        .world-particles {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .world-map-grid {
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Region card entrance: fade in + slide up */
+        .region-card {
+          animation: regionEntrance 0.5s ease-out both;
+        }
+        @keyframes regionEntrance {
+          0%   { opacity: 0; transform: translateY(24px) scale(0.96); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Completed region glow pulse */
+        .region-completed {
+          animation: regionEntrance 0.5s ease-out both, glowPulse 3s ease-in-out infinite;
+        }
+        .region-completed .region-icon {
+          animation: iconFloat 4s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 6px rgba(34, 197, 94, 0.15); }
+          50%      { box-shadow: 0 0 18px rgba(34, 197, 94, 0.35); }
+        }
+        @keyframes iconFloat {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-3px); }
+        }
+
+        /* Locked region shimmer — subtle diagonal sweep */
+        .region-locked {
+          position: relative;
+          overflow: hidden;
+        }
+        .region-locked::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            105deg,
+            transparent 40%,
+            rgba(255, 255, 255, 0.03) 50%,
+            transparent 60%
+          );
+          background-size: 200% 100%;
+          animation: shimmer 4s ease-in-out infinite;
+          pointer-events: none;
+        }
+        @keyframes shimmer {
+          0%   { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        /* Progress bar animated fill */
+        .region-progress-fill {
+          animation: fillBar 0.8s ease-out both;
+        }
+        @keyframes fillBar {
+          0%   { width: 0% !important; }
+        }
+
+        /* Enhanced hover: lift + glow border */
+        .region-card:hover {
+          transform: translateY(-3px) !important;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .region-completed:hover {
+          box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25) !important;
+        }
+        .region-in-progress:hover {
+          box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2) !important;
+        }
+        .region-available:hover {
+          box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2) !important;
+        }
+
+        /* Connection path between regions (svg line) */
+        .world-connections {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .world-connections line,
+        .world-connections path {
+          stroke: #334155;
+          stroke-width: 1.5;
+          fill: none;
+          stroke-dasharray: 6 4;
+          animation: connectionFlow 20s linear infinite;
+        }
+        .world-connections .completed-edge {
+          stroke: #22c55e;
+          stroke-opacity: 0.4;
+        }
+        .world-connections .active-edge {
+          stroke: #f59e0b;
+          stroke-opacity: 0.5;
+          stroke-dasharray: 4 3;
+        }
+        @keyframes connectionFlow {
+          0%   { stroke-dashoffset: 0; }
+          100% { stroke-dashoffset: -20; }
+        }
+
+        @media (max-width: 768px) {
+          .world-particles {
+            display: none;
+          }
+          .region-card {
+            animation: none;
           }
         }
       `}</style>

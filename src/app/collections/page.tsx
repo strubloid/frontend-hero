@@ -97,18 +97,21 @@ export default function CollectionsPage() {
                         {item.hidden && !item.earned ? "???" : item.name}
                       </h3>
                       <p className="achievement-desc">
-                        {item.hidden && !item.earned ? "Keep exploring to discover this secret." : item.description}
+                        {item.hidden && !item.earned
+                          ? "Keep exploring to discover this secret."
+                          : item.description}
                       </p>
                     </div>
                     {item.earned && (
-                      <div className="achievement-earned-badge" title={`Earned ${item.earnedAt ? new Date(item.earnedAt).toLocaleDateString() : ""}`}>
+                      <div
+                        className="achievement-earned-badge"
+                        title={`Earned ${item.earnedAt ? new Date(item.earnedAt).toLocaleDateString() : ""}`}
+                      >
                         ✓
                       </div>
                     )}
                     {item.rewardType && item.earned && (
-                      <div className="achievement-reward">
-                        {item.rewardValue}
-                      </div>
+                      <div className="achievement-reward">{item.rewardValue}</div>
                     )}
                   </div>
                 ))}

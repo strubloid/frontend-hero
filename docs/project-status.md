@@ -22,7 +22,7 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 7 — Advanced Game Experience (In Progress)   |
+| **Current Phase**       | Phase 7 — Advanced Game Experience (Completed)     |
 | **Next Phase**          | Phase 8 — Production Readiness                     |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
@@ -568,6 +568,29 @@ Delivered:
 5. [x] Mobile-responsive pass — world-map, profile, play, boss encounter, and settings layouts improved for tablet/phone widths.
 6. [x] Unit tests for new services — added regression coverage for mission-chain completion deactivation and boss retreat-state handling.
 7. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 172 tests ✓).
+
+### Phase 7 — Advanced Game Experience (Completed)
+
+Delivered:
+
+1. [x] Collections page — `/collections` displays collectible achievement cards grouped by category, earned/total summaries, hidden/locked/earned states, reward badges, and a collection progress bar.
+2. [x] Animated world map — `/world-map` now includes atmospheric particle canvas, animated connection paths between sequential regions, staggered region-card entrances, completed-region glow, locked-region shimmer, animated progress bars, and enhanced hover states.
+3. [x] Story progression banners — `StoryBanner` / `StoryProgression` components plus `getRecentStoryEvents` server action surface level-up and achievement milestone events as animated narrative banners.
+4. [x] Title & cosmetic selection — profile page includes a Title & Cosmetics card for selecting unlocked display titles and realm themes, with optimistic updates and toast feedback.
+5. [x] Navigation — world-map and profile navigation include Collections; profile achievements section links to the complete collections page.
+6. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 177 tests ✓).
+
+Files created:
+
+- `src/app/collections/page.tsx` — collections/achievement gallery page.
+- `src/app/actions/story.ts` — story milestone server action.
+- `src/components/story-banner.tsx` — animated story milestone banner components.
+
+Files updated:
+
+- `src/app/actions/profile.ts` — collection data actions plus title/theme persistence actions.
+- `src/app/profile/page.tsx` — collections navigation/link and title/theme picker UI.
+- `src/app/world-map/page.tsx` — animated world map polish and story progression integration.
 
 ### Phase 4 — Game Foundation (Completed)
 
