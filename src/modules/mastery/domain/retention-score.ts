@@ -30,7 +30,11 @@ export class RetentionScore {
    * @param hoursSinceLastReview — elapsed time in hours.
    * @param stabilityHours — half-life in hours (how long until retention halves).
    */
-  static computeDecay(score: number, hoursSinceLastReview: number, stabilityHours: number): RetentionScore {
+  static computeDecay(
+    score: number,
+    hoursSinceLastReview: number,
+    stabilityHours: number,
+  ): RetentionScore {
     const decay = Math.exp(-(hoursSinceLastReview / stabilityHours) * Math.LN2);
     return RetentionScore.from(score * decay);
   }

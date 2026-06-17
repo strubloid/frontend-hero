@@ -1,6 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { ReviewAlgorithm, ReviewInput } from "@/modules/reviews/domain/review-algorithm";
-import { ReviewSchedule, masteryScoreToQuality, isSuccessfulRecall, updateEasinessFactor, calculateInterval } from "@/modules/reviews/domain/review-schedule";
+import {
+  ReviewSchedule,
+  masteryScoreToQuality,
+  isSuccessfulRecall,
+  updateEasinessFactor,
+  calculateInterval,
+} from "@/modules/reviews/domain/review-schedule";
 
 describe("SM-2 helper functions", () => {
   it("masteryScoreToQuality maps correctly", () => {

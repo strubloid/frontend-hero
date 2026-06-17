@@ -22,8 +22,8 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 2 — Subject Engine (Complete)                |
-| **Next Phase**          | Phase 3 — Learning Engine                          |
+| **Current Phase**       | Phase 3 — Learning Engine (Complete)                |
+| **Next Phase**          | Phase 4 — Game Foundation                          |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
 | **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
@@ -448,17 +448,21 @@ frontend-hero/                    <-- Project root
 
 ## 7. Next Actions
 
-### Immediate (Phase 3 — Learning Engine)
+### Immediate (Phase 4 — Game Foundation)
 
-1. [ ] Implement mastery engine — concept mastery scoring, confidence, retention
-2. [ ] Build review scheduling — spaced repetition with SM-2 or similar algorithm
-3. [ ] Implement difficulty adaptation — adjust question difficulty based on performance
-4. [ ] Build mission selector — pick concepts, mission types, and questions based on player state
-5. [ ] Implement repetition control — semantic deduplication, variety management
-6. [ ] Connect learning engine to AI provider (Big Pickle) for dynamic content generation
-7. [ ] Tests for all learning engine components
-8. [ ] Verify with `npm run verify:full`
-9. [ ] Update documentation
+1. [ ] Build world map — regions, region unlock logic, visual map
+2. [ ] Build mission chain and structured progression system
+3. [ ] Build player XP and level system
+4. [ ] Build reward system for completing objectives
+5. [ ] Build initial narrative for the Frontend Realms setting
+6. [ ] Build daily/weekly quest variants
+7. [ ] Build achievement system
+8. [ ] Build boss encounters as multi-phase missions
+9. [ ] Build player profile page showing progression
+10. [ ] Add world map navigation UI
+11. [ ] Separate `mastery` module from `progression/` module
+12. [ ] Update `StartMissionUseCase` to inject `PrerequisiteGraphBuilder` for proper `availableConceptIds`
+13. [ ] Wire `StartMissionUseCase` to update `ConceptMastery` after answer submission
 
 ### Phase 2 — Subject Engine (Completed)
 
@@ -472,6 +476,28 @@ Delivered:
 6. [x] Subject repository — expanded `SubjectRepository` interface (`findAll`, `save`, `create`, `delete`, `exists`), reusable `InMemorySubjectRepository` module.
 7. [x] Subject selection UI — `/subjects` page with card grid, title/version/domain count/concept count per subject; `/play?subject=...` accepts query parameter.
 8. [x] Navigation — landing page (`/`) with "Enter the Realms" link to subjects, "Continue Last Session" to play; `/play` has "← Subjects" back button.
+
+### Phase 3 — Learning Engine (Completed)
+
+Delivered:
+
+1. [x] Mastery module — value objects (`MasteryScore`, `ConfidenceLevel`, `RetentionScore`), `MasteryCalculator` with weighted gain/loss, fluency bonus, context tracking, `WeaknessDetector` with 4 detection patterns, `MasteryRepository` interface.
+2. [x] Reviews module — SM-2 spaced repetition algorithm (`ReviewAlgorithm`), `ReviewPrioritizer` with urgency scoring (overdue/today/soon/low-retention), `ReviewRepository` interface, `ReviewSchedule` domain model.
+3. [x] Mission selector — 4-tier priority pipeline: overdue reviews → weakness detection → fresh concepts → fallback, with recent-concept avoidance.
+4. [x] Difficulty adaptation — `QuestionProvider.provideFor()` accepts player context, computes target difficulty (+/-2 from base) based on mastery level, scores seeds by suitability.
+5. [x] Repetition control — skips recently shown questions (window of 10), limits re-shows to 4 max, avoids repeats within mission.
+6. [x] Start mission use case — injects `MasteryRepository` and `ReviewRepository`, loads player state, passes to upgraded selector.
+7. [x] Tests — 56 tests across 7 files: mastery calculator (10), mastery score (11), retention score (5), weakness detector (8), review algorithm (10), review prioritizer (6), mission selector (6).
+8. [x] `npm run verify:full` — format ✓ lint ✓ type-check ✓ build ✓ 170/170 tests ✓
+
+Files created:
+
+- `src/modules/mastery/domain/` — concept-mastery.ts, mastery-score.ts, confidence-level.ts, retention-score.ts, mastery-calculator.ts, weakness-detector.ts, mastery-repository.ts
+- `src/modules/reviews/domain/` — review-schedule.ts, review-algorithm.ts, review-prioritizer.ts, review-repository.ts
+- `src/modules/missions/application/mission-selector.ts` — rewritten (4-tier pipeline)
+- `src/modules/missions/application/start-mission.use-case.ts` — upgraded (mastery + review injection)
+- `src/modules/questions/application/question-provider.ts` — upgraded (difficulty adaptation + repetition control)
+- `src/modules/*/domain/__tests__/` — 7 test files with 56 tests
 9. [x] Tests — 114 passing across 9 test files (18 graph, 16 migration, 14 repository, 29 parser, 4 mission, 2 integration, 12+13+6 other).
 10. [x] Verified — `npm run verify:full` passes (format, lint, type-check, build, 114 tests).
 

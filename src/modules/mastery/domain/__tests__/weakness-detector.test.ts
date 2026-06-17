@@ -68,21 +68,20 @@ describe("WeaknessDetector", () => {
   });
 
   it("detects never-attempted concepts", () => {
-    const reports = detector.detect(
-      [],
-      [makeConcept({ id: "c1" })],
-    );
+    const reports = detector.detect([], [makeConcept({ id: "c1" })]);
     expect(reports.some((r) => r.reason === "NEVER_ATTEMPTED" && r.conceptId === "c1")).toBe(true);
   });
 
   it("detects consecutive error pattern", () => {
     const reports = detector.detect(
-      [makeMastery({
-        conceptId: "c1",
-        masteryScore: 0.3,
-        incorrectAttempts: 3,
-        consecutiveCorrectAnswers: 0,
-      })],
+      [
+        makeMastery({
+          conceptId: "c1",
+          masteryScore: 0.3,
+          incorrectAttempts: 3,
+          consecutiveCorrectAnswers: 0,
+        }),
+      ],
       [makeConcept({ id: "c1" })],
     );
     expect(reports.some((r) => r.reason === "CONSECUTIVE_ERRORS")).toBe(true);
@@ -94,8 +93,24 @@ describe("WeaknessDetector", () => {
 
   it("getTopWeakness prefers CONSECUTIVE_ERRORS over LOW_MASTERY", () => {
     const reports = [
-      { conceptId: "c1", conceptName: "C1", domainName: "D", masteryScore: 0.3, confidenceScore: 0.3, retentionScore: 0.3, reason: "LOW_MASTERY" },
-      { conceptId: "c2", conceptName: "C2", domainName: "D", masteryScore: 0.4, confidenceScore: 0.4, retentionScore: 0.4, reason: "CONSECUTIVE_ERRORS" },
+      {
+        conceptId: "c1",
+        conceptName: "C1",
+        domainName: "D",
+        masteryScore: 0.3,
+        confidenceScore: 0.3,
+        retentionScore: 0.3,
+        reason: "LOW_MASTERY",
+      },
+      {
+        conceptId: "c2",
+        conceptName: "C2",
+        domainName: "D",
+        masteryScore: 0.4,
+        confidenceScore: 0.4,
+        retentionScore: 0.4,
+        reason: "CONSECUTIVE_ERRORS",
+      },
     ];
     const top = detector.getTopWeakness(reports);
     expect(top?.reason).toBe("CONSECUTIVE_ERRORS");
@@ -103,8 +118,24 @@ describe("WeaknessDetector", () => {
 
   it("getTopWeakness prefers LOW_MASTERY over DECAYING_RETENTION", () => {
     const reports = [
-      { conceptId: "c1", conceptName: "C1", domainName: "D", masteryScore: 0.7, confidenceScore: 0.7, retentionScore: 0.2, reason: "DECAYING_RETENTION" },
-      { conceptId: "c2", conceptName: "C2", domainName: "D", masteryScore: 0.3, confidenceScore: 0.3, retentionScore: 0.3, reason: "LOW_MASTERY" },
+      {
+        conceptId: "c1",
+        conceptName: "C1",
+        domainName: "D",
+        masteryScore: 0.7,
+        confidenceScore: 0.7,
+        retentionScore: 0.2,
+        reason: "DECAYING_RETENTION",
+      },
+      {
+        conceptId: "c2",
+        conceptName: "C2",
+        domainName: "D",
+        masteryScore: 0.3,
+        confidenceScore: 0.3,
+        retentionScore: 0.3,
+        reason: "LOW_MASTERY",
+      },
     ];
     const top = detector.getTopWeakness(reports);
     expect(top?.reason).toBe("LOW_MASTERY");

@@ -1,30 +1,93 @@
 import { v4 as uuidv4 } from "uuid";
 import { Question } from "@/modules/questions/domain/question";
 import { QuestionRepository } from "@/modules/questions/domain/question-repository";
-import { Concept, Subject } from "@/modules/subjects/domain/subject";
+import { Concept, Subject, QuestionSeed } from "@/modules/subjects/domain/subject";
 import { MissionPlan } from "@/modules/missions/application/mission-selector";
 
 /**
- * Converts QuestionSeeds embedded in a Concept into domain Question objects,
- * checking the QuestionRepository for existing questions by seedId+subjectId
- * to avoid duplicates.
+ * Player context for question selection.
+ * Used to adapt difficulty and avoid repetition.
+ */
+export interface QuestionProviderContext {
+  recentQuestionIds: string[];
+  conceptMastery?: Map<string, number>; // conceptId → mastery score 0-1
+  preferredDifficulty?: number; // 1-5 the player is currently targeting
+}
+
+/**
+ * Selects and adapts questions from a concept's seeds, applying:
+ *
+ * 1. Difficulty adaptation — prefer seeds near the player's mastery-adjusted level
+ * 2. Repetition control — skip questions shown recently or too many times
+ * 3. Variety enforcement — no repeats within the recent N questions
  */
 export class QuestionProvider {
-  constructor(private readonly questionRepository: QuestionRepository) {}
+  constructor(
+    private readonly questionRepository: QuestionRepository,
+    private readonly maxQuestionsPerMission: number = 3,
+    private readonly recentQuestionWindow: number = 10,
+  ) {}
 
-  async provideFor(missionPlan: MissionPlan, subject: Subject): Promise<Question[]> {
-    // Locate the concept targeted by this mission
+  async provideFor(
+    missionPlan: MissionPlan,
+    subject: Subject,
+    context?: QuestionProviderContext,
+  ): Promise<Question[]> {
     const concept = this.findConcept(missionPlan, subject);
-    return this.provideForConcept(concept, subject.id);
+    return this.provideForConcept(concept, subject.id, context);
   }
 
-  async provideForConcept(concept: Concept, subjectId: string): Promise<Question[]> {
-    const questions: Question[] = [];
+  async provideForConcept(
+    concept: Concept,
+    subjectId: string,
+    context?: QuestionProviderContext,
+  ): Promise<Question[]> {
+    const ctx = context ?? { recentQuestionIds: [] };
+    const avoidedIds = new Set(ctx.recentQuestionIds);
+
+    // Determine target difficulty from player mastery
+    const conceptMastery = ctx.conceptMastery?.get(concept.id) ?? 0;
+    const targetDifficulty = this.computeTargetDifficulty(conceptMastery, concept.difficulty);
+
+    // Get existing persisted questions for this concept
+    const existingQuestions = await this.questionRepository.getByConceptId(concept.id);
+
+    // Index persisted questions by seedId for fast lookup
+    const bySeedId = new Map<string, Question>();
+    for (const q of existingQuestions) {
+      bySeedId.set(q.seedId, q);
+    }
+
+    // Score each seed by suitability, then pick the best ones
+    const seededScores: Array<{ seed: QuestionSeed; score: number }> = [];
 
     for (const seed of concept.questionSeeds) {
-      // Check if question already exists
-      const existing = await this.questionRepository.getBySeedAndSubject(seed.seedId, subjectId);
+      const existing = bySeedId.get(seed.seedId);
 
+      // Repetition control: skip if recently shown and not the only option
+      if (existing && avoidedIds.has(existing.id) && concept.questionSeeds.length > 1) {
+        continue;
+      }
+
+      // Repetition control: skip if shown too many times (>3)
+      if (existing && existing.timesShown >= 4 && concept.questionSeeds.length > 1) {
+        continue;
+      }
+
+      const score = this.scoreSeed(seed, targetDifficulty, existing);
+      seededScores.push({ seed, score });
+    }
+
+    // Sort by score descending (best match first)
+    seededScores.sort((a, b) => b.score - a.score);
+
+    // Take the best seeds
+    const selected = seededScores.slice(0, this.maxQuestionsPerMission);
+
+    // Convert selected seeds to Question objects
+    const questions: Question[] = [];
+    for (const { seed } of selected) {
+      const existing = bySeedId.get(seed.seedId);
       if (existing) {
         questions.push(existing);
       } else {
@@ -35,6 +98,69 @@ export class QuestionProvider {
     }
 
     return questions;
+  }
+
+  /**
+   * Score a seed from 0 (worst) to 100 (best) based on:
+   * - Difficulty match: closer to target = higher score
+   * - Freshness: not yet seen = bonus
+   * - Shown count penalty: fewer times shown = better
+   */
+  private scoreSeed(
+    seed: QuestionSeed,
+    targetDifficulty: number,
+    existing?: Question | null,
+  ): number {
+    let score = 0;
+
+    // Difficulty match (0-40 points)
+    const diffDiff = Math.abs(seed.difficulty - targetDifficulty);
+    score += Math.max(0, 40 - diffDiff * 15);
+
+    // Freshness bonus (0-30 points)
+    if (!existing) {
+      score += 30;
+    } else {
+      score += Math.max(0, 30 - existing.timesShown * 8);
+
+      // Additional bonus if not recently shown
+      if (existing.lastShownAt) {
+        const daysSinceShown =
+          (Date.now() - existing.lastShownAt.getTime()) / (24 * 60 * 60 * 1000);
+        if (daysSinceShown < 1)
+          score -= 20; // shown today: penalty
+        else if (daysSinceShown < 3)
+          score -= 5; // shown recently: slight penalty
+        else score += Math.min(15, daysSinceShown); // older = better
+      } else {
+        score += 15; // never shown: bonus
+      }
+    }
+
+    return score;
+  }
+
+  /**
+   * Compute the ideal difficulty for a player based on their mastery.
+   *
+   * Rules:
+   * - mastery < 0.2: play at concept's base difficulty - 1 (min 1)
+   * - mastery 0.2-0.5: play at base difficulty
+   * - mastery 0.5-0.8: play at base difficulty + 1 (challenge)
+   * - mastery > 0.8: play at base difficulty + 2 (max 5)
+   */
+  private computeTargetDifficulty(conceptMastery: number, baseDifficulty: number): number {
+    let target: number;
+    if (conceptMastery < 0.2) {
+      target = baseDifficulty - 1;
+    } else if (conceptMastery < 0.5) {
+      target = baseDifficulty;
+    } else if (conceptMastery < 0.8) {
+      target = baseDifficulty + 1;
+    } else {
+      target = baseDifficulty + 2;
+    }
+    return Math.max(1, Math.min(5, target));
   }
 
   private findConcept(missionPlan: MissionPlan, subject: Subject): Concept {

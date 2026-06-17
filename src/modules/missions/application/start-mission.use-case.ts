@@ -43,9 +43,7 @@ export class StartMissionUseCase {
       : [];
 
     // All concept IDs in the subject (prerequisite-unlocked filtering comes later)
-    const allConceptIds = subject.domains.flatMap((d) =>
-      d.concepts.map((c) => c.id),
-    );
+    const allConceptIds = subject.domains.flatMap((d) => d.concepts.map((c) => c.id));
 
     const missionPlan: MissionPlan = this.missionSelector.select({
       subject,

@@ -37,9 +37,7 @@ export class MissionSelector {
 
     // --- Priority 1: Overdue reviews ---
     const masteriesMap = new Map(input.masteries.map((m) => [m.conceptId, m]));
-    const fullSchedules = input.schedules.filter(
-      (s) => s.nextReviewAt && s.nextReviewAt <= now,
-    );
+    const fullSchedules = input.schedules.filter((s) => s.nextReviewAt && s.nextReviewAt <= now);
     const prioritised = this.reviewPrioritizer.prioritise(fullSchedules, masteriesMap, 3);
 
     // Pick the highest urgency review that isn't recent
@@ -56,20 +54,17 @@ export class MissionSelector {
 
     // --- Priority 2: Weak concepts ---
     const allConcepts = input.subject.domains.flatMap((d) => d.concepts);
-    const validConcepts = allConcepts.filter(
-      (c) => input.availableConceptIds.includes(c.id),
-    );
-    const validMasteries = input.masteries.filter(
-      (m) => input.availableConceptIds.includes(m.conceptId),
+    const validConcepts = allConcepts.filter((c) => input.availableConceptIds.includes(c.id));
+    const validMasteries = input.masteries.filter((m) =>
+      input.availableConceptIds.includes(m.conceptId),
     );
 
     const weakReports = this.weaknessDetector.detect(validMasteries, validConcepts);
     const topWeakness = this.weaknessDetector.getTopWeakness(weakReports);
 
     if (topWeakness && !recentSet.has(topWeakness.conceptId)) {
-      const missionType: MissionType = topWeakness.reason === "CONSECUTIVE_ERRORS"
-        ? "review"
-        : "encounter";
+      const missionType: MissionType =
+        topWeakness.reason === "CONSECUTIVE_ERRORS" ? "review" : "encounter";
       return {
         subjectId: input.subject.id,
         conceptId: topWeakness.conceptId,

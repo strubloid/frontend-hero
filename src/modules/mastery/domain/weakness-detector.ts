@@ -39,10 +39,7 @@ export class WeaknessDetector {
   /**
    * Find all weak concepts for a player across a subject.
    */
-  detect(
-    allConceptMastery: ConceptMastery[],
-    allConcepts: Concept[],
-  ): WeaknessReport[] {
+  detect(allConceptMastery: ConceptMastery[], allConcepts: Concept[]): WeaknessReport[] {
     const reports: WeaknessReport[] = [];
 
     for (const mastery of allConceptMastery) {

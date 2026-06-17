@@ -62,7 +62,11 @@ export function updateEasinessFactor(currentEF: number, q: ReviewQuality): numbe
 /**
  * SM-2 interval calculation.
  */
-export function calculateInterval(repetitions: number, intervalDays: number, easinessFactor: number): number {
+export function calculateInterval(
+  repetitions: number,
+  intervalDays: number,
+  easinessFactor: number,
+): number {
   if (repetitions === 0) return 1; // first successful recall — 1 day
   if (repetitions === 1) return 6; // second successful recall — 6 days
   return Math.round(intervalDays * easinessFactor); // subsequent

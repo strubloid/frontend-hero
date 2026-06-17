@@ -40,7 +40,8 @@ export class ReviewPrioritizer {
       if (schedule.nextReviewAt) {
         if (schedule.nextReviewAt < now) {
           // Overdue: base urgency increases with how overdue
-          const daysOverdue = (now.getTime() - schedule.nextReviewAt.getTime()) / (24 * 60 * 60 * 1000);
+          const daysOverdue =
+            (now.getTime() - schedule.nextReviewAt.getTime()) / (24 * 60 * 60 * 1000);
           urgency = ReviewPrioritizer.OVERDUE_URGENCY_BASE + Math.round(daysOverdue * 10);
         } else if (schedule.nextReviewAt <= endOfToday) {
           urgency = ReviewPrioritizer.DUE_TODAY_URGENCY_BASE;

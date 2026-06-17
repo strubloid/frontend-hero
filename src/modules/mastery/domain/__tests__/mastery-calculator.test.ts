@@ -57,7 +57,11 @@ describe("MasteryCalculator", () => {
     }
     expect(mastery!.consecutiveCorrectAnswers).toBe(3);
 
-    const failResult = calculator.update({ ...baseInput, isCorrect: false, currentMastery: mastery });
+    const failResult = calculator.update({
+      ...baseInput,
+      isCorrect: false,
+      currentMastery: mastery,
+    });
     expect(failResult.mastery.consecutiveCorrectAnswers).toBe(0);
   });
 
@@ -81,11 +85,15 @@ describe("MasteryCalculator", () => {
       m = r.mastery;
     }
     const easyFail = calculator.update({
-      ...baseInput, isCorrect: false, difficulty: 1,
+      ...baseInput,
+      isCorrect: false,
+      difficulty: 1,
       currentMastery: m,
     });
     const hardFail = calculator.update({
-      ...baseInput, isCorrect: false, difficulty: 5,
+      ...baseInput,
+      isCorrect: false,
+      difficulty: 5,
       currentMastery: m,
     });
     expect(easyFail.mastery.masteryScore).toBeGreaterThan(hardFail.mastery.masteryScore);

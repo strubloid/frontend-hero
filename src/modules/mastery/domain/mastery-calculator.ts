@@ -33,7 +33,7 @@ export class MasteryCalculator {
   private static readonly BASE_MASTERY_GAIN = 0.08;
   private static readonly BASE_MASTERY_LOSS = 0.15;
   private static readonly CONFIDENCE_GAIN_PER_CORRECT = 0.05;
-  private static readonly CONFIDENCE_LOSS_ON_ERROR = 0.20;
+  private static readonly CONFIDENCE_LOSS_ON_ERROR = 0.2;
   private static readonly MAX_CONFIDENCE = 1.0;
   private static readonly MIN_CONFIDENCE = 0.1;
   private static readonly FLUENCY_THRESHOLD_MS = 3000;
@@ -98,9 +98,7 @@ export class MasteryCalculator {
       retentionScore: Math.round(newRetention * 1000) / 1000,
       correctAttempts: (prev?.correctAttempts ?? 0) + (input.isCorrect ? 1 : 0),
       incorrectAttempts: (prev?.incorrectAttempts ?? 0) + (input.isCorrect ? 0 : 1),
-      consecutiveCorrectAnswers: input.isCorrect
-        ? (prev?.consecutiveCorrectAnswers ?? 0) + 1
-        : 0,
+      consecutiveCorrectAnswers: input.isCorrect ? (prev?.consecutiveCorrectAnswers ?? 0) + 1 : 0,
       lastAttemptedAt: now,
       nextReviewAt: prev?.nextReviewAt ?? null,
       demonstratedContexts: [
