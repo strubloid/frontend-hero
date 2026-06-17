@@ -453,6 +453,57 @@ export default function WorldMapPage() {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.7; }
         }
+        @media (max-width: 768px) {
+          .world-map-page {
+            padding: 1.25rem 0.9rem 2rem;
+          }
+          .world-map-nav {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+          }
+          .world-map-header {
+            margin-bottom: 1.75rem;
+          }
+          .world-map-title {
+            font-size: 1.55rem;
+          }
+          .world-map-grid,
+          .skeleton-regions-grid {
+            grid-template-columns: 1fr;
+          }
+          .region-card,
+          .skeleton-region-card {
+            padding: 1rem;
+          }
+          .region-detail-card {
+            width: calc(100vw - 1.5rem);
+            padding: 1.25rem;
+          }
+          .region-detail-stats {
+            width: 100%;
+            justify-content: space-between;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+          }
+          .region-play-btn {
+            width: 100%;
+          }
+        }
+        @media (max-width: 480px) {
+          .world-map-page {
+            padding-inline: 0.75rem;
+          }
+          .world-map-title {
+            font-size: 1.35rem;
+          }
+          .region-status-row {
+            gap: 0.5rem;
+          }
+          .region-detail-icon {
+            font-size: 2.4rem;
+          }
+        }
       `}</style>
     </main>
   );

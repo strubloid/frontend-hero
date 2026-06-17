@@ -41,6 +41,24 @@ export class BossService {
 
     const progress = await this.bossProgressRepository.getByPlayerAndBoss(playerId, boss.id);
 
+    if (progress?.status === "retreat") {
+      return {
+        bossId: boss.id,
+        name: boss.name,
+        title: boss.title,
+        narrativeIntro: boss.defeatMessage,
+        totalPhases: boss.phases.length,
+        currentPhaseIndex: progress.currentPhaseIndex,
+        completedPhaseIds: progress.completedPhaseIds,
+        phaseName: "",
+        phasePrompt: "",
+        phaseDifficulty: 0,
+        question: null,
+        status: "retreat",
+        bossDefeated: false,
+      };
+    }
+
     if (progress?.status === "defeated" || progress?.completedAt) {
       return {
         bossId: boss.id,
@@ -80,7 +98,9 @@ export class BossService {
     }
 
     // Load the first question for the current phase
-    const questions = await this.questionRepository.getByConceptId(currentPhase.conceptIds[0] ?? "");
+    const questions = await this.questionRepository.getByConceptId(
+      currentPhase.conceptIds[0] ?? "",
+    );
     const currentQuestion = questions[0] ?? null;
 
     return {
@@ -151,9 +171,9 @@ export class BossService {
     );
 
     const question = await this.questionRepository.getById(questionId);
-    const explanation = question?.explanation ?? (
-      isCorrect ? "Correct!" : "Incorrect. Review the concept and try again."
-    );
+    const explanation =
+      question?.explanation ??
+      (isCorrect ? "Correct!" : "Incorrect. Review the concept and try again.");
 
     // Update boss progress repository
     const updatedProgress: PlayerBossProgress = {

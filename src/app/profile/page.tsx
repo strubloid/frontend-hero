@@ -21,9 +21,8 @@ export default function ProfilePage() {
   // Detect new achievements and level-ups on first load
   useEffect(() => {
     if (!profile || notifiedRef.current) return;
-    const lastSeen = typeof window !== "undefined"
-      ? sessionStorage.getItem("hermes-last-profile")
-      : null;
+    const lastSeen =
+      typeof window !== "undefined" ? sessionStorage.getItem("hermes-last-profile") : null;
     notifiedRef.current = true;
 
     const prev = lastSeen ? JSON.parse(lastSeen) : null;
@@ -671,5 +670,68 @@ const profileStyles = `
   @keyframes sk-pulse {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.7; }
+  }
+  @media (max-width: 768px) {
+    .profile-page {
+      padding: 1.25rem 0.9rem 2rem;
+    }
+    .profile-nav {
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .profile-card,
+    .skeleton-card {
+      padding: 1.1rem;
+    }
+    .player-header,
+    .skeleton-header-row {
+      align-items: flex-start;
+    }
+    .stats-grid,
+    .detail-stats-grid,
+    .skeleton-stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .mastery-item,
+    .activity-item,
+    .skeleton-mastery-row {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .mastery-domain {
+      width: 100%;
+    }
+    .mastery-pct,
+    .mastery-count,
+    .activity-time {
+      margin-left: 0;
+      width: auto;
+      text-align: left;
+    }
+    .achievements-grid,
+    .skeleton-achievements-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 480px) {
+    .profile-page {
+      padding-inline: 0.75rem;
+    }
+    .player-header {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .stats-grid,
+    .detail-stats-grid,
+    .skeleton-stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .achievement-badge {
+      align-items: flex-start;
+    }
+    .activity-item {
+      gap: 0.5rem;
+    }
   }
 `;

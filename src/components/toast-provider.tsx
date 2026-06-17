@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 
 // -----------------------------------------------------------------------
 // Types
@@ -79,7 +87,13 @@ const TYPE_STYLES: Record<ToastType, { bg: string; border: string; defaultIcon: 
   error: { bg: "#2a0d0d", border: "#e74c3c", defaultIcon: "✕" },
 };
 
-function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: string) => void }) {
+function ToastContainer({
+  toasts,
+  onDismiss,
+}: {
+  toasts: Toast[];
+  onDismiss: (id: string) => void;
+}) {
   return (
     <div className="toast-container">
       {toasts.map((toast) => {

@@ -219,14 +219,22 @@ function PlayPageInner() {
       style={{
         maxWidth: 720,
         margin: "0 auto",
-        padding: "3rem 1rem",
+        padding: "clamp(1.25rem, 4vw, 3rem) clamp(0.75rem, 3vw, 1rem)",
         fontFamily: "system-ui, sans-serif",
         color: "#e0e0e0",
         background: "#121212",
         minHeight: "100vh",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          marginBottom: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
         <button
           onClick={() => router.push("/subjects")}
           style={{
@@ -297,6 +305,8 @@ function PhaseRenderer(props: {
             style={{
               display: "flex",
               justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "0.35rem 0.75rem",
               color: "#888",
               fontSize: "0.85rem",
               marginBottom: "0.5rem",
@@ -394,6 +404,7 @@ function PhaseRenderer(props: {
           <div
             style={{
               display: "flex",
+              flexWrap: "wrap",
               gap: "1.5rem",
               marginBottom: "1rem",
               padding: "0.75rem 1rem",
@@ -458,6 +469,7 @@ const buttonStyle: React.CSSProperties = {
   background: "#4a9eff",
   color: "#fff",
   transition: "opacity 0.15s",
+  width: "100%",
 };
 
 const optionButtonStyle: React.CSSProperties = {
@@ -468,4 +480,5 @@ const optionButtonStyle: React.CSSProperties = {
   cursor: "pointer",
   color: "#e0e0e0",
   transition: "border 0.15s, background 0.15s",
+  width: "100%",
 };

@@ -4,10 +4,7 @@ import {
   PlayerBossProgress,
   BossPhaseAttempt,
 } from "../domain/boss-encounter";
-import {
-  BossEncounterRepository,
-  BossProgressRepository,
-} from "../domain/boss-repository";
+import { BossEncounterRepository, BossProgressRepository } from "../domain/boss-repository";
 
 // -----------------------------------------------------------------------
 // Boss definitions
@@ -79,8 +76,12 @@ const BOSS_DEFINITIONS: BossEncounter[] = [
     ],
     requiredDifficulty: 2,
     requiredConceptIds: [
-      "layout-files", "nested-layouts", "route-groups",
-      "loading-ui", "error-handling", "data-fetching",
+      "layout-files",
+      "nested-layouts",
+      "route-groups",
+      "loading-ui",
+      "error-handling",
+      "data-fetching",
       "server-components",
     ],
     rewardTitle: "App Router Champion",
@@ -153,9 +154,7 @@ const BOSS_DEFINITIONS: BossEncounter[] = [
       },
     ],
     requiredDifficulty: 2,
-    requiredConceptIds: [
-      "data-fetching", "server-actions", "caching", "revalidation",
-    ],
+    requiredConceptIds: ["data-fetching", "server-actions", "caching", "revalidation"],
     rewardTitle: "Data Master",
     rewardAchievementId: null,
     cooldownDays: 1,

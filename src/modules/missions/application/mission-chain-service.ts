@@ -74,6 +74,7 @@ export class MissionChainService {
     if (progress.currentStepIndex + 1 < chain.steps.length) {
       progress.currentStepIndex++;
     } else {
+      progress.isActive = false;
       progress.completedAt = now;
     }
 

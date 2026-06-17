@@ -32,11 +32,17 @@ interface QuestionDisplay {
   type: string;
 }
 
-type Phase = 
+type Phase =
   | { state: "loading" }
   | { state: "intro"; boss: BossState }
   | { state: "question"; boss: BossState }
-  | { state: "feedback"; boss: BossState; isCorrect: boolean; explanation: string; xpAwarded: number }
+  | {
+      state: "feedback";
+      boss: BossState;
+      isCorrect: boolean;
+      explanation: string;
+      xpAwarded: number;
+    }
   | { state: "victory"; boss: BossState; score: number }
   | { state: "defeat"; boss: BossState }
   | { state: "error"; message: string };
@@ -149,10 +155,17 @@ function BossEncounterInner() {
       }
 
       if (result.bossState?.status === "victory") {
-        setTimeout(() => setPhase({ state: "victory", boss: result.bossState, score: result.score ?? 0 }), 800);
+        setTimeout(
+          () => setPhase({ state: "victory", boss: result.bossState, score: result.score ?? 0 }),
+          800,
+        );
         if (!toastShown.current) {
           toastShown.current = true;
-          addToast({ type: "boss-defeat", title: "Boss Defeated!", description: "Congratulations, champion!" });
+          addToast({
+            type: "boss-defeat",
+            title: "Boss Defeated!",
+            description: "Congratulations, champion!",
+          });
         }
       } else if (result.bossState?.status === "defeated") {
         setTimeout(() => setPhase({ state: "defeat", boss: result.bossState }), 800);
@@ -294,10 +307,70 @@ function BossEncounterInner() {
         .boss-btn.success:hover { opacity: 0.85; }
         .boss-btn:disabled { opacity: 0.4; cursor: default; }
         .boss-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+        @media (max-width: 768px) {
+          .boss-page {
+            padding: 1.25rem 0.9rem 2rem;
+          }
+          .boss-header {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+          }
+          .boss-title {
+            font-size: 1.3rem;
+          }
+          .health-row {
+            flex-wrap: wrap;
+            gap: 0.45rem;
+          }
+          .health-label {
+            width: auto;
+            min-width: 48px;
+            text-align: left;
+          }
+          .health-bar-bg {
+            min-width: 0;
+            width: 100%;
+          }
+          .phase-indicators {
+            flex-wrap: wrap;
+          }
+          .boss-intro-card,
+          .boss-question-card,
+          .boss-feedback-card,
+          .boss-result-card {
+            padding: 1.25rem;
+          }
+          .boss-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .boss-btn {
+            width: 100%;
+          }
+        }
+        @media (max-width: 480px) {
+          .boss-page {
+            padding-inline: 0.75rem;
+          }
+          .boss-intro-icon,
+          .boss-result-icon {
+            font-size: 3rem;
+          }
+          .boss-actions {
+            grid-template-columns: 1fr;
+          }
+          .phase-dot {
+            width: 28px;
+            height: 28px;
+            font-size: 0.65rem;
+          }
+        }
       `}</style>
 
       {phase.state === "loading" && (
-        <p style={{ color: "#888", textAlign: "center", marginTop: "3rem" }}>Loading boss encounter…</p>
+        <p style={{ color: "#888", textAlign: "center", marginTop: "3rem" }}>
+          Loading boss encounter…
+        </p>
       )}
 
       {phase.state === "intro" && (
@@ -308,13 +381,15 @@ function BossEncounterInner() {
             <h2 style={{ color: "#e2e8f0", margin: 0, fontSize: "1.3rem" }}>{phase.boss.name}</h2>
             <p style={{ color: "#94a3b8", margin: 0, fontSize: "0.85rem" }}>{phase.boss.title}</p>
             <p className="boss-intro-narrative">{phase.boss.narrativeIntro}</p>
-            <p style={{ color: "#64748b", fontSize: "0.8rem" }}>
-              {phase.boss.totalPhases} phases
-            </p>
+            <p style={{ color: "#64748b", fontSize: "0.8rem" }}>{phase.boss.totalPhases} phases</p>
             <button className="boss-btn primary" onClick={handleStart}>
               Begin Battle
             </button>
-            <button className="boss-btn danger" onClick={handleRetreat} style={{ background: "transparent", border: "1px solid #555", color: "#888" }}>
+            <button
+              className="boss-btn danger"
+              onClick={handleRetreat}
+              style={{ background: "transparent", border: "1px solid #555", color: "#888" }}
+            >
               Retreat
             </button>
           </div>
@@ -325,7 +400,11 @@ function BossEncounterInner() {
         <>
           <BossHeader regionId={regionId} />
           <HealthBars bossHealth={bossHealth} playerHealth={playerHealth} />
-          <PhaseIndicators total={phase.boss.totalPhases} current={phase.boss.currentPhaseIndex} completed={phase.boss.completedPhaseIds} />
+          <PhaseIndicators
+            total={phase.boss.totalPhases}
+            current={phase.boss.currentPhaseIndex}
+            completed={phase.boss.completedPhaseIds}
+          />
           <div className="boss-phase-prompt">
             <strong>Phase {phase.boss.currentPhaseIndex + 1}:</strong> {phase.boss.phasePrompt}
           </div>
@@ -344,7 +423,11 @@ function BossEncounterInner() {
             </div>
           )}
           <div className="boss-actions">
-            <button className="boss-btn primary" onClick={handleAnswer} disabled={selectedIndex === null}>
+            <button
+              className="boss-btn primary"
+              onClick={handleAnswer}
+              disabled={selectedIndex === null}
+            >
               Strike!
             </button>
             <button className="boss-btn danger" onClick={handleRetreat}>
@@ -359,7 +442,10 @@ function BossEncounterInner() {
           <BossHeader regionId={regionId} />
           <HealthBars bossHealth={bossHealth} playerHealth={playerHealth} />
           <div className={`boss-feedback-card ${phase.isCorrect ? "correct" : "wrong"}`}>
-            <p className="boss-feedback-label" style={{ color: phase.isCorrect ? "#2ecc71" : "#e74c3c" }}>
+            <p
+              className="boss-feedback-label"
+              style={{ color: phase.isCorrect ? "#2ecc71" : "#e74c3c" }}
+            >
               {phase.isCorrect ? "⚔ Hit!" : "💥 Boss counters!"}
             </p>
             <p className="boss-feedback-text">{phase.explanation}</p>
@@ -388,7 +474,9 @@ function BossEncounterInner() {
           <div className="boss-result-card defeat">
             <div className="boss-result-icon">💀</div>
             <h2 className="boss-result-title defeat">Defeated</h2>
-            <p className="boss-result-desc">The boss was too strong. Level up your mastery and try again.</p>
+            <p className="boss-result-desc">
+              The boss was too strong. Level up your mastery and try again.
+            </p>
             <button className="boss-btn primary" onClick={handleStart}>
               Try Again
             </button>
@@ -436,14 +524,20 @@ function HealthBars({ bossHealth, playerHealth }: { bossHealth: number; playerHe
       <div className="health-row">
         <span className="health-label">Boss</span>
         <div className="health-bar-bg">
-          <div className="health-bar-fill" style={{ width: `${bossHealth}%`, background: bossColor }} />
+          <div
+            className="health-bar-fill"
+            style={{ width: `${bossHealth}%`, background: bossColor }}
+          />
         </div>
         <span className="health-text">{Math.round(bossHealth)}%</span>
       </div>
       <div className="health-row">
         <span className="health-label">You</span>
         <div className="health-bar-bg">
-          <div className="health-bar-fill" style={{ width: `${playerHealth}%`, background: playerColor }} />
+          <div
+            className="health-bar-fill"
+            style={{ width: `${playerHealth}%`, background: playerColor }}
+          />
         </div>
         <span className="health-text">{Math.round(playerHealth)}%</span>
       </div>
@@ -451,7 +545,15 @@ function HealthBars({ bossHealth, playerHealth }: { bossHealth: number; playerHe
   );
 }
 
-function PhaseIndicators({ total, current, completed }: { total: number; current: number; completed: string[] }) {
+function PhaseIndicators({
+  total,
+  current,
+  completed,
+}: {
+  total: number;
+  current: number;
+  completed: string[];
+}) {
   return (
     <div className="phase-indicators">
       {Array.from({ length: total }, (_, i) => (

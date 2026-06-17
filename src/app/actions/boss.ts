@@ -2,7 +2,10 @@
 
 import { v4 as uuid } from "uuid";
 import { BossEncounter, PlayerBossProgress } from "@/modules/missions/domain/boss-encounter";
-import { InMemoryBossEncounterRepository, InMemoryBossProgressRepository } from "@/modules/missions/infrastructure/in-memory-boss-repository";
+import {
+  InMemoryBossEncounterRepository,
+  InMemoryBossProgressRepository,
+} from "@/modules/missions/infrastructure/in-memory-boss-repository";
 import { QuestionRepository } from "@/modules/questions/domain/question-repository";
 
 // ---------------------------------------------------------------------------
@@ -12,9 +15,16 @@ import { QuestionRepository } from "@/modules/questions/domain/question-reposito
 class LocalQuestionRepository implements QuestionRepository {
   private store = new Map<string, any>();
 
-  set(q: any) { this.store.set(q.id, q); }
-  async getById(id: string) { return this.store.get(id) ?? null; }
-  async create(q: any) { this.store.set(q.id, q); return q; }
+  set(q: any) {
+    this.store.set(q.id, q);
+  }
+  async getById(id: string) {
+    return this.store.get(id) ?? null;
+  }
+  async create(q: any) {
+    this.store.set(q.id, q);
+    return q;
+  }
   async getByConceptId(conceptId: string) {
     return Array.from(this.store.values()).filter((q) => q.conceptId === conceptId);
   }
@@ -24,8 +34,11 @@ class LocalQuestionRepository implements QuestionRepository {
       .slice(0, limit);
   }
   async getBySeedAndSubject(seedId: string, subjectId: string) {
-    return Array.from(this.store.values())
-      .find((q) => q.seedId === seedId && q.subjectId === subjectId) ?? null;
+    return (
+      Array.from(this.store.values()).find(
+        (q) => q.seedId === seedId && q.subjectId === subjectId,
+      ) ?? null
+    );
   }
 }
 
@@ -52,16 +65,31 @@ class LocalPlayerRepo {
     this.player = { id, name: "Adventurer", level: 1, experiencePoints: 0, masteryPoints: 0 };
     return this.player;
   }
-  async create(p: any) { this.player = p; return p; }
-  async save(p: any) { this.player = p; return p; }
+  async create(p: any) {
+    this.player = p;
+    return p;
+  }
+  async save(p: any) {
+    this.player = p;
+    return p;
+  }
 }
 
 class LocalMissionRepo {
   private store = new Map<string, any>();
   private activeByPlayer = new Map<string, string>();
-  async getById(id: string) { return this.store.get(id) ?? null; }
-  async create(m: any) { this.store.set(m.id, m); this.activeByPlayer.set(m.playerId, m.id); return m; }
-  async save(m: any) { this.store.set(m.id, m); return m; }
+  async getById(id: string) {
+    return this.store.get(id) ?? null;
+  }
+  async create(m: any) {
+    this.store.set(m.id, m);
+    this.activeByPlayer.set(m.playerId, m.id);
+    return m;
+  }
+  async save(m: any) {
+    this.store.set(m.id, m);
+    return m;
+  }
   async getActiveByPlayer(playerId: string) {
     const id = this.activeByPlayer.get(playerId);
     if (!id) return null;
@@ -76,7 +104,10 @@ class LocalMissionRepo {
 
 class LocalAttemptRepo {
   private store = new Map<string, any>();
-  async create(a: any) { this.store.set(a.id, a); return a; }
+  async create(a: any) {
+    this.store.set(a.id, a);
+    return a;
+  }
   async getByMission(missionId: string) {
     return Array.from(this.store.values()).filter((a) => a.missionId === missionId);
   }
@@ -115,13 +146,134 @@ async function ensureQuestions(): Promise<void> {
   } catch {
     // Fallback: seed a few direct questions
     const fallbackQuestions = [
-      { id: "q1", subjectId: "nextjs", conceptId: "layout-files", stem: "What is a layout file in Next.js?", options: ["A shared UI wrapper", "A CSS file", "A database schema", "An API route"], correctIndex: 0, difficulty: 1, type: "multiple-choice", explanation: "A layout file defines a shared UI wrapper for route segments.", seedId: "layout-files-1", createdAt: new Date(), updatedAt: new Date() },
-      { id: "q2", subjectId: "nextjs", conceptId: "nested-layouts", stem: "How do nested layouts work in the App Router?", options: ["Layouts are composed hierarchically along route segments", "Only one layout is allowed", "Layouts replace each other", "Layouts only work at the root level"], correctIndex: 0, difficulty: 2, type: "multiple-choice", explanation: "Layouts in the App Router compose hierarchically — each route segment can have its own layout.", seedId: "nested-layouts-1", createdAt: new Date(), updatedAt: new Date() },
-      { id: "q3", subjectId: "nextjs", conceptId: "route-groups", stem: "What are route groups in Next.js App Router?", options: ["Way to organize routes without affecting URL structure", "Groups of API endpoints", "Database groups", "CSS modules"], correctIndex: 0, difficulty: 2, type: "multiple-choice", explanation: "Route groups let you organize routes in folders without changing the URL path.", seedId: "route-groups-1", createdAt: new Date(), updatedAt: new Date() },
-      { id: "q4", subjectId: "nextjs", conceptId: "loading-ui", stem: "What file creates a loading state in Next.js App Router?", options: ["loading.tsx", "loading.js", "spinner.tsx", "loading-ui.tsx"], correctIndex: 0, difficulty: 1, type: "multiple-choice", explanation: "A loading.tsx file creates an immediate loading state for a route segment.", seedId: "loading-ui-1", createdAt: new Date(), updatedAt: new Date() },
-      { id: "q5", subjectId: "nextjs", conceptId: "error-handling", stem: "How do you add an error boundary to a route segment?", options: ["Create an error.tsx file", "Wrap in try/catch", "Use a custom _error page", "Add error handling middleware"], correctIndex: 0, difficulty: 1, type: "multiple-choice", explanation: "Creating an error.tsx file in a route segment automatically creates an error boundary.", seedId: "error-handling-1", createdAt: new Date(), updatedAt: new Date() },
-      { id: "q6", subjectId: "nextjs", conceptId: "data-fetching", stem: "What is the recommended approach for data fetching in Next.js App Router?", options: ["Fetch directly in server components", "Use useEffect in client components", "Always use SWR", "Fetch in getServerSideProps"], correctIndex: 0, difficulty: 1, type: "multiple-choice", explanation: "Server components can fetch data directly with async/await, eliminating the need for useEffect.", seedId: "data-fetching-1", createdAt: new Date(), updatedAt: new Date() },
-      { id: "q7", subjectId: "nextjs", conceptId: "server-components", stem: "What is true about server components?", options: ["They run on the server and reduce client JS", "They run in the browser", "They only work with getStaticProps", "They require client-side hydration"], correctIndex: 0, difficulty: 2, type: "multiple-choice", explanation: "Server components run on the server, reducing the JavaScript sent to the client.", seedId: "server-components-1", createdAt: new Date(), updatedAt: new Date() },
+      {
+        id: "q1",
+        subjectId: "nextjs",
+        conceptId: "layout-files",
+        stem: "What is a layout file in Next.js?",
+        options: ["A shared UI wrapper", "A CSS file", "A database schema", "An API route"],
+        correctIndex: 0,
+        difficulty: 1,
+        type: "multiple-choice",
+        explanation: "A layout file defines a shared UI wrapper for route segments.",
+        seedId: "layout-files-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "q2",
+        subjectId: "nextjs",
+        conceptId: "nested-layouts",
+        stem: "How do nested layouts work in the App Router?",
+        options: [
+          "Layouts are composed hierarchically along route segments",
+          "Only one layout is allowed",
+          "Layouts replace each other",
+          "Layouts only work at the root level",
+        ],
+        correctIndex: 0,
+        difficulty: 2,
+        type: "multiple-choice",
+        explanation:
+          "Layouts in the App Router compose hierarchically — each route segment can have its own layout.",
+        seedId: "nested-layouts-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "q3",
+        subjectId: "nextjs",
+        conceptId: "route-groups",
+        stem: "What are route groups in Next.js App Router?",
+        options: [
+          "Way to organize routes without affecting URL structure",
+          "Groups of API endpoints",
+          "Database groups",
+          "CSS modules",
+        ],
+        correctIndex: 0,
+        difficulty: 2,
+        type: "multiple-choice",
+        explanation:
+          "Route groups let you organize routes in folders without changing the URL path.",
+        seedId: "route-groups-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "q4",
+        subjectId: "nextjs",
+        conceptId: "loading-ui",
+        stem: "What file creates a loading state in Next.js App Router?",
+        options: ["loading.tsx", "loading.js", "spinner.tsx", "loading-ui.tsx"],
+        correctIndex: 0,
+        difficulty: 1,
+        type: "multiple-choice",
+        explanation: "A loading.tsx file creates an immediate loading state for a route segment.",
+        seedId: "loading-ui-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "q5",
+        subjectId: "nextjs",
+        conceptId: "error-handling",
+        stem: "How do you add an error boundary to a route segment?",
+        options: [
+          "Create an error.tsx file",
+          "Wrap in try/catch",
+          "Use a custom _error page",
+          "Add error handling middleware",
+        ],
+        correctIndex: 0,
+        difficulty: 1,
+        type: "multiple-choice",
+        explanation:
+          "Creating an error.tsx file in a route segment automatically creates an error boundary.",
+        seedId: "error-handling-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "q6",
+        subjectId: "nextjs",
+        conceptId: "data-fetching",
+        stem: "What is the recommended approach for data fetching in Next.js App Router?",
+        options: [
+          "Fetch directly in server components",
+          "Use useEffect in client components",
+          "Always use SWR",
+          "Fetch in getServerSideProps",
+        ],
+        correctIndex: 0,
+        difficulty: 1,
+        type: "multiple-choice",
+        explanation:
+          "Server components can fetch data directly with async/await, eliminating the need for useEffect.",
+        seedId: "data-fetching-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "q7",
+        subjectId: "nextjs",
+        conceptId: "server-components",
+        stem: "What is true about server components?",
+        options: [
+          "They run on the server and reduce client JS",
+          "They run in the browser",
+          "They only work with getStaticProps",
+          "They require client-side hydration",
+        ],
+        correctIndex: 0,
+        difficulty: 2,
+        type: "multiple-choice",
+        explanation:
+          "Server components run on the server, reducing the JavaScript sent to the client.",
+        seedId: "server-components-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ];
     for (const q of fallbackQuestions) {
       questionRepository.set(q);
@@ -194,7 +346,12 @@ export async function getBossState(playerId: string, regionId: string) {
     phasePrompt: currentPhase.prompt,
     phaseDifficulty: currentPhase.difficulty,
     question: currentQuestion
-      ? { questionId: currentQuestion.id, stem: currentQuestion.stem, options: currentQuestion.options, type: currentQuestion.type }
+      ? {
+          questionId: currentQuestion.id,
+          stem: currentQuestion.stem,
+          options: currentQuestion.options,
+          type: currentQuestion.type,
+        }
       : null,
     status: "active" as const,
     bossDefeated: false,
@@ -291,7 +448,15 @@ export async function submitBossAnswer(
     progress.completedAt = new Date();
     await bossProgressRepository.save(progress);
     const bossState = await getBossState(playerId, regionId);
-    return { isCorrect, explanation, xpAwarded: 15, bossState, newBossHealth: 0, newPlayerHealth: 100, score: 100 };
+    return {
+      isCorrect,
+      explanation,
+      xpAwarded: 15,
+      bossState,
+      newBossHealth: 0,
+      newPlayerHealth: 100,
+      score: 100,
+    };
   }
 
   const phaseAttempts = allAttempts.filter((a) =>
@@ -299,12 +464,14 @@ export async function submitBossAnswer(
   );
 
   // Count correct
-  const correctInPhase = allAttempts.filter((a) =>
-    currentPhase.conceptIds.some((cid) => {
-      const q = questionRepository.getById(a.questionId);
-      return true; // simplified
-    }),
-  ).filter((a) => a.isCorrect).length;
+  const correctInPhase = allAttempts
+    .filter((a) =>
+      currentPhase.conceptIds.some((cid) => {
+        const q = questionRepository.getById(a.questionId);
+        return true; // simplified
+      }),
+    )
+    .filter((a) => a.isCorrect).length;
 
   const totalInPhase = allAttempts.length;
   const phasePassed = correctInPhase >= currentPhase.minCorrectCount;
@@ -344,7 +511,9 @@ export async function submitBossAnswer(
   const totalPhases = boss.phases.length;
   const completedPhases = progress.completedPhaseIds.length;
   const bossHealth = bossDefeated ? 0 : Math.max(5, 100 - (completedPhases / totalPhases) * 100);
-  const playerHealth = phaseFailed ? 0 : Math.max(5, 100 - (totalInPhase / currentPhase.maxAttempts) * 40);
+  const playerHealth = phaseFailed
+    ? 0
+    : Math.max(5, 100 - (totalInPhase / currentPhase.maxAttempts) * 40);
 
   const bossState = await getBossState(playerId, regionId);
   bossState.status = bossDefeated ? "victory" : "active";
@@ -356,7 +525,7 @@ export async function submitBossAnswer(
     bossState,
     newBossHealth: bossHealth,
     newPlayerHealth: playerHealth,
-    score: bossDefeated ? 100 : Math.round(completedPhases / totalPhases * 100),
+    score: bossDefeated ? 100 : Math.round((completedPhases / totalPhases) * 100),
   };
 }
 

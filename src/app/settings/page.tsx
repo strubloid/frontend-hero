@@ -28,29 +28,24 @@ const DEFAULT_SETTINGS: Settings = {
 // -----------------------------------------------------------------------
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const [mounted, setMounted] = useState(false);
-  const { addToast } = useToast();
-
-  // Load settings from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("hermes-settings");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
-      }
-    } catch {
-      // Use defaults
+  const [settings, setSettings] = useState<Settings>(() => {
+    if (typeof window === "undefined") {
+      return DEFAULT_SETTINGS;
     }
-    setMounted(true);
-  }, []);
+
+    try {
+      const saved = window.localStorage.getItem("hermes-settings");
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
+  });
+  const { addToast } = useToast();
 
   // Apply theme
   useEffect(() => {
-    if (!mounted) return;
     document.documentElement.setAttribute("data-theme", settings.theme);
-  }, [settings.theme, mounted]);
+  }, [settings.theme]);
 
   const updateSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
     const next = { ...settings, [key]: value };
@@ -58,16 +53,6 @@ export default function SettingsPage() {
     localStorage.setItem("hermes-settings", JSON.stringify(next));
     addToast({ type: "info", title: "Setting updated", duration: 1500 });
   };
-
-  if (!mounted) {
-    return (
-      <main className="settings-page">
-        <div style={{ padding: "3rem 1rem", maxWidth: 600, margin: "0 auto" }}>
-          <p style={{ color: "#888" }}>Loading settings…</p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="settings-page">
@@ -205,6 +190,37 @@ export default function SettingsPage() {
         .difficulty-btn:hover:not(.active) {
           border-color: #555;
         }
+        @media (max-width: 768px) {
+          .settings-page {
+            padding: 1.25rem 0.9rem 2rem;
+          }
+          .settings-header {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+          }
+          .settings-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.9rem;
+          }
+          .difficulty-group {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+        }
+        @media (max-width: 480px) {
+          .settings-page {
+            padding-inline: 0.75rem;
+          }
+          .difficulty-group {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .difficulty-btn:last-child {
+            grid-column: 1 / -1;
+          }
+        }
       `}</style>
 
       <div className="settings-header">
@@ -271,12 +287,14 @@ export default function SettingsPage() {
       {/* About */}
       <div className="settings-section">
         <p className="settings-section-title">About</p>
-        <div className="settings-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "0.25rem" }}>
+        <div
+          className="settings-card"
+          style={{ flexDirection: "column", alignItems: "flex-start", gap: "0.25rem" }}
+        >
           <p className="settings-label">Frontend Realms</p>
           <p className="settings-desc" style={{ whiteSpace: "normal" }}>
-            A gamified learning platform for mastering frontend development.
-            Build mastery through missions, boss encounters, and quests.
-            Version 1.0.0
+            A gamified learning platform for mastering frontend development. Build mastery through
+            missions, boss encounters, and quests. Version 1.0.0
           </p>
         </div>
       </div>

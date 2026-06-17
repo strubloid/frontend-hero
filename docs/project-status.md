@@ -22,8 +22,8 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase** | Phase 6 — Experience & Integration (In Progress) |
-| **Next Phase** | Phase 7 — TBD |
+| **Current Phase**       | Phase 6 — Experience & Integration (Complete)      |
+| **Next Phase**          | Phase 7 — TBD                                      |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
 | **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
@@ -556,6 +556,18 @@ Delivered:
 5. [x] Skeleton loading states — world-map (6 skeleton region cards with pulse animation) and profile (avatar, stat grid, mastery rows, achievement cards).
 6. [x] Error boundaries — `ErrorFallback` shared component, route-level `error.tsx` for world-map & profile, `global-error.tsx`, `not-found.tsx` with themed narrative.
 7. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 170 tests ✓).
+
+### Phase 6 — Experience & Integration (Completed)
+
+Delivered:
+
+1. [x] Review-system gameplay integration verified — mission selection already prioritizes overdue review content, and answer submission already updates spaced-repetition schedules.
+2. [x] Toast notifications — `ToastProvider` + `useToast`, wired into profile progression feedback and play-session XP feedback.
+3. [x] Boss encounter experience — boss UI page, state/start/answer/retreat API routes, in-memory boss repositories, and boss service orchestration.
+4. [x] Settings page — dark/light theme, sound toggle, difficulty selection, persisted to localStorage.
+5. [x] Mobile-responsive pass — world-map, profile, play, boss encounter, and settings layouts improved for tablet/phone widths.
+6. [x] Unit tests for new services — added regression coverage for mission-chain completion deactivation and boss retreat-state handling.
+7. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 172 tests ✓).
 
 ### Phase 4 — Game Foundation (Completed)
 
