@@ -22,8 +22,8 @@
 | ----------------------- | -------------------------------------------------- |
 | **Project Name**        | Frontend Realms (package: `frontend-realms`)       |
 | **Project Folder**      | `/home/strubloid/apps/frontend-hero`               |
-| **Current Phase**       | Phase 7 — Advanced Game Experience (Completed)     |
-| **Next Phase**          | Phase 8 — Production Readiness                     |
+| **Current Phase**       | Phase 8 — Production Readiness (Completed)         |
+| **Next Phase**          | Post-launch hardening and durable persistence      |
 | **Framework**           | Next.js 16.2.9 (App Router)                        |
 | **Language**            | TypeScript (strict mode)                           |
 | **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven) |
@@ -591,6 +591,38 @@ Files updated:
 - `src/app/actions/profile.ts` — collection data actions plus title/theme persistence actions.
 - `src/app/profile/page.tsx` — collections navigation/link and title/theme picker UI.
 - `src/app/world-map/page.tsx` — animated world map polish and story progression integration.
+
+### Phase 8 — Production Readiness (Completed)
+
+Delivered:
+
+1. [x] CI — GitHub Actions workflow runs `npm ci` and `npm run verify:full` on pull requests and pushes to `main`.
+2. [x] Deployment — added Docker standalone production image and Fly.io app configuration with HTTPS, concurrency settings, and `/api/health` health check.
+3. [x] Security hardening — added production response headers in `next.config.ts`, a production audit script for leaked public secrets/hardcoded credential-like values, and a high/critical dependency audit gate.
+4. [x] Accessibility/performance audit baseline — `npm run audit:production` plus documented manual accessibility and performance checklists.
+5. [x] Observability/error reporting baseline — dynamic `/api/health`, existing error boundaries documented, Fly log workflow documented, future error-reporting constraints recorded.
+6. [x] Backups and migration documentation — backup policy, migration checklist, migration record template, rollback strategy, and durable persistence launch gap documented.
+7. [x] Metadata cleanup — replaced scaffold metadata with Frontend Realms production metadata.
+8. [x] Verification — `npm run verify:full`, `npm run fly:validate`, and `npm run docker:verify` pass.
+
+Files created:
+
+- `.dockerignore` — reduced Docker build context and excluded local artifacts/secrets.
+- `.github/workflows/ci.yml` — CI verification workflow.
+- `Dockerfile` — multi-stage Next.js standalone image.
+- `fly.toml` — Fly.io deployment config.
+- `src/app/api/health/route.ts` — runtime health endpoint.
+- `scripts/production-audit.mjs` — production security/accessibility smoke audit.
+- `scripts/verify-docker-image.mjs` — Docker image build verification helper.
+- `docs/production-readiness.md` — production runbook.
+- `docs/backups-and-migrations.md` — backups, migration, and rollback runbook.
+
+Files updated:
+
+- `package.json` — added `audit:production` and included it in `verify`.
+- `next.config.ts` — added production security headers.
+- `src/app/layout.tsx` — updated application metadata.
+- `docs/project-status.md` — current project status updated to Phase 8 complete.
 
 ### Phase 4 — Game Foundation (Completed)
 

@@ -2,3 +2,5 @@ eslint.config.mjs
 node_modules
 .next
 public
+Dockerfile
+fly.toml
