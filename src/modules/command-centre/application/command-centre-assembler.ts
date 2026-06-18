@@ -4,10 +4,8 @@ import type { PlayerSubjectProgress } from "@/modules/subjects/domain/subject-le
 import type { Subject } from "@/modules/subjects/domain/subject";
 import type { CommandCentreViewModel } from "../presentation/view-models/command-centre-view-model";
 import type { CommandCentrePlayerState } from "../presentation/view-models/command-centre-player-state";
-import type { QuestCategory } from "../presentation/view-models/quest-category";
-import type { QuestDifficulty } from "../presentation/view-models/quest-difficulty";
+import type { CurrentQuestViewModel } from "../presentation/view-models/current-quest-view-model";
 import type { WorldNodeState } from "../presentation/view-models/world-node-state";
-import type { WorldNodeType } from "../presentation/view-models/world-node-type";
 import type { WorldNodeViewModel } from "../presentation/view-models/world-node-view-model";
 import type { CampaignLevelViewModel } from "../presentation/view-models/campaign-rail-view-model";
 import { buildDefaultCommandCentre } from "../development/development-fixtures";
@@ -24,7 +22,7 @@ export class CommandCentreAssembler {
     progression: PlayerProgression;
     playerSubjectProgress: PlayerSubjectProgress | null;
     subject: Subject | null;
-    currentQuest: unknown;
+    currentQuest: CurrentQuestViewModel | null;
     worldNodes: WorldNodeViewModel[];
     recentProgress: {
       xpGained: number;
@@ -104,32 +102,8 @@ export class CommandCentreAssembler {
     // -- Player state --
     const playerState = this.determinePlayerState(playerSubjectProgress, currentQuest);
 
-    // -- Current quest --
-    const currentQuestVm = currentQuest
-      ? {
-          questId: ((currentQuest as Record<string, unknown>).questId as string) ?? "quest-1",
-          category: "MAIN_QUEST" as QuestCategory,
-          title:
-            ((currentQuest as Record<string, unknown>).title as string) ?? "Continue Your Journey",
-          narrative:
-            ((currentQuest as Record<string, unknown>).narrative as string) ??
-            "Master the next concept in your subject.",
-          objective:
-            ((currentQuest as Record<string, unknown>).objective as string) ??
-            "Complete 3 encounters",
-          estimatedDuration: "15 min",
-          difficulty: "BEGINNER" as QuestDifficulty,
-          progress: { current: 1, max: 3, percent: 33, label: "1 / 3 encounters" },
-          rewards: [{ type: "xp" as const, amount: 100, label: "100 XP" }],
-          primaryAction: {
-            label: "Continue",
-            destination: "/missions/active",
-            disabled: false,
-            disabledReason: null,
-            primary: true,
-          },
-        }
-      : null;
+    // -- Current quest (pre-built by use case) --
+    const currentQuestVm = currentQuest;
 
     // -- Campaign rail --
     const levels: CampaignLevelViewModel[] =
@@ -145,14 +119,21 @@ export class CommandCentreAssembler {
       levels,
     };
 
-    // -- World map --
-    const connections = worldNodes
-      .filter((n) => n.nodeId !== worldNodes[0]?.nodeId)
-      .map((n) => ({
-        fromNodeId: worldNodes[0]?.nodeId ?? "",
-        toNodeId: n.nodeId,
-        state: n.state === "LOCKED" ? ("inactive" as const) : ("active" as const),
-      }));
+    // -- World map connections (sequential path) --
+    const sortedNodes = [...worldNodes];
+    const connections = sortedNodes.slice(0, -1).map((node, i) => {
+      const nextNode = sortedNodes[i + 1];
+      const isLocked = node.state === "LOCKED" || nextNode.state === "LOCKED";
+      const isCompleted = node.state === "COMPLETED" && nextNode.state === "COMPLETED";
+      return {
+        fromNodeId: node.nodeId,
+        toNodeId: nextNode.nodeId,
+        state: (isCompleted ? "completed" : isLocked ? "inactive" : "active") as
+          | "active"
+          | "inactive"
+          | "completed",
+      };
+    });
 
     const world = { nodes: worldNodes, connections };
 
@@ -169,10 +150,10 @@ export class CommandCentreAssembler {
     const recommendedActions = [
       {
         id: "continue",
-        label: "Continue Learning",
-        description: "Pick up where you left off",
+        label: "Continue Quest",
+        description: "Resume your current mission",
         primary: true,
-        destination: "/missions/active",
+        destination: "/play",
         icon: "play",
       },
       {
@@ -209,7 +190,7 @@ export class CommandCentreAssembler {
 
   private determinePlayerState(
     progress: PlayerSubjectProgress | null,
-    _currentQuest: unknown,
+    _currentQuest: CurrentQuestViewModel | null,
   ): CommandCentrePlayerState {
     if (!progress) return "NEW_PLAYER" as CommandCentrePlayerState;
     if (progress.completedAt) return "SUBJECT_COMPLETED" as CommandCentrePlayerState;
