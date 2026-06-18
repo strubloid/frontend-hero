@@ -1,0 +1,19 @@
+.resourceDisplay {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+.icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.amount {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cc-text);
+  font-family: var(--cc-font-mono);
+  line-height: 1;
+}

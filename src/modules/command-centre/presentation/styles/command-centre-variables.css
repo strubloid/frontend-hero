@@ -1,0 +1,39 @@
+/* Command Centre Design Tokens — Dark Game Theme */
+
+:root {
+  --cc-bg: #070b14;
+  --cc-surface: #0f1729;
+  --cc-surface-elevated: #1a2340;
+  --cc-primary: #3b82f6;
+  --cc-primary-glow: rgba(59, 130, 246, 0.3);
+  --cc-gold: #f59e0b;
+  --cc-success: #22c55e;
+  --cc-danger: #ef4444;
+  --cc-text: #e2e8f0;
+  --cc-text-secondary: #94a3b8;
+  --cc-text-muted: #475569;
+  --cc-border: #1e293b;
+  --cc-hover: #334155;
+
+  /* Typography */
+  --cc-font-sans: var(--font-geist-sans, "Geist", system-ui, -apple-system, sans-serif);
+  --cc-font-mono: var(--font-geist-mono, "Geist Mono", "Fira Code", monospace);
+
+  /* Spacing scale */
+  --cc-space-xs: 4px;
+  --cc-space-sm: 8px;
+  --cc-space-md: 16px;
+  --cc-space-lg: 24px;
+  --cc-space-xl: 32px;
+
+  /* Radius */
+  --cc-radius-sm: 4px;
+  --cc-radius-md: 8px;
+  --cc-radius-lg: 12px;
+  --cc-radius-full: 9999px;
+
+  /* Transitions */
+  --cc-transition-fast: 0.15s ease;
+  --cc-transition-normal: 0.3s ease;
+  --cc-transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}

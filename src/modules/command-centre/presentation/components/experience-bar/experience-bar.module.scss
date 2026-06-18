@@ -1,0 +1,29 @@
+.experienceBar {
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-sm);
+  min-width: 120px;
+}
+
+.barTrack {
+  flex: 1;
+  height: 6px;
+  background: var(--cc-surface-elevated);
+  border-radius: var(--cc-radius-full);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cc-primary), var(--cc-gold));
+  border-radius: var(--cc-radius-full);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.label {
+  font-size: 11px;
+  font-family: var(--cc-font-mono);
+  color: var(--cc-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

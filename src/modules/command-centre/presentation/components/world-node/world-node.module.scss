@@ -1,0 +1,167 @@
+.worldNode {
+  transition:
+    transform var(--cc-transition-fast),
+    opacity var(--cc-transition-fast);
+
+  &:hover {
+    .nodeShape {
+      filter: brightness(1.3);
+    }
+  }
+}
+
+.nodeShape {
+  fill: var(--cc-surface-elevated);
+  stroke: var(--cc-border);
+  stroke-width: 1.5;
+  transition:
+    fill var(--cc-transition-fast),
+    stroke var(--cc-transition-fast),
+    filter var(--cc-transition-fast);
+}
+
+.nodeIcon {
+  fill: var(--cc-text-secondary);
+  pointer-events: none;
+  font-family: var(--cc-font-sans);
+}
+
+.nodeTitle {
+  fill: var(--cc-text);
+  font-size: 10px;
+  font-family: var(--cc-font-sans);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* State variants */
+.stateCOMPLETED {
+  .nodeShape {
+    fill: var(--cc-success);
+    stroke: var(--cc-success);
+  }
+  .nodeIcon {
+    fill: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .nodeTitle {
+    fill: var(--cc-success);
+  }
+}
+
+.stateMASTERED {
+  .nodeShape {
+    fill: var(--cc-gold);
+    stroke: var(--cc-gold);
+  }
+  .nodeIcon {
+    fill: #000;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .nodeTitle {
+    fill: var(--cc-gold);
+  }
+}
+
+.stateCURRENT {
+  .nodeShape {
+    fill: var(--cc-primary);
+    stroke: var(--cc-primary);
+    filter: drop-shadow(0 0 8px var(--cc-primary-glow));
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .nodeIcon {
+    fill: #fff;
+    font-size: 10px;
+  }
+  .nodeTitle {
+    fill: var(--cc-primary);
+    font-weight: 600;
+  }
+}
+
+.stateAVAILABLE {
+  .nodeShape {
+    fill: var(--cc-surface);
+    stroke: var(--cc-text-muted);
+    stroke-dasharray: 3 2;
+  }
+  .nodeIcon {
+    fill: var(--cc-text-muted);
+  }
+}
+
+.stateLOCKED {
+  opacity: 0.4;
+  .nodeShape {
+    fill: var(--cc-surface);
+    stroke: var(--cc-border);
+  }
+  .nodeIcon {
+    font-size: 10px;
+  }
+  .nodeTitle {
+    fill: var(--cc-text-muted);
+  }
+}
+
+.stateREVIEW_REQUIRED {
+  .nodeShape {
+    fill: #f59e0b33;
+    stroke: var(--cc-gold);
+  }
+  .nodeIcon {
+    fill: var(--cc-gold);
+    font-size: 11px;
+  }
+  .nodeTitle {
+    fill: var(--cc-gold);
+  }
+}
+
+/* Boss nodes */
+.boss {
+  .nodeShape {
+    fill: var(--cc-danger);
+    stroke: var(--cc-danger);
+    filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.5));
+  }
+  .nodeIcon {
+    fill: #fff;
+    font-size: 11px;
+  }
+  .nodeTitle {
+    fill: var(--cc-danger);
+    font-weight: 600;
+  }
+}
+
+.selected {
+  .nodeShape {
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .nodeTitle {
+    fill: #fff;
+    font-weight: 600;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px var(--cc-primary-glow));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px var(--cc-primary-glow))
+      drop-shadow(0 0 40px var(--cc-primary-glow));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stateCURRENT .nodeShape {
+    animation: none;
+  }
+}

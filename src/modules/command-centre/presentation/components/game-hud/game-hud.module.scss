@@ -1,0 +1,127 @@
+.gameHud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--cc-space-md);
+  background: var(--cc-surface);
+  border-bottom: 1px solid var(--cc-border);
+  z-index: 100;
+  gap: var(--cc-space-md);
+}
+
+.hudLeft {
+  flex-shrink: 0;
+}
+
+.hudCenter {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-md);
+  justify-content: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.hudRight {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-md);
+}
+
+.activeSubject {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.subjectLabel {
+  font-size: 11px;
+  color: var(--cc-text-muted);
+  font-family: var(--cc-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.currencies {
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-sm);
+}
+
+.notifications {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.notificationBell {
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity var(--cc-transition-fast);
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &[data-priority="high"] {
+    opacity: 1;
+  }
+}
+
+.iconButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.iconBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cc-radius-sm);
+  padding: 4px 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--cc-text-secondary);
+  transition:
+    background var(--cc-transition-fast),
+    color var(--cc-transition-fast);
+
+  &:hover {
+    background: var(--cc-hover);
+    color: var(--cc-text);
+  }
+}
+
+@media (max-width: 768px) {
+  .gameHud {
+    height: 48px;
+    padding: 0 var(--cc-space-sm);
+  }
+
+  .hudCenter {
+    display: none;
+  }
+
+  .notifications {
+    display: none;
+  }
+
+  .iconButtons {
+    gap: 2px;
+  }
+
+  .iconBtn {
+    padding: 4px;
+    font-size: 12px;
+  }
+}

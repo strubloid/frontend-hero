@@ -1,0 +1,28 @@
+.worldStage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: var(--cc-bg);
+}
+
+.worldCanvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--cc-space-md);
+  min-height: 300px;
+}
+
+@media (max-width: 768px) {
+  .worldStage {
+    min-height: 0;
+  }
+
+  .worldCanvas {
+    padding: var(--cc-space-sm);
+    min-height: 250px;
+  }
+}

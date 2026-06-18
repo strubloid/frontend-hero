@@ -38,7 +38,7 @@
 | Phase 7     | Advanced Game Experience             | ✅ Complete                  |
 | Phase 8     | Production Readiness                 | ✅ Complete                  |
 | Post-launch | Durable Persistence Hardening        | ✅ Complete                  |
-| **Phase 9** | **Command Centre & Question Supply** | 🚧 In Progress (9C complete) |
+| **Phase 9** | **Command Centre & Question Supply** | 🚧 In Progress (9D complete) |
 | Phase 10    | Subject Campaign Progression         | 📋 Planned                   |
 | Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned                   |
 | Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned                   |

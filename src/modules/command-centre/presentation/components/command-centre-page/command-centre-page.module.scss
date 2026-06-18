@@ -1,0 +1,61 @@
+.commandCentre {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--cc-bg);
+  color: var(--cc-text);
+  font-family: var(--cc-font-sans);
+  padding-top: 56px;
+  padding-bottom: 60px;
+
+  @media (max-width: 768px) {
+    padding-top: 48px;
+    padding-bottom: 52px;
+  }
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mainArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.questSection {
+  padding: var(--cc-space-md);
+  padding-top: 0;
+
+  @media (max-width: 768px) {
+    padding: var(--cc-space-sm);
+    padding-top: 0;
+  }
+}
+
+/* Tablet: 768-1024px */
+@media (max-width: 1024px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .mainArea {
+    order: -1;
+  }
+}
+
+/* Mobile: <768px */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .mainArea {
+    order: -1;
+  }
+}
