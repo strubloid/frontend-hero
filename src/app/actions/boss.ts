@@ -3,10 +3,11 @@
 import { v4 as uuid } from "uuid";
 import { BossEncounter, PlayerBossProgress } from "@/modules/missions/domain/boss-encounter";
 import {
-  InMemoryBossEncounterRepository,
-  InMemoryBossProgressRepository,
-} from "@/modules/missions/infrastructure/in-memory-boss-repository";
+  DrizzleBossEncounterRepository,
+  DrizzleBossProgressRepository,
+} from "@/modules/missions/infrastructure/drizzle-boss-repository";
 import { QuestionRepository } from "@/modules/questions/domain/question-repository";
+import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 
 // ---------------------------------------------------------------------------
 // Minimal in-memory repositories for the boss workflow
@@ -120,8 +121,9 @@ class LocalAttemptRepo {
 // Singletons
 // ---------------------------------------------------------------------------
 
-const bossEncounterRepository = new InMemoryBossEncounterRepository();
-const bossProgressRepository = new InMemoryBossProgressRepository();
+const sqlite = getSqliteConnection();
+const bossEncounterRepository = new DrizzleBossEncounterRepository(sqlite);
+const bossProgressRepository = new DrizzleBossProgressRepository(sqlite);
 const questionRepository = new LocalQuestionRepository();
 const playerRepo = new LocalPlayerRepo();
 const missionRepo = new LocalMissionRepo();

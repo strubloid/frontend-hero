@@ -1,12 +1,13 @@
 "use server";
 
-import { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
-import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
-import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
-import { InMemoryMasteryRepository } from "@/modules/mastery/infrastructure/in-memory-mastery-repository";
+import type { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
+import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
+import type { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
+import { DrizzleMasteryRepository } from "@/modules/mastery/infrastructure/drizzle-mastery-repository";
 import { WorldMapService } from "@/modules/game-world/domain/world-map-service";
 import { Region } from "@/modules/game-world/domain/region";
 import { WorldMapProgress } from "@/modules/game-world/domain/world-map";
+import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 
 // ---------------------------------------------------------------------------
 // Domain → Region mapping for the Frontend Realms
@@ -84,8 +85,9 @@ const DOMAIN_REGION_MAP: Record<string, { icon: string; flavor: string }> = {
 // Singleton instances
 // ---------------------------------------------------------------------------
 
-const subjectRepository = new InMemorySubjectRepository();
-const masteryRepository = new InMemoryMasteryRepository();
+const sqlite = getSqliteConnection();
+const subjectRepository: SubjectRepository = new DrizzleSubjectRepository(sqlite);
+const masteryRepository: MasteryRepository = new DrizzleMasteryRepository(sqlite);
 const worldMapService = new WorldMapService();
 
 async function ensureSubjectLoaded(): Promise<void> {
@@ -115,7 +117,7 @@ async function ensureSubjectLoaded(): Promise<void> {
   );
 
   const result = await subjectImportService.import("nextjs");
-  subjectRepository.set(result.subject);
+  await subjectRepository.save(result.subject);
 }
 
 // ---------------------------------------------------------------------------

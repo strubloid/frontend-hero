@@ -3,26 +3,28 @@
 import type { PlayerRepository } from "@/modules/players/domain/player-repository";
 import type { AchievementCategory } from "@/modules/rewards/domain/achievement";
 import type { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
-import { InMemoryMasteryRepository } from "@/modules/mastery/infrastructure/in-memory-mastery-repository";
+import { DrizzleMasteryRepository } from "@/modules/mastery/infrastructure/drizzle-mastery-repository";
 import type {
   MissionRepository,
   MissionAttemptRepository,
 } from "@/modules/missions/domain/mission-repository";
 import type { AchievementRepository } from "@/modules/rewards/domain/achievement-repository";
-import { InMemoryAchievementRepository } from "@/modules/rewards/infrastructure/in-memory-achievement-repository";
+import { DrizzleAchievementRepository } from "@/modules/rewards/infrastructure/drizzle-achievement-repository";
 import { AchievementService } from "@/modules/rewards/application/achievement-service";
-import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
+import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
 import type { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
 import { StreakStatusService } from "@/modules/players/application/streak-status.service";
+import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 
 // ---------------------------------------------------------------------------
 // Shared repositories (singletons)
 // ---------------------------------------------------------------------------
 
 let playerRepository: PlayerRepository | null = null;
-const masteryRepository = new InMemoryMasteryRepository();
-const subjectRepository = new InMemorySubjectRepository();
-const achievementRepository: AchievementRepository = new InMemoryAchievementRepository();
+const sqlite = getSqliteConnection();
+const masteryRepository: MasteryRepository = new DrizzleMasteryRepository(sqlite);
+const subjectRepository: SubjectRepository = new DrizzleSubjectRepository(sqlite);
+const achievementRepository: AchievementRepository = new DrizzleAchievementRepository(sqlite);
 const streakStatusService = new StreakStatusService();
 
 // These will be wired from the missions action module at runtime
@@ -191,7 +193,8 @@ async function ensureSubjectLoaded(): Promise<void> {
     new PrerequisiteGraphBuilder(),
   );
 
-  await subjectImportService.import("nextjs");
+  const result = await subjectImportService.import("nextjs");
+  await subjectRepository.save(result.subject);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 "use server";
 
 import { Subject } from "@/modules/subjects/domain/subject";
+import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
+import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 
 // Module-level cache
 let cachedSubjects: Subject[] | null = null;
@@ -8,9 +10,12 @@ let cachedSubjects: Subject[] | null = null;
 export async function getAvailableSubjects(): Promise<Subject[]> {
   if (cachedSubjects) return cachedSubjects;
 
-  const { InMemorySubjectRepository } =
-    await import("@/modules/subjects/infrastructure/in-memory-subject-repository");
-  const repo = new InMemorySubjectRepository();
+  const repo = new DrizzleSubjectRepository(getSqliteConnection());
+  const persisted = await repo.findAll();
+  if (persisted.length > 0) {
+    cachedSubjects = persisted;
+    return persisted;
+  }
 
   // Try to load from seed data first
   const { SubjectImportService } =
@@ -53,7 +58,7 @@ export async function getAvailableSubjects(): Promise<Subject[]> {
     const subjectId = file.replace(/\.md$/, "");
     try {
       const result = await importService.import(subjectId);
-      repo.set(result.subject);
+      await repo.save(result.subject);
       subjects.push(result.subject);
     } catch {
       // Skip malformed subjects silently

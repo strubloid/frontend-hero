@@ -113,6 +113,13 @@ export class SubjectSchemaValidator {
       }
     }
 
+    const knownConceptIds = new Set<string>();
+    for (const domain of subject.domains) {
+      for (const concept of domain.concepts) {
+        knownConceptIds.add(concept.id);
+      }
+    }
+
     // --- Concept checks ---
     const conceptIds = new Set<string>();
     for (const domain of subject.domains) {
@@ -161,7 +168,7 @@ export class SubjectSchemaValidator {
 
         // Prerequisites that reference nonexistent concepts
         for (const prereq of concept.prerequisites) {
-          if (!conceptIds.has(prereq) && prereq !== concept.id) {
+          if (!knownConceptIds.has(prereq) && prereq !== concept.id) {
             const pe: ParseError = {
               message: `Concept "${concept.id}" references unknown prerequisite "${prereq}"`,
               severity: "warning",

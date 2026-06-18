@@ -1,8 +1,8 @@
 "use server";
 
-import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
-import { InMemoryMasteryRepository } from "@/modules/mastery/infrastructure/in-memory-mastery-repository";
-import { InMemoryReviewRepository } from "@/modules/reviews/infrastructure/in-memory-review-repository";
+import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
+import { DrizzleMasteryRepository } from "@/modules/mastery/infrastructure/drizzle-mastery-repository";
+import { DrizzleReviewRepository } from "@/modules/reviews/infrastructure/drizzle-review-repository";
 import { DrizzlePlayerRepository } from "@/modules/players/infrastructure/drizzle-player-repository";
 import {
   DrizzleMissionAttemptRepository,
@@ -28,7 +28,7 @@ import { Question } from "@/modules/questions/domain/question";
 
 interface MissionActionWiring {
   playerRepository: DrizzlePlayerRepository;
-  subjectRepository: InMemorySubjectRepository;
+  subjectRepository: DrizzleSubjectRepository;
   missionRepository: DrizzleMissionRepository;
   questionRepository: DrizzleQuestionRepository;
   questionProvider: QuestionProvider;
@@ -44,12 +44,12 @@ async function wireDependencies(): Promise<MissionActionWiring> {
   wiringPromise = Promise.resolve().then(() => {
     const sqlite = getSqliteConnection();
     const playerRepository = new DrizzlePlayerRepository(sqlite);
-    const subjectRepository = new InMemorySubjectRepository();
+    const subjectRepository = new DrizzleSubjectRepository(sqlite);
     const missionRepository = new DrizzleMissionRepository(sqlite);
     const missionAttemptRepository = new DrizzleMissionAttemptRepository(sqlite);
     const questionRepository = new DrizzleQuestionRepository(sqlite);
-    const masteryRepository = new InMemoryMasteryRepository();
-    const reviewRepository = new InMemoryReviewRepository();
+    const masteryRepository = new DrizzleMasteryRepository(sqlite);
+    const reviewRepository = new DrizzleReviewRepository(sqlite);
     const graphBuilder = new PrerequisiteGraphBuilder();
     const missionSelector = new MissionSelector();
     const answerEvaluator = new AnswerEvaluator();
@@ -140,7 +140,7 @@ async function ensureSeeded(wiring: MissionActionWiring): Promise<void> {
   );
 
   const result = await subjectImportService.import("nextjs");
-  wiring.subjectRepository.set(result.subject);
+  await wiring.subjectRepository.save(result.subject);
 
   // Pre-generate questions for the first concept
   const firstDomain = result.subject.domains[0];

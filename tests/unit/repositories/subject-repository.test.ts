@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import * as schema from "@/shared/infrastructure/database/schema";
 import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
+import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
 import { Subject } from "@/modules/subjects/domain/subject";
+import { createTables } from "../../fixtures/create-tables";
 
 function makeSubject(id: string, overrides?: Partial<Subject>): Subject {
   return {
@@ -14,6 +19,59 @@ function makeSubject(id: string, overrides?: Partial<Subject>): Subject {
     createdAt: overrides?.createdAt ?? new Date("2025-01-01"),
     updatedAt: overrides?.updatedAt ?? new Date("2025-01-01"),
   };
+}
+
+function makeSubjectWithConcept(id: string): Subject {
+  return makeSubject(id, {
+    domains: [
+      {
+        name: "Routing",
+        concepts: [
+          {
+            id: `${id}.routing`,
+            subjectId: id,
+            name: "Routing Fundamentals",
+            domainName: "Routing",
+            level: "foundation",
+            difficulty: 2,
+            prerequisites: ["javascript.modules"],
+            tags: ["routing", "app-router"],
+            outcomes: ["Explain route segments"],
+            knowledge: "Routes map URLs to UI.",
+            commonMisconceptions: ["Routes always require client code"],
+            examples: ["app/dashboard/page.tsx"],
+            questionSeeds: [
+              {
+                seedId: `${id}.routing.q1`,
+                type: "multiple-choice",
+                difficulty: 2,
+                stem: "Which file defines a route UI?",
+                options: ["page.tsx", "route.ts", "layout.css", "next.config.ts"],
+                correctIndex: 0,
+                explanation: "A page file renders route UI.",
+              },
+            ],
+            practicalChallenges: [
+              {
+                challengeId: `${id}.routing.challenge`,
+                type: "implementation",
+                difficulty: 2,
+                prompt: "Create a dashboard route.",
+                solution: "Add app/dashboard/page.tsx.",
+              },
+            ],
+            interviewPrompts: [
+              {
+                promptId: `${id}.routing.interview`,
+                prompt: "Explain nested layouts.",
+                evaluationCriteria: ["Mentions layout nesting"],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
 }
 
 describe("InMemorySubjectRepository", () => {
@@ -121,5 +179,81 @@ describe("InMemorySubjectRepository", () => {
       const preloaded = new InMemorySubjectRepository([makeSubject("a"), makeSubject("b")]);
       expect(preloaded.count).toBe(2);
     });
+  });
+});
+
+describe("DrizzleSubjectRepository", () => {
+  let db: ReturnType<typeof drizzle<typeof schema>>;
+  let repo: DrizzleSubjectRepository;
+
+  beforeEach(() => {
+    const sqlite = new Database(":memory:");
+    sqlite.pragma("foreign_keys = ON");
+    db = createTables(sqlite);
+    repo = new DrizzleSubjectRepository(sqlite);
+  });
+
+  it("creates and retrieves a subject with full concept content", async () => {
+    const subject = makeSubjectWithConcept("nextjs");
+
+    await repo.create(subject);
+    const result = await repo.getById("nextjs");
+
+    expect(result).not.toBeNull();
+    expect(result!.domains).toHaveLength(1);
+    expect(result!.domains[0].concepts).toHaveLength(1);
+    expect(result!.domains[0].concepts[0].questionSeeds[0].stem).toBe(
+      "Which file defines a route UI?",
+    );
+    expect(result!.domains[0].concepts[0].practicalChallenges[0].prompt).toBe(
+      "Create a dashboard route.",
+    );
+    expect(result!.domains[0].concepts[0].interviewPrompts[0].prompt).toBe(
+      "Explain nested layouts.",
+    );
+  });
+
+  it("finds all subjects and preserves empty-domain subjects", async () => {
+    await repo.create(makeSubject("react"));
+    await repo.create(makeSubjectWithConcept("nextjs"));
+
+    const results = await repo.findAll();
+
+    expect(results.map((subject) => subject.id)).toEqual(["nextjs", "react"]);
+    expect(results.find((subject) => subject.id === "react")!.domains).toEqual([]);
+  });
+
+  it("throws on duplicate create", async () => {
+    await repo.create(makeSubject("nextjs"));
+
+    await expect(repo.create(makeSubject("nextjs"))).rejects.toThrow(/already exists/i);
+  });
+
+  it("saves an existing subject and replaces concepts", async () => {
+    await repo.create(makeSubjectWithConcept("nextjs"));
+    const updated = makeSubject("nextjs", { title: "Updated Next.js" });
+
+    await repo.save(updated);
+    const result = await repo.getById("nextjs");
+    const conceptRows = db.select().from(schema.concepts).all();
+
+    expect(result!.title).toBe("Updated Next.js");
+    expect(result!.domains).toEqual([]);
+    expect(conceptRows).toEqual([]);
+  });
+
+  it("creates on save when subject does not exist", async () => {
+    await repo.save(makeSubject("typescript"));
+
+    await expect(repo.exists("typescript")).resolves.toBe(true);
+  });
+
+  it("deletes subject and concepts", async () => {
+    await repo.create(makeSubjectWithConcept("nextjs"));
+
+    await repo.delete("nextjs");
+
+    await expect(repo.getById("nextjs")).resolves.toBeNull();
+    expect(db.select().from(schema.concepts).all()).toEqual([]);
   });
 });

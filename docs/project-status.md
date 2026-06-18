@@ -473,9 +473,12 @@ Delivered:
 3. [x] Subject validator — 15+ edge cases: duplicate IDs, invalid levels, difficulty range, unknown prerequisites, self-prerequisites, insufficient options, missing correctIndex, empty domains/knowledge.
 4. [x] Prerequisite graph — DAG with Kahn's algorithm topological sort, DFS cycle detection, depth computation, `getAvailableConcepts()`.
 5. [x] Subject version migration — `SubjectVersionMigrationService` with chain verification, v1→v2 migration step.
-6. [x] Subject repository — expanded `SubjectRepository` interface (`findAll`, `save`, `create`, `delete`, `exists`), reusable `InMemorySubjectRepository` module.
+6. [x] Subject repository — expanded `SubjectRepository` interface (`findAll`, `save`, `create`, `delete`, `exists`), reusable `InMemorySubjectRepository` module and Drizzle-backed persistence.
 7. [x] Subject selection UI — `/subjects` page with card grid, title/version/domain count/concept count per subject; `/play?subject=...` accepts query parameter.
 8. [x] Navigation — landing page (`/`) with "Enter the Realms" link to subjects, "Continue Last Session" to play; `/play` has "← Subjects" back button.
+9. [x] Validator coverage — standalone `SubjectSchemaValidator` tests cover subject/domain/concept/question-seed validation and formatting helpers.
+10. [x] Architecture guard — dependency-cruiser config plus Vitest architecture test enforce module-layer dependency direction and circular-dependency errors.
+11. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ depcruise: 0 errors/7 warnings ✓ production audit ✓ dependency audit gate ✓ build ✓ 217 tests ✓).
 
 ### Phase 3 — Learning Engine (Completed)
 
@@ -616,19 +619,31 @@ Delivered:
 5. [x] Disposable database tests cover first-open bootstrap and idempotent repeat bootstrap.
 6. [x] Mission gameplay action now uses Drizzle/SQLite-backed repositories for player, mission, mission-attempt, and question persistence.
 7. [x] Mission repository returns the latest active mission when multiple active rows exist, preserving the previous in-memory active-mission behavior.
-8. [ ] Wire subject, mastery, review, achievement, quest, mission-chain, boss, and progression app-action stores to durable repositories.
-9. [ ] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
-10. [ ] Run a real backup/restore drill against the Fly volume or future managed database.
+8. [x] Subject selection/import action now uses Drizzle/SQLite-backed subject and concept persistence.
+9. [x] Subject repository persists full concept content, including question seeds, practical challenges, and interview prompts.
+10. [x] Mission learning state now uses Drizzle/SQLite-backed concept mastery and review schedule persistence.
+11. [x] Review schedule bootstrap added to the SQLite schema; existing `conceptMastery` tables are upgraded idempotently with demonstrated context and common mistake JSON columns.
+12. [x] Latest verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ depcruise: 0 errors/7 warnings ✓ production audit ✓ dependency audit gate ✓ build ✓ 226 tests ✓).
+13. [ ] Wire achievement, quest, mission-chain, boss, profile/world-map read-model, and progression app-action stores to durable repositories.
+14. [ ] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
+15. [ ] Run a real backup/restore drill against the Fly volume or future managed database.
 
 Files created:
 
 - `src/shared/infrastructure/database/create-tables.ts` — shared idempotent SQLite schema bootstrap.
 - `src/shared/infrastructure/database/connection.test.ts` — disposable database bootstrap regression tests.
+- `src/modules/subjects/infrastructure/drizzle-subject-repository.ts` — durable subject/concept repository.
+- `src/modules/mastery/infrastructure/drizzle-mastery-repository.ts` — durable concept mastery repository.
+- `src/modules/reviews/infrastructure/drizzle-review-repository.ts` — durable review schedule repository.
+- `tests/unit/repositories/learning-state-repository.test.ts` — disposable database tests for mastery/review persistence.
 - `scripts/migrate-database.ts` — operational database bootstrap command.
 
 Files updated:
 
-- `src/app/actions/missions.ts` — mission gameplay now uses durable Drizzle/SQLite-backed player, mission, mission-attempt, and question repositories.
+- `src/app/actions/subjects.ts` — subject listing now reads/writes through durable Drizzle/SQLite-backed subject persistence.
+- `src/shared/infrastructure/database/schema.ts` / `src/shared/infrastructure/database/create-tables.ts` — concept rows now persist question seeds, practical challenges, and interview prompts.
+- `tests/unit/repositories/subject-repository.test.ts` — covers durable subject repository CRUD and nested concept content.
+- `src/app/actions/missions.ts` — mission gameplay now uses durable Drizzle/SQLite-backed player, subject, mission, mission-attempt, question, concept-mastery, and review-schedule repositories.
 - `src/modules/missions/infrastructure/drizzle-mission-repository.ts` — active mission lookup now returns the most recently started active mission.
 - `tests/unit/repositories/mission-repository.test.ts` — covers latest-active mission selection.
 - `src/shared/infrastructure/database/connection.ts` — runtime parent-directory creation and automatic table bootstrap.

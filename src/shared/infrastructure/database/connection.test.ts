@@ -5,12 +5,21 @@ import { describe, expect, it } from "vitest";
 import { openSqliteDatabase } from "./connection";
 
 const REQUIRED_TABLES = [
+  "bossEncounters",
+  "bossProgress",
   "conceptMastery",
   "concepts",
   "missionAttempts",
+  "missionChainProgress",
+  "missionChains",
   "missions",
+  "playerAchievements",
+  "playerProgression",
   "players",
+  "questProgress",
   "questions",
+  "quests",
+  "reviewSchedules",
   "subjects",
 ];
 
