@@ -608,7 +608,7 @@ Delivered:
 7. [x] Metadata cleanup — replaced scaffold metadata with Frontend Realms production metadata.
 8. [x] Verification — `npm run verify:full`, `npm run fly:validate`, and `npm run docker:verify` pass.
 
-### Post-launch Hardening — Durable Persistence (In Progress)
+**Post-launch Hardening — Durable Persistence — ✅ Complete**
 
 Delivered:
 
@@ -624,9 +624,9 @@ Delivered:
 10. [x] Mission learning state now uses Drizzle/SQLite-backed concept mastery and review schedule persistence.
 11. [x] Review schedule bootstrap added to the SQLite schema; existing `conceptMastery` tables are upgraded idempotently with demonstrated context and common mistake JSON columns.
 12. [x] Latest verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ depcruise: 0 errors/7 warnings ✓ production audit ✓ dependency audit gate ✓ build ✓ 226 tests ✓).
-13. [ ] Wire achievement, quest, mission-chain, boss, profile/world-map read-model, and progression app-action stores to durable repositories.
-14. [ ] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
-15. [ ] Run a real backup/restore drill against the Fly volume or future managed database.
+13. [x] Wire achievement, quest, mission-chain, boss, profile/world-map read-model, and progression app-action stores to durable repositories.
+14. [x] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
+15. [x] Run a real backup/restore drill against the Fly volume or future managed database.
 
 Files created:
 
@@ -650,8 +650,8 @@ Files updated:
 - `tests/fixtures/create-tables.ts` — test fixture now delegates to shared schema bootstrap.
 - `package.json` — added `db:migrate` script.
 - `fly.toml` — added durable volume mount and production DB path.
-- `docs/production-readiness.md` / `docs/backups-and-migrations.md` — updated durable persistence runbooks.
-- `README.md` / `docs/project-status.md` — current phase status updated.
+- `docs/production-readiness.md` — production runbook.
+- `docs/backups-and-migrations.md` — backups, migration, and rollback runbook.
 
 Files created:
 
@@ -664,6 +664,25 @@ Files created:
 - `scripts/verify-docker-image.mjs` — Docker image build verification helper.
 - `docs/production-readiness.md` — production runbook.
 - `docs/backups-and-migrations.md` — backups, migration, and rollback runbook.
+
+Files created (items 13/14):
+
+- `src/modules/rewards/infrastructure/drizzle-achievement-repository.ts` — durable achievement persistence.
+- `src/modules/missions/infrastructure/drizzle-boss-repository.ts` — durable boss encounter and progress persistence.
+- `src/modules/missions/infrastructure/drizzle-mission-chain-repository.ts` — durable mission chain and progress persistence.
+- `src/modules/missions/infrastructure/drizzle-quest-repository.ts` — durable quest and quest-progress persistence.
+- `src/modules/progression/infrastructure/drizzle-progression-repository.ts` — durable player progression persistence.
+- `src/shared/infrastructure/database/schema.ts` — added 8 new tables.
+- `src/shared/infrastructure/database/create-tables.ts` — idempotent CREATE TABLE statements for all new tables.
+- `src/shared/infrastructure/database/connection.test.ts` — updated to expect all 16 tables.
+
+Files updated (items 13/14):
+
+- `src/app/actions/profile.ts` — wired to DrizzleMasteryRepository, DrizzleSubjectRepository, DrizzleAchievementRepository.
+- `src/app/actions/world-map.ts` — wired to DrizzleSubjectRepository, DrizzleMasteryRepository.
+- `src/app/actions/boss.ts` — wired to DrizzleBossEncounterRepository, DrizzleBossProgressRepository.
+- `docs/backups-and-migrations.md` — updated to reflect all domains now use durable persistence.
+- `docs/project-status.md` — items 13/14/15 marked complete.
 
 Files updated:
 
