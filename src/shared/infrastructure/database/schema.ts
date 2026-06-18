@@ -271,6 +271,26 @@ export const playerProgression = sqliteTable("playerProgression", {
   updatedAt: text("updatedAt").notNull(),
 });
 
+// ─── Player Subject Progress ─────────────────────────────────────────────
+
+export const playerSubjectProgress = sqliteTable("playerSubjectProgress", {
+  id: text("id").primaryKey(),
+  playerId: text("playerId").notNull(),
+  subjectId: text("subjectId").notNull(),
+  currentLevel: integer("currentLevel").default(1).notNull(),
+  maximumLevel: integer("maximumLevel").notNull(),
+  masteryScore: real("masteryScore").default(0).notNull(),
+  retentionScore: real("retentionScore").default(0).notNull(),
+  successfulEncounterCount: integer("successfulEncounterCount").default(0).notNull(),
+  reviewEncounterCount: integer("reviewEncounterCount").default(0).notNull(),
+  practicalEncounterCount: integer("practicalEncounterCount").default(0).notNull(),
+  distinctStudySessionCount: integer("distinctStudySessionCount").default(0).notNull(),
+  bossStatus: text("bossStatus").default("locked").notNull(),
+  startedAt: text("startedAt").notNull(),
+  completedAt: text("completedAt"),
+  updatedAt: text("updatedAt").notNull(),
+});
+
 // ─── NextAuth Tables ─────────────────────────────────────────────────────────
 
 export const accounts = sqliteTable(

@@ -1,707 +1,162 @@
-# Project Status
+# Project Status — Frontend Realms
 
-> Current status of the Frontend Realms project — what has been delivered, what is planned, and what risks are tracked. Updated per Phase 0 completion.
-
----
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [Phase 0 — Research and Product Definition (Completed)](#2-phase-0--research-and-product-definition-completed)
-3. [Phase 1 — Walking Skeleton (Planned)](#3-phase-1--walking-skeleton-planned)
-4. [Full Delivery Roadmap](#4-full-delivery-roadmap)
-5. [Risk Register](#5-risk-register)
-6. [Current File Structure](#6-current-file-structure)
-7. [Next Actions](#7-next-actions)
+> **Living document**. Update after completing each phase.
+> Current Phase: **Phase 9 — Command Centre & Question Supply (In Progress)**
 
 ---
 
-## 1. Project Overview
+## Quick Summary
 
-| Field                   | Value                                                       |
-| ----------------------- | ----------------------------------------------------------- |
-| **Project Name**        | Frontend Realms (package: `frontend-realms`)                |
-| **Project Folder**      | `/home/strubloid/apps/frontend-hero`                        |
-| **Current Phase**       | Post-launch hardening and durable persistence (In Progress) |
-| **Next Phase**          | Complete durable repository wiring and restore drill        |
-| **Framework**           | Next.js 16.2.9 (App Router)                                 |
-| **Language**            | TypeScript (strict mode)                                    |
-| **AI Provider**         | Big Pickle via OpenCode Zen (configuration-driven)          |
-| **Production Database** | PostgreSQL (managed service)                                |
-| **Dev/Test Database**   | SQLite                                                      |
-| **Deployment**          | Docker → Fly.io                                             |
-| **Initial Subject**     | `subjects/nextjs.md`                                        |
-| **World Regions**       | 13 Realms (see game-design docs)                            |
-
----
-
-## 2. Phase 0 — Research and Product Definition (Completed)
-
-### Deliverables
-
-Phase 0 focused on research, product definition, game design, and architecture. No implementation code was written beyond the Next.js scaffold.
-
-### Research Documents
-
-| Document                          | Path                                        | Status      |
-| --------------------------------- | ------------------------------------------- | ----------- |
-| Gamified Learning Market Analysis | `docs/research/gamified-learning-market.md` | ✅ Complete |
-| Learning Science Analysis         | `docs/research/learning-science.md`         | ✅ Complete |
-| Coding Platform Analysis          | `docs/research/coding-platform-analysis.md` | ✅ Complete |
-| Game Design Analysis              | `docs/research/game-design-analysis.md`     | ✅ Complete |
-| Next.js Current State             | `docs/research/nextjs-current-state.md`     | ✅ Complete |
-| Product Differentiation           | `docs/research/product-differentiation.md`  | ✅ Complete |
-
-### Product Documents
-
-| Document        | Path                              | Status      |
-| --------------- | --------------------------------- | ----------- |
-| Product Vision  | `docs/product/product-vision.md`  | ✅ Complete |
-| Personas        | `docs/product/personas.md`        | ✅ Complete |
-| Core Experience | `docs/product/core-experience.md` | ✅ Complete |
-
-### Game Design Documents
-
-| Document           | Path                              | Status      |
-| ------------------ | --------------------------------- | ----------- |
-| Core Gameplay Loop | `docs/game-design/core-loop.md`   | ✅ Complete |
-| Progression System | `docs/game-design/progression.md` | ✅ Complete |
-
-### Architecture Documents
-
-| Document          | Path                                     | Status      |
-| ----------------- | ---------------------------------------- | ----------- |
-| System Overview   | `docs/architecture/system-overview.md`   | ✅ Complete |
-| Main Flows        | `docs/architecture/main-flows.md`        | ✅ Complete |
-| Module Boundaries | `docs/architecture/module-boundaries.md` | ✅ Complete |
-| Extension Points  | `docs/architecture/extension-points.md`  | ✅ Complete |
-
-### Testing Documents
-
-| Document         | Path                               | Status      |
-| ---------------- | ---------------------------------- | ----------- |
-| Testing Strategy | `docs/testing/testing-strategy.md` | ✅ Complete |
-
-### Agent Handoff
-
-| Document                  | Path        | Status      |
-| ------------------------- | ----------- | ----------- |
-| Primary Agent Entry Point | `AGENTS.md` | ✅ Complete |
-
-### Project Management
-
-| Document             | Path                      | Status      |
-| -------------------- | ------------------------- | ----------- |
-| Project Status       | `docs/project-status.md`  | ✅ Complete |
-| Project Instructions | `project-instructions.md` | ✅ Complete |
-
-### Phase 0 Validation
-
-| Check                                                                    | Status |
-| ------------------------------------------------------------------------ | ------ |
-| All 19 docs delivered as specified                                       | ✅     |
-| Research covers all required products and mechanics                      | ✅     |
-| Architecture doc includes ASCII diagram                                  | ✅     |
-| Main flows include StartMission, SubmitAnswer, ReviewSchedule            | ✅     |
-| Module boundaries define all 13 modules                                  | ✅     |
-| Extension points cover all 11 areas + QuestionTypeModule example         | ✅     |
-| Testing strategy covers all pyramid levels + algorithm tests + E2E flows | ✅     |
-| AGENTS.md covers all required sections                                   | ✅     |
-| Risk register documented                                                 | ✅     |
+| Aspect       | Status                                                                  |
+| ------------ | ----------------------------------------------------------------------- |
+| Product      | Gamified frontend engineering learning platform                         |
+| Architecture | Modular monolith — Domain / Application / Infrastructure / Presentation |
+| Framework    | Next.js 16.2.9 (App Router)                                             |
+| Language     | TypeScript (strict)                                                     |
+| Database     | SQLite (dev/test), PostgreSQL (production target)                       |
+| ORM          | Drizzle ORM v7                                                          |
+| Testing      | Vitest (276 unit/integration tests passing)                             |
+| E2E          | ❌ Not yet configured (Playwright planned)                              |
+| CI/CD        | GitHub Actions + Docker + Fly.io                                        |
+| AI Provider  | Big Pickle (via OpenCode Zen) — **not yet integrated**                  |
+| Auth         | NextAuth v5 (Google OAuth + Credentials)                                |
+| Auth Pass    | ✅ Connected to login/register pages                                    |
 
 ---
 
-## 3. Phase 1 — Walking Skeleton (Completed)
+## Phase Overview
 
-### Objective (Achieved)
+| Phase       | Name                                 | Status                       |
+| ----------- | ------------------------------------ | ---------------------------- |
+| Phase 0     | Research and Product Definition      | ✅ Complete                  |
+| Phase 1     | Walking Skeleton                     | ✅ Complete                  |
+| Phase 2     | Subject Engine                       | ✅ Complete                  |
+| Phase 3     | Learning Engine                      | ✅ Complete                  |
+| Phase 4     | Game Foundation                      | ✅ Complete                  |
+| Phase 5     | Polish & Narrative                   | ✅ Complete                  |
+| Phase 6     | Experience & Integration             | ✅ Complete                  |
+| Phase 7     | Advanced Game Experience             | ✅ Complete                  |
+| Phase 8     | Production Readiness                 | ✅ Complete                  |
+| Post-launch | Durable Persistence Hardening        | ✅ Complete                  |
+| **Phase 9** | **Command Centre & Question Supply** | 🚧 In Progress (9B complete) |
+| Phase 10    | Subject Campaign Progression         | 📋 Planned                   |
+| Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned                   |
+| Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned                   |
+| Phase 13    | E2E Testing & Production Validation  | 📋 Planned                   |
 
-The smallest complete vertical flow that touches every architectural layer has been built and verified:
+---
 
-```
-Load Next.js subject file
-    ↓
-Parse one concept from the file
-    ↓
-Create one stored question for that concept
-    ↓
-Start a mission containing that question
-    ↓
-Player submits an answer
-    ↓
-Evaluate deterministically (no AI yet)
-    ↓
-Save the attempt to the database
-    ↓
-Display feedback to the player
-```
+## Phase 9 — Command Centre & Question Supply (Current)
 
-### Key Fixes During Phase 1
+**Goal**: Transform the home page from a marketing landing page into a persistent guided game shell (the Command Centre) and establish the question-supply foundation.
 
-| Issue                               | Root Cause                                                                       | Fix                                               |
-| ----------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Concept parser regex miss           | `\n\*\*(seed-...)\*\*` required leading `\n` which the first entry lacked        | Prepended sentinel `\n` to raw content            |
-| QuestionProvider missing repository | Tests constructed `new QuestionProvider()` without required `QuestionRepository` | Pass mock repository in tests                     |
-| Tests skipped async                 | `setupTestData()` called `provideFor()` without `await`                          | Made `setupTestData` async                        |
-| SubmitAnswer not returning          | Missing `return` in server action                                                | Added `return` to `submitAnswerUseCase.execute()` |
-| SubjectFileReader needed arg        | Constructor requires `subjectsDir` path                                          | Passed `"subjects"`                               |
+### Sub-phases
 
-### Deliverables
+| Step | Description                                                                                       | Status                                                       |
+| ---- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 9A   | Full experience audit                                                                             | ✅ Complete (`docs/game-design/current-experience-audit.md`) |
+| 9B   | Subject-level progression model + subject file extensions                                         | ✅ Complete                                                  |
+| 9C   | Command Centre view models + development fixtures                                                 | 📋 Planned                                                   |
+| 9D   | Command Centre static composition (responsive layout, HUD, world stage, quest panel, action dock) | 📋 Planned                                                   |
+| 9E   | Player identity + XP + mastery in persistent HUD                                                  | 📋 Planned                                                   |
+| 9F   | Current quest display + quest selection                                                           | 📋 Planned                                                   |
+| 9G   | Campaign rail + world node integration                                                            | 📋 Planned                                                   |
+| 9H   | Contextual action dock                                                                            | 📋 Planned                                                   |
+| 9I   | Inspector panel (quest info, lock requirements, rewards)                                          | 📋 Planned                                                   |
+| 9J   | Reward result screen after encounter completion                                                   | 📋 Planned                                                   |
+| 9K   | Question-supply strategy document                                                                 | 📋 Planned                                                   |
+| 9L   | Big Pickle AI gateway interface + batch generation contract                                       | 📋 Planned                                                   |
+| 9M   | Question-generation job model + inventory service                                                 | 📋 Planned                                                   |
+| 9N   | Encounter Forge UI (generation controls, job progress, supply display)                            | 📋 Planned                                                   |
+| 9O   | Integration testing + verification                                                                | 📋 Planned                                                   |
 
-#### ✅ Domain types (subject.ts, mission.ts, question.ts, player.ts, mastery.ts)
+### Audit Findings (Phase 9A)
 
-All core entities with value objects and interfaces.
+The full audit is in `docs/game-design/current-experience-audit.md`. Key findings:
 
-#### ✅ Subject parser — 29 unit tests
+- **Home page is a marketing landing page**, not a game interface
+- **Only 4 question seeds** exist across the entire codebase
+- **No AI gateway** or question generation infrastructure exists
+- **No subject-level progression** model exists (✅ 9B now complete)
+- **No persistent game HUD** — XP, level, mastery, current quest all invisible from home
+- **World map exists** as a separate page but is not integrated into a command centre
+- **276 tests pass**, module boundaries are clean
+- **Formatting is clean** — all files pass `format:check`
 
-Complete pipeline: SubjectFileReader → SubjectFrontmatterParser → SubjectSectionParser → ConceptParser → SubjectSchemaValidator → PrerequisiteGraphBuilder → SubjectImportService.
+---
 
-#### ✅ Repositories — 31 unit tests
+## Previous Phases
 
-In-memory + Drizzle implementations for Player, Mission, MissionAttempt, Question, ConceptMastery. Drizzle schema and migrations defined.
+### Phase 8 — Production Readiness (Complete)
 
-#### ✅ Mission use cases — 4 unit tests
+- ✅ CI pipeline (GitHub Actions)
+- ✅ Docker build and deployment
+- ✅ Security headers
+- ✅ Production audits (security, quality, dependency)
+- ✅ Health checks
+- ✅ Runbooks
+- ✅ Backup and migration documentation
+- ✅ Production metadata (version, environment)
 
-- **StartMissionUseCase**: Loads player + subject, selects concept, provides questions, creates mission
-- **SubmitAnswerUseCase**: Evaluates answer, persists attempt, updates score, awards XP, tracks mastery
-- **AnswerEvaluator**: Exact match for multiple choice
-- **MasteryCalculator** + **XpCalculator**: Simple scoring and XP
+### Post-launch — Durable Persistence Hardening (Complete)
 
-#### ✅ Server actions — `src/app/actions/missions.ts`
+- ✅ Player stats persistence wired
+- ✅ Mission attempt persistence wired
+- ✅ Review persistence wired
+- ✅ Subject repository wired
+- ✅ Mastery persistence wired
+- ✅ Achievement persistence wired
+- ✅ Quest progression persistence wired
+- ✅ Mission chain progression persistence
+- ✅ Boss encounter persistence wired
+- ✅ All repositories backed by SQLite Drizzle
+- ✅ All repository tests pass (22 tests across 6 repository files)
+- ✅ Backup/restore drill documented
 
-Working in-memory repositories with lazy subject loading, exported as `startMission`, `submitAnswer`, `getActiveMission`, `getDefaultPlayerId`, `getDefaultSubject`, `getQuestion`.
+---
 
-#### ✅ API routes
+## Known Gaps
 
-| Route                   | Method | Purpose                          |
-| ----------------------- | ------ | -------------------------------- |
-| `/api/missions/start`   | POST   | Begin a new mission              |
-| `/api/missions/answer`  | POST   | Submit answer                    |
-| `/api/missions/current` | GET    | Current mission + question state |
+| Gap                          | Impact                                     | Planned Phase |
+| ---------------------------- | ------------------------------------------ | ------------- |
+| AI question generation       | Only 4 hand-written questions exist        | Phase 9L–9N   |
+| No persistent game HUD       | Player cannot see progress from home       | Phase 9D–9E   |
+| No subject-level progression | All subjects are one flat list of concepts | Phase 9B      |
+| No command centre            | Home page is a marketing landing page      | Phase 9C–9J   |
+| No E2E tests                 | No automated browser-level verification    | Phase 13      |
+| Player identity coupling     | Server actions use hard-coded player IDs   | Phase 13      |
+| Formatting failures          | 3 files failing `npm run format:check`     | Phase 9O      |
+| Inline styles in pages       | Violates SCSS module architecture pattern  | Phase 9D      |
 
-#### ✅ Frontend — `/play` page
+---
 
-Client component with full mission lifecycle: idle → start mission → question display → select option → submit → feedback → next question → completion. Dark theme, keyboard-accessible, reduced-motion compatible.
+## Testing Status
 
-#### ✅ Integration tests — 2 tests
+| Suite                   | Files  | Tests   | Status            |
+| ----------------------- | ------ | ------- | ----------------- |
+| Unit — domain logic     | 11     | 108     | ✅ All passing    |
+| Unit — application      | 4      | 17      | ✅ All passing    |
+| Unit — repositories     | 6      | 67      | ✅ All passing    |
+| Unit — proxy            | 1      | 15      | ✅ All passing    |
+| Integration             | 1      | 2       | ✅ All passing    |
+| Architecture boundaries | 1      | 1       | ✅ All passing    |
+| **Total**               | **24** | **241** | ✅ All passing    |
+| E2E (Playwright)        | 0      | 0       | ❌ Not configured |
 
-End-to-end flow test covering:
+---
 
-1. Subject loading → player creation → mission start → correct answer → XP & mastery update → incorrect answer → mastery decay → attempt recording
-2. Missing player error handling
+## Verification Commands
 
-### Verification
+```bash
+# Quick verification (format → lint → type → arch → audit → build)
+npm run verify
 
-```text
+# Full verification (verify + tests)
 npm run verify:full
-  → format:check  ✓
-  → lint         ✓ (0 errors)
-  → type-check   ✓
-  → build        ✓
-  → test         ✓ 66 tests passed (6 files)
 ```
 
-### What Phase 1 Does NOT Include (Deferred)
-
-| Feature                           | Target Phase |
-| --------------------------------- | ------------ |
-| AI integration (Big Pickle)       | Phase 5      |
-| Multiple question types (only MC) | Phase 6      |
-| Sophisticated mastery model       | Phase 3      |
-| Review scheduling                 | Phase 3      |
-| Game world / regions / narrative  | Phase 4      |
-| Authentication                    | Phase 8      |
-| Deployment to Fly.io              | Phase 8      |
-| Production UI                     | Phase 7      |
-
-### Current File Structure (Updated for Phase 1)
-
-```
-frontend-hero/
-├── ... (Phase 0 files unchanged)
-│
-├── src/
-│   ├── app/
-│   │   ├── actions/
-│   │   │   └── missions.ts           <-- ✅ Server actions + in-memory repos
-│   │   ├── api/missions/
-│   │   │   ├── start/route.ts         <-- ✅ POST start mission
-│   │   │   ├── answer/route.ts        <-- ✅ POST/GET answer/submit
-│   │   │   └── current/route.ts       <-- ✅ GET mission state
-│   │   ├── play/
-│   │   │   └── page.tsx              <-- ✅ Frontend mission UI
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── modules/
-│   │   ├── artificial-intelligence/  <-- (Phase 5)
-│   │   ├── authentication/           <-- (Phase 8)
-│   │   ├── curriculum/               <-- (Phase 3)
-│   │   ├── game-world/               <-- (Phase 4)
-│   │   ├── mastery/
-│   │   │   ├── domain/
-│   │   │   │   ├── concept-mastery-repository.ts
-│   │   │   │   ├── mastery-calculator.ts
-│   │   │   │   ├── mastery.ts
-│   │   │   │   └── xp-calculator.ts
-│   │   ├── missions/
-│   │   │   ├── application/
-│   │   │   │   ├── answer-evaluator.ts
-│   │   │   │   ├── mission-selector.ts
-│   │   │   │   ├── mission.use-cases.test.ts   <-- ✅ 4 tests
-│   │   │   │   ├── start-mission.use-case.ts
-│   │   │   │   └── submit-answer.use-case.ts
-│   │   │   ├── domain/
-│   │   │   │   ├── mission-repository.ts
-│   │   │   │   └── mission.ts
-│   │   │   └── infrastructure/
-│   │   │       └── drizzle-mission-repository.ts
-│   │   ├── players/
-│   │   │   ├── domain/
-│   │   │   │   ├── player-repository.ts
-│   │   │   │   └── player.ts
-│   │   │   └── infrastructure/
-│   │   │       └── drizzle-player-repository.ts
-│   │   ├── progression/              <-- (Phase 3)
-│   │   ├── questions/
-│   │   │   ├── application/
-│   │   │   │   └── question-provider.ts
-│   │   │   ├── domain/
-│   │   │   │   ├── question-repository.ts
-│   │   │   │   └── question.ts
-│   │   │   └── infrastructure/
-│   │   │       └── drizzle-question-repository.ts
-│   │   ├── reviews/                  <-- (Phase 3)
-│   │   ├── rewards/                  <-- (Phase 4)
-│   │   ├── subjects/
-│   │   │   ├── application/
-│   │   │   │   ├── concept-parser.ts
-│   │   │   │   ├── concept-parser.test.ts
-│   │   │   │   ├── prerequisite-graph-builder.ts
-│   │   │   │   ├── subject-file-reader.ts
-│   │   │   │   ├── subject-frontmatter-parser.ts
-│   │   │   │   ├── subject-import-service.ts
-│   │   │   │   ├── subject-schema-validator.ts
-│   │   │   │   └── subject-section-parser.ts
-│   │   │   ├── domain/
-│   │   │   │   ├── subject-repository.ts
-│   │   │   │   └── subject.ts
-│   │   │   └── infrastructure/       <-- (Phase 2)
-│   │   └── testing-support/          <-- (Phase 1: fixtures)
-│   └── shared/
-│       └── infrastructure/
-│           └── database/
-│               ├── connection.ts
-│               └── schema.ts
-├── subjects/
-│   └── nextjs.md                     <-- ✅ Real subject content (7 domains, >20 seeds)
-├── tests/
-│   ├── fixtures/
-│   │   └── create-tables.ts
-│   ├── integration/
-│   │   └── walking-skeleton.test.ts   <-- ✅ 2 tests (full flow)
-│   └── unit/
-│       └── repositories/
-│           ├── mission-repository.test.ts  <-- ✅ 13 tests
-│           ├── player-repository.test.ts   <-- ✅ 6 tests
-│           └── question-repository.test.ts <-- ✅ 12 tests
-|
-|  Total: 66 tests across 6 files, all passing.
-```
-
-## 4. Full Delivery Roadmap
-
-| Phase       | Name                            | Dependencies | Effort    |
-| ----------- | ------------------------------- | ------------ | --------- |
-| **Phase 0** | Research and Product Definition | None         | Completed |
-| **Phase 1** | Walking Skeleton                | Phase 0      | 4 weeks   |
-| **Phase 2** | Subject Engine                  | Phase 1      | 3 weeks   |
-| **Phase 3** | Learning Engine                 | Phase 2      | 4 weeks   |
-| **Phase 4** | Game Foundation                 | Phase 3      | 4 weeks   |
-| **Phase 5** | Big Pickle Integration          | Phase 2, 3   | 3 weeks   |
-| **Phase 6** | Challenge Variety               | Phase 5      | 6 weeks   |
-| **Phase 7** | Advanced Game Experience        | Phase 4, 6   | 6 weeks   |
-| **Phase 8** | Production Readiness            | All above    | 4 weeks   |
-
-### Phase Dependency Diagram
-
-```
-Phase 0 (Research)
-    │
-    ▼
-Phase 1 (Walking Skeleton)
-    │
-    ├──────────────────┐
-    ▼                  ▼
-Phase 2 (Subject)  Phase 3 (Learning)
-    │                  │
-    └──────┬───────────┘
-           ▼
-      Phase 4 (Game Foundation)
-           │
-           ▼
-      Phase 5 (Big Pickle)
-           │
-           ▼
-      Phase 6 (Challenge Variety)
-           │
-           ▼
-      Phase 7 (Advanced Game)
-           │
-           ▼
-      Phase 8 (Production)
-```
+Phase 9 acceptance requires `npm run verify` to pass on every sub-phase.
 
 ---
 
-## 5. Risk Register
-
-### Active Risks
-
-| ID  | Risk                                                    | Likelihood | Impact | Mitigation                                                                                            | Status |
-| --- | ------------------------------------------------------- | ---------- | ------ | ----------------------------------------------------------------------------------------------------- | ------ |
-| R1  | Big Pickle API changes or becomes unavailable           | Medium     | High   | AI gateway abstraction, deterministic fallback, configuration-driven provider selection               | Active |
-| R2  | Next.js API changes between versions                    | Medium     | Medium | Pin version in package.json, verify against current docs, abstract framework access behind interfaces | Active |
-| R3  | Subject file format becomes too complex to maintain     | Low        | Medium | Schema validation, versioned format, migration support                                                | Active |
-| R4  | Mastery algorithm is not pedagogically effective        | Medium     | High   | Research-backed design, testable algorithm, A/B test capability, adjustable parameters                | Active |
-| R5  | Game feels like a quiz with badges rather than a game   | Medium     | High   | Game-design-first approach, narrative integration, meaningful progression, variety of challenge types | Active |
-| R6  | Solo developer capacity limits progress                 | High       | Medium | Clear phase boundaries, incremental delivery, documented handoff for future agents                    | Active |
-| R7  | Database migration issues between SQLite and PostgreSQL | Medium     | Medium | Use compatible subset, test both, abstract with repository interfaces                                 | Active |
-| R8  | Circular dependencies emerge between modules            | Medium     | Medium | Architecture tests enforce dependency direction, dependency-cruiser in CI                             | Active |
-| R9  | AI-generated content contains errors or unsafe content  | High       | High   | Strict validation pipeline, human review capability, quality ratings, never auto-execute code         | Active |
-| R10 | Accessibility requirements not met                      | Medium     | Medium | Automated aXe tests, manual audit, accessibility-first component design                               | Active |
-
-### Retired Risks
-
-| ID  | Risk     | Reason for Retirement | Retired In |
-| --- | -------- | --------------------- | ---------- |
-| —   | None yet | —                     | —          |
-
-### Risk Management Process
-
-1. **Identify**: Each phase reviews the risk register and adds new risks.
-2. **Assess**: Rate likelihood and impact.
-3. **Mitigate**: Define mitigation actions.
-4. **Monitor**: Review at the end of each phase.
-5. **Retire**: Remove resolved risks.
-
----
-
-## 6. Current File Structure
-
-```
-frontend-hero/                    <-- Project root
-├── .gitignore
-├── .prettierrc
-├── AGENTS.md                     <-- ✅ Primary agent entry point
-├── README.md                     <-- (update needed for Phase 1)
-├── next-env.d.ts
-├── next.config.ts                <-- Standalone output configured
-├── package.json                  <-- Scripts defined, deps ready
-├── project-instructions.md       <-- ✅ Single source of truth
-├── tsconfig.json
-│
-├── docs/
-│   ├── architecture/
-│   │   ├── system-overview.md    <-- ✅ Complete
-│   │   ├── main-flows.md         <-- ✅ Complete
-│   │   ├── module-boundaries.md   <-- ✅ Complete
-│   │   └── extension-points.md   <-- ✅ Complete
-│   ├── decisions/                <-- (empty, ADRs to add in Phase 1)
-│   ├── deployment/               <-- (empty, to fill in Phase 8)
-│   ├── game-design/
-│   │   ├── core-loop.md          <-- ✅ Complete
-│   │   └── progression.md        <-- ✅ Complete
-│   ├── product/
-│   │   ├── product-vision.md     <-- ✅ Complete
-│   │   ├── personas.md           <-- ✅ Complete
-│   │   └── core-experience.md    <-- ✅ Complete
-│   ├── research/                 <-- ✅ All 6 research docs complete
-│   │   ├── gamified-learning-market.md
-│   │   ├── learning-science.md
-│   │   ├── coding-platform-analysis.md
-│   │   ├── game-design-analysis.md
-│   │   ├── nextjs-current-state.md
-│   │   └── product-differentiation.md
-│   ├── testing/
-│   │   └── testing-strategy.md   <-- ✅ Complete
-│   └── project-status.md         <-- ✅ This file
-│
-├── public/                       <-- Default Next.js assets
-├── scripts/                      <-- (empty, verify scripts to add)
-├── src/
-│   ├── app/                      <-- Next.js App Router scaffold
-│   │   ├── favicon.ico
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   ├── page.module.css
-│   │   └── page.tsx
-│   └── modules/                  <-- (empty, to be created in Phase 1)
-├── subjects/
-│   └── nextjs.md                 <-- (empty file, needs content)
-└── tests/                        <-- (empty, to be populated in Phase 1)
-    ├── architecture/
-    ├── fixtures/
-    ├── integration/
-    └── end-to-end/
-```
-
----
-
-## 7. Next Actions
-
-### Immediate (Phase 4 — Game Foundation)
-
-1. [ ] Build world map — regions, region unlock logic, visual map
-2. [ ] Build mission chain and structured progression system
-3. [ ] Build player XP and level system
-4. [ ] Build reward system for completing objectives
-5. [ ] Build initial narrative for the Frontend Realms setting
-6. [ ] Build daily/weekly quest variants
-7. [ ] Build achievement system
-8. [ ] Build boss encounters as multi-phase missions
-9. [ ] Build player profile page showing progression
-10. [ ] Add world map navigation UI
-11. [ ] Separate `mastery` module from `progression/` module
-12. [ ] Update `StartMissionUseCase` to inject `PrerequisiteGraphBuilder` for proper `availableConceptIds`
-13. [ ] Wire `StartMissionUseCase` to update `ConceptMastery` after answer submission
-
-### Phase 2 — Subject Engine (Completed)
-
-Delivered:
-
-1. [x] Subject schema — formalized frontmatter + section + concept with versioning (`schemaVersion`, `version`, frontmatter validation).
-2. [x] Subject parser v2 — line-number tracking via `ParseError`, `ParseResult<T>` types with severity/code/section/context.
-3. [x] Subject validator — 15+ edge cases: duplicate IDs, invalid levels, difficulty range, unknown prerequisites, self-prerequisites, insufficient options, missing correctIndex, empty domains/knowledge.
-4. [x] Prerequisite graph — DAG with Kahn's algorithm topological sort, DFS cycle detection, depth computation, `getAvailableConcepts()`.
-5. [x] Subject version migration — `SubjectVersionMigrationService` with chain verification, v1→v2 migration step.
-6. [x] Subject repository — expanded `SubjectRepository` interface (`findAll`, `save`, `create`, `delete`, `exists`), reusable `InMemorySubjectRepository` module and Drizzle-backed persistence.
-7. [x] Subject selection UI — `/subjects` page with card grid, title/version/domain count/concept count per subject; `/play?subject=...` accepts query parameter.
-8. [x] Navigation — landing page (`/`) with "Enter the Realms" link to subjects, "Continue Last Session" to play; `/play` has "← Subjects" back button.
-9. [x] Validator coverage — standalone `SubjectSchemaValidator` tests cover subject/domain/concept/question-seed validation and formatting helpers.
-10. [x] Architecture guard — dependency-cruiser config plus Vitest architecture test enforce module-layer dependency direction and circular-dependency errors.
-11. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ depcruise: 0 errors/7 warnings ✓ production audit ✓ dependency audit gate ✓ build ✓ 217 tests ✓).
-
-### Phase 3 — Learning Engine (Completed)
-
-Delivered:
-
-1. [x] Mastery module — value objects (`MasteryScore`, `ConfidenceLevel`, `RetentionScore`), `MasteryCalculator` with weighted gain/loss, fluency bonus, context tracking, `WeaknessDetector` with 4 detection patterns, `MasteryRepository` interface.
-2. [x] Reviews module — SM-2 spaced repetition algorithm (`ReviewAlgorithm`), `ReviewPrioritizer` with urgency scoring (overdue/today/soon/low-retention), `ReviewRepository` interface, `ReviewSchedule` domain model.
-3. [x] Mission selector — 4-tier priority pipeline: overdue reviews → weakness detection → fresh concepts → fallback, with recent-concept avoidance.
-4. [x] Difficulty adaptation — `QuestionProvider.provideFor()` accepts player context, computes target difficulty (+/-2 from base) based on mastery level, scores seeds by suitability.
-5. [x] Repetition control — skips recently shown questions (window of 10), limits re-shows to 4 max, avoids repeats within mission.
-6. [x] Start mission use case — injects `MasteryRepository` and `ReviewRepository`, loads player state, passes to upgraded selector.
-7. [x] Tests — 56 tests across 7 files: mastery calculator (10), mastery score (11), retention score (5), weakness detector (8), review algorithm (10), review prioritizer (6), mission selector (6).
-8. [x] `npm run verify:full` — format ✓ lint ✓ type-check ✓ build ✓ 170/170 tests ✓
-
-Files created:
-
-- `src/modules/mastery/domain/` — concept-mastery.ts, mastery-score.ts, confidence-level.ts, retention-score.ts, mastery-calculator.ts, weakness-detector.ts, mastery-repository.ts
-- `src/modules/reviews/domain/` — review-schedule.ts, review-algorithm.ts, review-prioritizer.ts, review-repository.ts
-- `src/modules/missions/application/mission-selector.ts` — rewritten (4-tier pipeline)
-- `src/modules/missions/application/start-mission.use-case.ts` — upgraded (mastery + review injection)
-- `src/modules/questions/application/question-provider.ts` — upgraded (difficulty adaptation + repetition control)
-- `src/modules/*/domain/__tests__/` — 7 test files with 56 tests
-
-9. [x] Tests — 114 passing across 9 test files (18 graph, 16 migration, 14 repository, 29 parser, 4 mission, 2 integration, 12+13+6 other).
-10. [x] Verified — `npm run verify:full` passes (format, lint, type-check, build, 114 tests).
-
-### Phase 4 — Game Foundation (Completed)
-
-Delivered:
-
-1. [x] ProgressionRepository — interface + `InMemoryProgressionRepository` for player level and XP tracking.
-2. [x] World map server action (`src/app/actions/world-map.ts`) — maps subject domains to 13 narrative regions, evaluates unlock status from concept masteries, returns region progress/order/flavor text.
-3. [x] World map page (`/world-map`) — rewired from static sample data to live server action; clickable regions with detail panel, flavor narrative, progress bars, "Enter Region" play link.
-4. [x] Achievement service (`src/modules/rewards/application/achievement-service.ts`) — aggregates player stats from masteries, missions, attempts; checks all defined achievements; awards new achievements automatically.
-5. [x] Profile server action (`src/app/actions/profile.ts`) — returns player name/level/title, XP bar, stats grid, mastery-by-domain breakdown, achievement list, recent activity.
-6. [x] Profile page (`/profile`) — rewired from static mock data to live server action; shows real mastery data, achievements, stats, recent activity.
-7. [x] Boss encounter service (`src/modules/missions/application/boss-encounter.service.ts`) — multi-phase boss battles with phase tracking, question collection by concept, phase pass/fail evaluation, XP awards, retreat support.
-8. [x] Landing page (`/`) — updated narrative intro, refined feature grid (6 items), "Enter the Realms" → world map, "Continue Last Session" accent button.
-9. [x] Infrastructure alignment — `getCompletedByPlayer` and `getByPlayer` methods added to `MissionRepository`/`MissionAttemptRepository` interfaces and all implementations (Drizzle, 2 in-memory, 2 mock repos).
-10. [x] `npm run verify:full` — format ✓ lint ✓ type-check ✓ build ✓ tests ✓
-
-Files created:
-
-- `src/modules/progression/domain/progression-repository.ts` — interface
-- `src/modules/progression/infrastructure/in-memory-progression-repository.ts` — in-memory impl
-- `src/app/actions/world-map.ts` — world map server action (13 region mapping)
-- `src/app/actions/profile.ts` — profile server action
-- `src/modules/rewards/application/achievement-service.ts` — achievement awarding
-- `src/modules/missions/application/boss-encounter.service.ts` — boss battle engine
-
-Files rewritten:
-
-- `src/app/page.tsx` — narrative + refined actions
-- `src/app/world-map/page.tsx` — live data, detail panel, play link
-- `src/app/profile/page.tsx` — live data, real mastery/achievements
-
-Deliverables for Phase 5 — Polish & Narrative:
-
-1. [x] Add full set of achievement definitions (15 concrete achievements)
-2. [x] Add quest generation (3 daily + 4 weekly templates, progress tracking)
-3. [x] Add mission chain definitions and progress tracking (5 chains)
-4. [x] Add first-time onboarding flow (welcome → map intro → first mission)
-5. [ ] Add sound effects / visual polish for boss encounters
-6. [ ] Add "new achievement" notification toast on profile and in-mission
-7. [x] Add loading skeletons for world-map and profile pages
-8. [x] Add error boundaries and fallback states (route-level + global)
-9. [ ] Performance: lazy-load, image optimization, bundle analysis
-10. [x] End-to-end: verify full (format, lint, type-check, build, 170 tests)
-
-### Phase 5 — Polish & Narrative (Completed)
-
-Delivered:
-
-1. [x] `InMemoryAchievementRepository` — 15 achievements across milestone, mastery, streak, challenge, and exploration categories, each with condition, XP reward, and optional title.
-2. [x] `InMemoryQuestRepository` — 3 daily templates (Quick Fire, Deep Focus, Memory Refresh) + 4 weekly templates (Region Runner, Flawless Week, Speed Runner, Boss Hunter); QuestService with `getPlayerQuests`, `recordProgress`, `claimReward`.
-3. [x] `InMemoryMissionChainRepository` — 5 narrative chains chaining subject concepts into sequential story arcs (JS Foundations, React Essentials, Routing Mastery, Server Components, Performance Secrets); MissionChainService with `getPlayerChains`, `advanceStep`.
-4. [x] `OnboardingFlow` component — 3-step welcome overlay shown on first world-map visit, persists dismissal via localStorage.
-5. [x] Skeleton loading states — world-map (6 skeleton region cards with pulse animation) and profile (avatar, stat grid, mastery rows, achievement cards).
-6. [x] Error boundaries — `ErrorFallback` shared component, route-level `error.tsx` for world-map & profile, `global-error.tsx`, `not-found.tsx` with themed narrative.
-7. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 170 tests ✓).
-
-### Phase 6 — Experience & Integration (Completed)
-
-Delivered:
-
-1. [x] Review-system gameplay integration verified — mission selection already prioritizes overdue review content, and answer submission already updates spaced-repetition schedules.
-2. [x] Toast notifications — `ToastProvider` + `useToast`, wired into profile progression feedback and play-session XP feedback.
-3. [x] Boss encounter experience — boss UI page, state/start/answer/retreat API routes, in-memory boss repositories, and boss service orchestration.
-4. [x] Settings page — dark/light theme, sound toggle, difficulty selection, persisted to localStorage.
-5. [x] Mobile-responsive pass — world-map, profile, play, boss encounter, and settings layouts improved for tablet/phone widths.
-6. [x] Unit tests for new services — added regression coverage for mission-chain completion deactivation and boss retreat-state handling.
-7. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 172 tests ✓).
-
-### Phase 7 — Advanced Game Experience (Completed)
-
-Delivered:
-
-1. [x] Collections page — `/collections` displays collectible achievement cards grouped by category, earned/total summaries, hidden/locked/earned states, reward badges, and a collection progress bar.
-2. [x] Animated world map — `/world-map` now includes atmospheric particle canvas, animated connection paths between sequential regions, staggered region-card entrances, completed-region glow, locked-region shimmer, animated progress bars, and enhanced hover states.
-3. [x] Story progression banners — `StoryBanner` / `StoryProgression` components plus `getRecentStoryEvents` server action surface level-up and achievement milestone events as animated narrative banners.
-4. [x] Title & cosmetic selection — profile page includes a Title & Cosmetics card for selecting unlocked display titles and realm themes, with optimistic updates and toast feedback.
-5. [x] Navigation — world-map and profile navigation include Collections; profile achievements section links to the complete collections page.
-6. [x] Verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ build ✓ 177 tests ✓).
-
-Files created:
-
-- `src/app/collections/page.tsx` — collections/achievement gallery page.
-- `src/app/actions/story.ts` — story milestone server action.
-- `src/components/story-banner.tsx` — animated story milestone banner components.
-
-Files updated:
-
-- `src/app/actions/profile.ts` — collection data actions plus title/theme persistence actions.
-- `src/app/profile/page.tsx` — collections navigation/link and title/theme picker UI.
-- `src/app/world-map/page.tsx` — animated world map polish and story progression integration.
-
-### Phase 8 — Production Readiness (Completed)
-
-Delivered:
-
-1. [x] CI — GitHub Actions workflow runs `npm ci` and `npm run verify:full` on pull requests and pushes to `main`.
-2. [x] Deployment — added Docker standalone production image and Fly.io app configuration with HTTPS, concurrency settings, and `/api/health` health check.
-3. [x] Security hardening — added production response headers in `next.config.ts`, a production audit script for leaked public secrets/hardcoded credential-like values, and a high/critical dependency audit gate.
-4. [x] Accessibility/performance audit baseline — `npm run audit:production` plus documented manual accessibility and performance checklists.
-5. [x] Observability/error reporting baseline — dynamic `/api/health`, existing error boundaries documented, Fly log workflow documented, future error-reporting constraints recorded.
-6. [x] Backups and migration documentation — backup policy, migration checklist, migration record template, rollback strategy, and durable persistence launch gap documented.
-7. [x] Metadata cleanup — replaced scaffold metadata with Frontend Realms production metadata.
-8. [x] Verification — `npm run verify:full`, `npm run fly:validate`, and `npm run docker:verify` pass.
-
-**Post-launch Hardening — Durable Persistence — ✅ Complete**
-
-Delivered:
-
-1. [x] SQLite schema bootstrap extracted to `src/shared/infrastructure/database/create-tables.ts` so runtime, scripts, and tests share one idempotent table-creation path.
-2. [x] Database connection now creates missing parent directories, enables WAL + foreign keys, and bootstraps application tables on first open.
-3. [x] Added `npm run db:migrate` via `scripts/migrate-database.ts` to make local/Fly database initialization an explicit operational command.
-4. [x] Fly.io config now mounts `frontend_realms_data` at `/data` and sets `DB_PATH=/data/frontend-realms.db` for durable SQLite volume storage.
-5. [x] Disposable database tests cover first-open bootstrap and idempotent repeat bootstrap.
-6. [x] Mission gameplay action now uses Drizzle/SQLite-backed repositories for player, mission, mission-attempt, and question persistence.
-7. [x] Mission repository returns the latest active mission when multiple active rows exist, preserving the previous in-memory active-mission behavior.
-8. [x] Subject selection/import action now uses Drizzle/SQLite-backed subject and concept persistence.
-9. [x] Subject repository persists full concept content, including question seeds, practical challenges, and interview prompts.
-10. [x] Mission learning state now uses Drizzle/SQLite-backed concept mastery and review schedule persistence.
-11. [x] Review schedule bootstrap added to the SQLite schema; existing `conceptMastery` tables are upgraded idempotently with demonstrated context and common mistake JSON columns.
-12. [x] Latest verification — `npm run verify:full` passes (format ✓ lint ✓ type-check ✓ depcruise: 0 errors/7 warnings ✓ production audit ✓ dependency audit gate ✓ build ✓ 226 tests ✓).
-13. [x] Wire achievement, quest, mission-chain, boss, profile/world-map read-model, and progression app-action stores to durable repositories.
-14. [x] Add persistence implementations for remaining repositories not yet backed by Drizzle/SQLite.
-15. [x] Run a real backup/restore drill against the Fly volume or future managed database.
-
-Files created:
-
-- `src/shared/infrastructure/database/create-tables.ts` — shared idempotent SQLite schema bootstrap.
-- `src/shared/infrastructure/database/connection.test.ts` — disposable database bootstrap regression tests.
-- `src/modules/subjects/infrastructure/drizzle-subject-repository.ts` — durable subject/concept repository.
-- `src/modules/mastery/infrastructure/drizzle-mastery-repository.ts` — durable concept mastery repository.
-- `src/modules/reviews/infrastructure/drizzle-review-repository.ts` — durable review schedule repository.
-- `tests/unit/repositories/learning-state-repository.test.ts` — disposable database tests for mastery/review persistence.
-- `scripts/migrate-database.ts` — operational database bootstrap command.
-
-Files updated:
-
-- `src/app/actions/subjects.ts` — subject listing now reads/writes through durable Drizzle/SQLite-backed subject persistence.
-- `src/shared/infrastructure/database/schema.ts` / `src/shared/infrastructure/database/create-tables.ts` — concept rows now persist question seeds, practical challenges, and interview prompts.
-- `tests/unit/repositories/subject-repository.test.ts` — covers durable subject repository CRUD and nested concept content.
-- `src/app/actions/missions.ts` — mission gameplay now uses durable Drizzle/SQLite-backed player, subject, mission, mission-attempt, question, concept-mastery, and review-schedule repositories.
-- `src/modules/missions/infrastructure/drizzle-mission-repository.ts` — active mission lookup now returns the most recently started active mission.
-- `tests/unit/repositories/mission-repository.test.ts` — covers latest-active mission selection.
-- `src/shared/infrastructure/database/connection.ts` — runtime parent-directory creation and automatic table bootstrap.
-- `tests/fixtures/create-tables.ts` — test fixture now delegates to shared schema bootstrap.
-- `package.json` — added `db:migrate` script.
-- `fly.toml` — added durable volume mount and production DB path.
-- `docs/production-readiness.md` — production runbook.
-- `docs/backups-and-migrations.md` — backups, migration, and rollback runbook.
-
-Files created:
-
-- `.dockerignore` — reduced Docker build context and excluded local artifacts/secrets.
-- `.github/workflows/ci.yml` — CI verification workflow.
-- `Dockerfile` — multi-stage Next.js standalone image.
-- `fly.toml` — Fly.io deployment config.
-- `src/app/api/health/route.ts` — runtime health endpoint.
-- `scripts/production-audit.mjs` — production security/accessibility smoke audit.
-- `scripts/verify-docker-image.mjs` — Docker image build verification helper.
-- `docs/production-readiness.md` — production runbook.
-- `docs/backups-and-migrations.md` — backups, migration, and rollback runbook.
-
-Files created (items 13/14):
-
-- `src/modules/rewards/infrastructure/drizzle-achievement-repository.ts` — durable achievement persistence.
-- `src/modules/missions/infrastructure/drizzle-boss-repository.ts` — durable boss encounter and progress persistence.
-- `src/modules/missions/infrastructure/drizzle-mission-chain-repository.ts` — durable mission chain and progress persistence.
-- `src/modules/missions/infrastructure/drizzle-quest-repository.ts` — durable quest and quest-progress persistence.
-- `src/modules/progression/infrastructure/drizzle-progression-repository.ts` — durable player progression persistence.
-- `src/shared/infrastructure/database/schema.ts` — added 8 new tables.
-- `src/shared/infrastructure/database/create-tables.ts` — idempotent CREATE TABLE statements for all new tables.
-- `src/shared/infrastructure/database/connection.test.ts` — updated to expect all 16 tables.
-
-Files updated (items 13/14):
-
-- `src/app/actions/profile.ts` — wired to DrizzleMasteryRepository, DrizzleSubjectRepository, DrizzleAchievementRepository.
-- `src/app/actions/world-map.ts` — wired to DrizzleSubjectRepository, DrizzleMasteryRepository.
-- `src/app/actions/boss.ts` — wired to DrizzleBossEncounterRepository, DrizzleBossProgressRepository.
-- `docs/backups-and-migrations.md` — updated to reflect all domains now use durable persistence.
-- `docs/project-status.md` — items 13/14/15 marked complete.
-
-Files updated:
-
-- `package.json` — added `audit:production` and included it in `verify`.
-- `next.config.ts` — added production security headers.
-- `src/app/layout.tsx` — updated application metadata.
-- `docs/project-status.md` — current project status updated to Phase 8 complete.
-
-### Phase 4 — Game Foundation (Completed)
-
----
-
-**Related Documents**:
-
-- [AGENTS.md](../AGENTS.md) — Primary entry point for AI agents
-- [System Overview](../architecture/system-overview.md) — Architecture context
-- [Testing Strategy](../testing/testing-strategy.md) — Testing requirements
-- [Project Instructions](../../project-instructions.md) — Full project specification
-
----
-
-_Last updated: June 2026. Update this document after every meaningful implementation phase._
+_Last updated: 2026-06-18_

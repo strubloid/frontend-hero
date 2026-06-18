@@ -32,5 +32,12 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/play/:path*", "/profile/:path*", "/boss-encounter/:path*", "/world-map/:path*", "/login", "/register"],
+  matcher: [
+    "/play/:path*",
+    "/profile/:path*",
+    "/boss-encounter/:path*",
+    "/world-map/:path*",
+    "/login",
+    "/register",
+  ],
 };

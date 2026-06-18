@@ -5,6 +5,7 @@ import * as schema from "@/shared/infrastructure/database/schema";
 import { InMemorySubjectRepository } from "@/modules/subjects/infrastructure/in-memory-subject-repository";
 import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
 import { Subject } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 import { createTables } from "../../fixtures/create-tables";
 
 function makeSubject(id: string, overrides?: Partial<Subject>): Subject {
@@ -18,6 +19,26 @@ function makeSubject(id: string, overrides?: Partial<Subject>): Subject {
     domains: overrides?.domains ?? [],
     createdAt: overrides?.createdAt ?? new Date("2025-01-01"),
     updatedAt: overrides?.updatedAt ?? new Date("2025-01-01"),
+    ...overrides,
+    progression: {
+      minimumLevel: 1,
+      maximumLevel: 10,
+      estimatedDaysPerLevel: 7,
+      bossRequired: true,
+      levels: [
+        {
+          level: 1,
+          title: "Foundations",
+          description: "Core concepts",
+          difficultyRange: { minimum: 1, maximum: 2 },
+          requiredMastery: 65,
+          requiredSuccessfulEncounters: 20,
+          requiredReviewEncounters: 5,
+          concepts: [],
+          allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+        },
+      ],
+    },
   };
 }
 

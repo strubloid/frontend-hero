@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { SubjectSchemaValidator, formatValidationFailures } from "./subject-schema-validator";
 import type { Subject, Concept, QuestionSeed } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 
 function makeSubject(overrides?: Partial<Subject>): Subject {
   return {
@@ -14,6 +15,25 @@ function makeSubject(overrides?: Partial<Subject>): Subject {
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
     ...overrides,
+    progression: {
+      minimumLevel: 1,
+      maximumLevel: 10,
+      estimatedDaysPerLevel: 7,
+      bossRequired: true,
+      levels: [
+        {
+          level: 1,
+          title: "Foundations",
+          description: "Core concepts",
+          difficultyRange: { minimum: 1, maximum: 2 },
+          requiredMastery: 65,
+          requiredSuccessfulEncounters: 20,
+          requiredReviewEncounters: 5,
+          concepts: [],
+          allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+        },
+      ],
+    },
   };
 }
 

@@ -88,6 +88,151 @@ export class SubjectSchemaValidator {
       parseErrors.push(pe);
     }
 
+    // --- Progression checks ---
+    if (subject.progression) {
+      // minimumLevel must be >= 1
+      if (subject.progression.minimumLevel < 1) {
+        const pe: ParseError = {
+          message: `progression.minimumLevel must be >= 1, got ${subject.progression.minimumLevel}`,
+          severity: "error",
+          code: "INVALID_MINIMUM_LEVEL",
+        };
+        errors.push(pe.message);
+        parseErrors.push(pe);
+      }
+
+      // maximumLevel must be >= minimumLevel
+      if (subject.progression.maximumLevel < subject.progression.minimumLevel) {
+        const pe: ParseError = {
+          message: `progression.maximumLevel (${subject.progression.maximumLevel}) must be >= minimumLevel (${subject.progression.minimumLevel})`,
+          severity: "error",
+          code: "INVALID_MAXIMUM_LEVEL",
+        };
+        errors.push(pe.message);
+        parseErrors.push(pe);
+      }
+
+      // estimatedDaysPerLevel must be positive
+      if (subject.progression.estimatedDaysPerLevel < 1) {
+        const pe: ParseError = {
+          message: `progression.estimatedDaysPerLevel must be >= 1, got ${subject.progression.estimatedDaysPerLevel}`,
+          severity: "error",
+          code: "INVALID_ESTIMATED_DAYS",
+        };
+        errors.push(pe.message);
+        parseErrors.push(pe);
+      }
+
+      // Check levels array
+      if (!subject.progression.levels || subject.progression.levels.length === 0) {
+        const pe: ParseError = {
+          message: "Subject progression must define at least one level",
+          severity: "error",
+          code: "NO_LEVELS_DEFINED",
+        };
+        errors.push(pe.message);
+        parseErrors.push(pe);
+      } else {
+        const seenLevels = new Set<number>();
+        for (let i = 0; i < subject.progression.levels.length; i++) {
+          const def = subject.progression.levels[i];
+          const prefix = `progression.levels[${i}]`;
+
+          // Level number must be unique
+          if (seenLevels.has(def.level)) {
+            const pe: ParseError = {
+              message: `${prefix}: duplicate level number ${def.level}`,
+              severity: "error",
+              code: "DUPLICATE_LEVEL_NUMBER",
+            };
+            errors.push(pe.message);
+            parseErrors.push(pe);
+          }
+          seenLevels.add(def.level);
+
+          // Level number within range
+          if (
+            def.level < subject.progression.minimumLevel ||
+            def.level > subject.progression.maximumLevel
+          ) {
+            const pe: ParseError = {
+              message: `${prefix}: level ${def.level} outside range [${subject.progression.minimumLevel}-${subject.progression.maximumLevel}]`,
+              severity: "error",
+              code: "LEVEL_OUT_OF_RANGE",
+            };
+            errors.push(pe.message);
+            parseErrors.push(pe);
+          }
+
+          // Title required
+          if (!def.title || def.title.trim().length === 0) {
+            const pe: ParseError = {
+              message: `${prefix}: title is required`,
+              severity: "error",
+              code: "LEVEL_TITLE_REQUIRED",
+            };
+            errors.push(pe.message);
+            parseErrors.push(pe);
+          }
+
+          // Difficulty range validation
+          if (def.difficultyRange) {
+            if (def.difficultyRange.minimum < 1 || def.difficultyRange.minimum > 10) {
+              const pe: ParseError = {
+                message: `${prefix}: difficultyRange.minimum must be 1-10, got ${def.difficultyRange.minimum}`,
+                severity: "error",
+                code: "DIFFICULTY_MIN_OUT_OF_RANGE",
+              };
+              errors.push(pe.message);
+              parseErrors.push(pe);
+            }
+            if (
+              def.difficultyRange.maximum < def.difficultyRange.minimum ||
+              def.difficultyRange.maximum > 10
+            ) {
+              const pe: ParseError = {
+                message: `${prefix}: difficultyRange.maximum (${def.difficultyRange.maximum}) must be >= minimum (${def.difficultyRange.minimum}) and <= 10`,
+                severity: "error",
+                code: "INVALID_DIFFICULTY_MAX",
+              };
+              errors.push(pe.message);
+              parseErrors.push(pe);
+            }
+          }
+
+          // requiredMastery must be 0-100
+          if (def.requiredMastery < 0 || def.requiredMastery > 100) {
+            const pe: ParseError = {
+              message: `${prefix}: requiredMastery must be 0-100, got ${def.requiredMastery}`,
+              severity: "error",
+              code: "INVALID_REQUIRED_MASTERY",
+            };
+            errors.push(pe.message);
+            parseErrors.push(pe);
+          }
+
+          // requiredSuccessfulEncounters must be positive
+          if (def.requiredSuccessfulEncounters < 1) {
+            const pe: ParseError = {
+              message: `${prefix}: requiredSuccessfulEncounters must be >= 1, got ${def.requiredSuccessfulEncounters}`,
+              severity: "error",
+              code: "INVALID_REQUIRED_ENCOUNTERS",
+            };
+            errors.push(pe.message);
+            parseErrors.push(pe);
+          }
+        }
+      }
+    } else {
+      const pe: ParseError = {
+        message: "Subject progression definition is required",
+        severity: "error",
+        code: "PROGRESSION_REQUIRED",
+      };
+      errors.push(pe.message);
+      parseErrors.push(pe);
+    }
+
     // --- Domain checks ---
     const domainNames = new Set<string>();
     for (const domain of subject.domains) {

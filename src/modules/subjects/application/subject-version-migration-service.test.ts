@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { SubjectVersionMigrationService } from "./subject-version-migration-service";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 import { lineNumberAt, getLine } from "@/modules/subjects/domain/parse-error";
 
 describe("SubjectVersionMigrationService", () => {
@@ -70,6 +71,25 @@ describe("SubjectVersionMigrationService", () => {
       version: 1,
       schemaVersion: 1,
       minimumGameVersion: "1.0.0",
+      progression: {
+        minimumLevel: 1,
+        maximumLevel: 10,
+        estimatedDaysPerLevel: 7,
+        bossRequired: true,
+        levels: [
+          {
+            level: 1,
+            title: "Foundations",
+            description: "Core concepts",
+            difficultyRange: { minimum: 1, maximum: 2 },
+            requiredMastery: 65,
+            requiredSuccessfulEncounters: 20,
+            requiredReviewEncounters: 5,
+            concepts: [],
+            allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+          },
+        ],
+      },
       domains: [],
       createdAt: new Date("2025-01-01"),
       updatedAt: new Date("2025-01-01"),
@@ -86,6 +106,25 @@ describe("SubjectVersionMigrationService", () => {
       version: 1,
       schemaVersion: 2,
       minimumGameVersion: "1.0.0",
+      progression: {
+        minimumLevel: 1,
+        maximumLevel: 10,
+        estimatedDaysPerLevel: 7,
+        bossRequired: true,
+        levels: [
+          {
+            level: 1,
+            title: "Foundations",
+            description: "Core concepts",
+            difficultyRange: { minimum: 1, maximum: 2 },
+            requiredMastery: 65,
+            requiredSuccessfulEncounters: 20,
+            requiredReviewEncounters: 5,
+            concepts: [],
+            allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+          },
+        ],
+      },
       domains: [],
       createdAt: new Date("2025-01-01"),
       updatedAt: new Date("2025-01-01"),

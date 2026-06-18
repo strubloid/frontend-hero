@@ -2,6 +2,8 @@ import { Entity } from "@/shared/domain/entity";
 
 export type SubjectLevel = "foundation" | "intermediate" | "advanced" | "senior";
 
+import { SubjectProgression } from "./subject-level";
+
 export interface Subject extends Entity {
   id: string; // e.g. 'nextjs'
   title: string;
@@ -9,6 +11,7 @@ export interface Subject extends Entity {
   version: number;
   schemaVersion: number;
   minimumGameVersion: string;
+  progression: SubjectProgression;
   domains: Domain[];
   createdAt: Date;
   updatedAt: Date;

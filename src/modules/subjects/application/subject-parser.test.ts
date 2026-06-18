@@ -7,6 +7,7 @@ import { SubjectSchemaValidator } from "./subject-schema-validator";
 import { PrerequisiteGraphBuilder } from "./prerequisite-graph-builder";
 import { SubjectImportService } from "./subject-import-service";
 import { Subject } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers for building test subjects                                  */
@@ -20,6 +21,25 @@ function buildMinimalValidSubject(): Subject {
     version: 1,
     schemaVersion: 1,
     minimumGameVersion: "1.0.0",
+    progression: {
+      minimumLevel: 1,
+      maximumLevel: 10,
+      estimatedDaysPerLevel: 7,
+      bossRequired: true,
+      levels: [
+        {
+          level: 1,
+          title: "Foundations",
+          description: "Core concepts",
+          difficultyRange: { minimum: 1, maximum: 2 },
+          requiredMastery: 65,
+          requiredSuccessfulEncounters: 20,
+          requiredReviewEncounters: 5,
+          concepts: [],
+          allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+        },
+      ],
+    },
     domains: [
       {
         name: "Domain A",

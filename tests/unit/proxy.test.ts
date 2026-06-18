@@ -41,9 +41,7 @@ vi.mock("next/server", () => {
       // Extract pathname from various URL formats
       const match = url.match(/https?:\/\/[^/]+(\/[^?]*)/);
       this.pathname = match ? match[1] : url;
-      this.searchParams = new URLSearchParams(
-        url.includes("?") ? url.split("?")[1] : "",
-      );
+      this.searchParams = new URLSearchParams(url.includes("?") ? url.split("?")[1] : "");
     }
 
     toString() {
@@ -163,18 +161,14 @@ describe("proxy", () => {
       // Authenticated
       mockGetToken.mockResolvedValue({ sub: "test" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const req = new (await import("next/server")).NextRequest(
-        "http://localhost:3000/",
-      ) as any;
+      const req = new (await import("next/server")).NextRequest("http://localhost:3000/") as any;
       const res = await middleware(req);
       expect((res as any).status).toBe(200);
     });
 
     it("allows unauthenticated users through /", async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const req = new (await import("next/server")).NextRequest(
-        "http://localhost:3000/",
-      ) as any;
+      const req = new (await import("next/server")).NextRequest("http://localhost:3000/") as any;
       const res = await middleware(req);
       expect((res as any).status).toBe(200);
     });

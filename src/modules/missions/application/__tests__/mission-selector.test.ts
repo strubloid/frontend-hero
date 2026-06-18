@@ -4,6 +4,7 @@ import {
   MissionSelectorInput,
 } from "@/modules/missions/application/mission-selector";
 import { Subject, Domain, Concept } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 import { ConceptMastery } from "@/modules/mastery/domain/concept-mastery";
 import { ReviewSchedule } from "@/modules/reviews/domain/review-schedule";
 
@@ -35,6 +36,25 @@ function makeSubject(concepts: Concept[]): Subject {
     version: 1,
     schemaVersion: 1,
     minimumGameVersion: "1.0.0",
+    progression: {
+      minimumLevel: 1,
+      maximumLevel: 10,
+      estimatedDaysPerLevel: 7,
+      bossRequired: true,
+      levels: [
+        {
+          level: 1,
+          title: "Foundations",
+          description: "Core concepts",
+          difficultyRange: { minimum: 1, maximum: 2 },
+          requiredMastery: 65,
+          requiredSuccessfulEncounters: 20,
+          requiredReviewEncounters: 5,
+          concepts: [],
+          allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+        },
+      ],
+    },
     domains: [{ name: "Test Domain", concepts }],
     createdAt: new Date(),
     updatedAt: new Date(),

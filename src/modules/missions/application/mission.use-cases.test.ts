@@ -6,6 +6,7 @@ import { AnswerEvaluator } from "./answer-evaluator";
 import { QuestionProvider } from "@/modules/questions/application/question-provider";
 import { Player } from "@/modules/players/domain/player";
 import { Subject, Domain, Concept, QuestionSeed } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 import { Question } from "@/modules/questions/domain/question";
 import {
   Mission,
@@ -305,6 +306,25 @@ function createTestSubject(): Subject {
     version: 1,
     schemaVersion: 1,
     minimumGameVersion: "0.1.0",
+    progression: {
+      minimumLevel: 1,
+      maximumLevel: 10,
+      estimatedDaysPerLevel: 7,
+      bossRequired: true,
+      levels: [
+        {
+          level: 1,
+          title: "Foundations",
+          description: "Core concepts",
+          difficultyRange: { minimum: 1, maximum: 2 },
+          requiredMastery: 65,
+          requiredSuccessfulEncounters: 20,
+          requiredReviewEncounters: 5,
+          concepts: [],
+          allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+        },
+      ],
+    },
     domains: [
       {
         name: "Domain 1",

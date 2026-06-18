@@ -11,6 +11,7 @@ import type {
   Subject,
   SubjectLevel,
 } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 import type { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
 import * as schema from "@/shared/infrastructure/database/schema";
 
@@ -136,6 +137,25 @@ export class DrizzleSubjectRepository implements SubjectRepository {
       version: subjectRow.version,
       schemaVersion: subjectRow.schemaVersion,
       minimumGameVersion: subjectRow.minimumGameVersion,
+      progression: {
+        minimumLevel: 1,
+        maximumLevel: 10,
+        estimatedDaysPerLevel: 7,
+        bossRequired: true,
+        levels: [
+          {
+            level: 1,
+            title: "Foundations",
+            description: "Core concepts",
+            difficultyRange: { minimum: 1, maximum: 2 },
+            requiredMastery: 65,
+            requiredSuccessfulEncounters: 20,
+            requiredReviewEncounters: 5,
+            concepts: [],
+            allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+          },
+        ],
+      },
       domains: Array.from(domains.values()),
       createdAt: new Date(subjectRow.createdAt),
       updatedAt: new Date(subjectRow.updatedAt),

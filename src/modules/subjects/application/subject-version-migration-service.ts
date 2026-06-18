@@ -1,4 +1,5 @@
 import { Subject } from "@/modules/subjects/domain/subject";
+import type { SubjectProgression } from "@/modules/subjects/domain/subject-level";
 
 /**
  * Registry entry for a single schema version migration.
@@ -210,6 +211,25 @@ export class SubjectVersionMigrationService {
       version: (raw.version as number) ?? 1,
       schemaVersion: (raw.schemaVersion as number) ?? 1,
       minimumGameVersion: (raw.minimumGameVersion as string) ?? "1.0.0",
+      progression: {
+        minimumLevel: 1,
+        maximumLevel: 10,
+        estimatedDaysPerLevel: 7,
+        bossRequired: true,
+        levels: [
+          {
+            level: 1,
+            title: "Foundations",
+            description: "Core concepts",
+            difficultyRange: { minimum: 1, maximum: 2 },
+            requiredMastery: 65,
+            requiredSuccessfulEncounters: 20,
+            requiredReviewEncounters: 5,
+            concepts: [],
+            allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+          },
+        ],
+      },
       domains:
         (raw.domains as any[])?.map((d: any) => ({
           name: d.name,

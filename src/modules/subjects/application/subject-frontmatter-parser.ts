@@ -1,16 +1,18 @@
+import * as yaml from "js-yaml";
+
 export interface FrontmatterData {
-  [key: string]: string | number | boolean;
+  [key: string]: unknown;
 }
 
 export class SubjectFrontmatterParser {
   /**
    * Extracts the YAML frontmatter block (between --- delimiters) from raw
-   * markdown content and parses it into a flat key-value map.
+   * markdown content and parses it using js-yaml.
    *
    * Supports:
-   *   - Simple key: value pairs
-   *   - Quoted string values
-   *   - Numeric and boolean coercion
+   *   - Nested YAML structures (arrays, objects)
+   *   - Scalar values (strings, numbers, booleans)
+   *   - Flat key: value pairs (backward-compatible)
    */
   parse(content: string): FrontmatterData {
     const trimmed = content.trimStart();
@@ -26,6 +28,20 @@ export class SubjectFrontmatterParser {
     }
 
     const raw = trimmed.slice(3, endIndex).trim();
+
+    try {
+      const parsed = yaml.load(raw) as Record<string, unknown> | undefined;
+      return parsed ?? {};
+    } catch {
+      // Fallback to simple line-by-line parsing if YAML fails
+      return this.parseSimple(raw);
+    }
+  }
+
+  /**
+   * Falls back to simple line-by-line parsing if js-yaml fails.
+   */
+  private parseSimple(raw: string): FrontmatterData {
     const data: FrontmatterData = {};
 
     for (const line of raw.split("\n")) {
