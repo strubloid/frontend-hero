@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { openSqliteDatabase } from "./connection";
 
 const REQUIRED_TABLES = [
+  "account",
   "bossEncounters",
   "bossProgress",
   "conceptMastery",
@@ -20,7 +21,9 @@ const REQUIRED_TABLES = [
   "questions",
   "quests",
   "reviewSchedules",
+  "session",
   "subjects",
+  "verificationToken",
 ];
 
 describe("database connection bootstrap", () => {

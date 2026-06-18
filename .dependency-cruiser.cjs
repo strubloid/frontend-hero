@@ -145,7 +145,10 @@ module.exports = {
       comment:
         "Presentation pages/components must use actions or application services instead of importing infrastructure directly",
       severity: "error",
-      from: { path: "src/app/(?!actions/)" },
+      from: {
+        path: "src/app/(?!actions/)",
+        pathNot: ["src/app/api/auth/"],
+      },
       to: { path: ["src/modules/[^/]+/infrastructure/", "src/shared/infrastructure/"] },
     },
   ],

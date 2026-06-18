@@ -3,6 +3,10 @@ import { Entity } from "@/shared/domain/entity";
 export interface Player extends Entity {
   id: string;
   name: string;
+  email: string | null;
+  passwordHash: string | null;
+  emailVerified: Date | null;
+  image: string | null;
   level: number;
   experiencePoints: number;
   masteryPoints: number;

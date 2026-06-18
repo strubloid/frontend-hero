@@ -48,6 +48,10 @@ export class DrizzlePlayerRepository implements PlayerRepository {
     return {
       id: row.id,
       name: row.name,
+      email: row.email ?? null,
+      passwordHash: row.passwordHash ?? null,
+      emailVerified: row.emailVerified ?? null,
+      image: row.image ?? null,
       level: row.level,
       experiencePoints: row.experiencePoints,
       masteryPoints: row.masteryPoints,
@@ -69,6 +73,10 @@ export class DrizzlePlayerRepository implements PlayerRepository {
     return {
       id: player.id,
       name: player.name,
+      email: player.email,
+      passwordHash: player.passwordHash,
+      emailVerified: player.emailVerified,
+      image: player.image,
       level: player.level,
       experiencePoints: player.experiencePoints,
       masteryPoints: player.masteryPoints,

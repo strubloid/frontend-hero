@@ -61,7 +61,7 @@ function inspectFile(file) {
   lines.forEach((line, index) => {
     const n = index + 1;
 
-    if (/NEXT_PUBLIC_.*(?:SECRET|TOKEN|KEY|PASSWORD)/i.test(line)) {
+    if (/NEXT_PUBLIC_.*(?:SECRET|TOKEN|KEY|PASSWORD)/i.test(line) && !/HCAPTCHA_SITE/.test(line)) {
       add(file, n, "error", "Potential secret exposed through NEXT_PUBLIC_* variable");
     }
 

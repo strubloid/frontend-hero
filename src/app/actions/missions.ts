@@ -98,6 +98,10 @@ async function ensureSeeded(wiring: MissionActionWiring): Promise<void> {
     await wiring.playerRepository.create({
       id: "default-player",
       name: "Adventurer",
+      email: null,
+      passwordHash: null,
+      emailVerified: null,
+      image: null,
       level: 1,
       experiencePoints: 0,
       masteryPoints: 0,
