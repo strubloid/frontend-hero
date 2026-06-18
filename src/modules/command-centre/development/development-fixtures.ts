@@ -33,11 +33,28 @@ export function buildDefaultCommandCentre(): CommandCentreViewModel {
         levelTitle: "Component Boundaries",
       },
       currencies: [
-        { id: "xp", label: "XP", amount: 12450, icon: "⚡", tooltip: "Total experience points earned" },
-        { id: "knowledge_shards", label: "Shards", amount: 340, icon: "💎", tooltip: "Knowledge shards for unlocking content" },
+        {
+          id: "xp",
+          label: "XP",
+          amount: 12450,
+          icon: "⚡",
+          tooltip: "Total experience points earned",
+        },
+        {
+          id: "knowledge_shards",
+          label: "Shards",
+          amount: 340,
+          icon: "💎",
+          tooltip: "Knowledge shards for unlocking content",
+        },
       ],
       notifications: [
-        { type: "daily_available", label: "Daily quests available!", priority: "normal", destination: "/quests/daily" },
+        {
+          type: "daily_available",
+          label: "Daily quests available!",
+          priority: "normal",
+          destination: "/quests/daily",
+        },
       ],
     },
 
@@ -45,7 +62,8 @@ export function buildDefaultCommandCentre(): CommandCentreViewModel {
       questId: "quest-nextjs-3",
       category: "MAIN_QUEST" as QuestCategory,
       title: "Master Component Boundaries",
-      narrative: "The realm of Next.js requires you to understand how components communicate across boundaries. Complete three encounters to advance.",
+      narrative:
+        "The realm of Next.js requires you to understand how components communicate across boundaries. Complete three encounters to advance.",
       objective: "Complete 3 encounters on component patterns",
       estimatedDuration: "15 min",
       difficulty: "ADVENTURER" as QuestDifficulty,
@@ -156,8 +174,16 @@ export function buildDefaultCommandCentre(): CommandCentreViewModel {
       connections: [
         { fromNodeId: "node-foundations", toNodeId: "node-routing", state: "completed" },
         { fromNodeId: "node-routing", toNodeId: "node-component-boundaries", state: "active" },
-        { fromNodeId: "node-component-boundaries", toNodeId: "node-data-fetching", state: "inactive" },
-        { fromNodeId: "node-component-boundaries", toNodeId: "node-boss-level-3", state: "inactive" },
+        {
+          fromNodeId: "node-component-boundaries",
+          toNodeId: "node-data-fetching",
+          state: "inactive",
+        },
+        {
+          fromNodeId: "node-component-boundaries",
+          toNodeId: "node-boss-level-3",
+          state: "inactive",
+        },
         { fromNodeId: "node-foundations", toNodeId: "node-review", state: "active" },
       ],
     },

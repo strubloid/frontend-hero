@@ -26,9 +26,23 @@ export class CommandCentreAssembler {
     subject: Subject | null;
     currentQuest: unknown;
     worldNodes: WorldNodeViewModel[];
-    recentProgress: { xpGained: number; masteryChange: number | null; missionsCompleted: number; conceptsMastered: number; lastAction: string };
+    recentProgress: {
+      xpGained: number;
+      masteryChange: number | null;
+      missionsCompleted: number;
+      conceptsMastered: number;
+      lastAction: string;
+    };
   }): CommandCentreViewModel {
-    const { player, progression, playerSubjectProgress, subject, currentQuest, worldNodes, recentProgress } = args;
+    const {
+      player,
+      progression,
+      playerSubjectProgress,
+      subject,
+      currentQuest,
+      worldNodes,
+      recentProgress,
+    } = args;
 
     // -- HUD --
     const playerIdentity = {
@@ -52,24 +66,37 @@ export class CommandCentreAssembler {
       progressPercent: Math.min(100, Math.max(0, progressPercent)),
     };
 
-    const activeSubject = subject && playerSubjectProgress
-      ? {
-          subjectId: subject.id,
-          subjectTitle: subject.title,
-          currentLevel: playerSubjectProgress.currentLevel,
-          maximumLevel: playerSubjectProgress.maximumLevel,
-          masteryScore: Math.round(playerSubjectProgress.masteryScore * 100),
-          levelTitle: this.getLevelTitle(subject, playerSubjectProgress.currentLevel),
-        }
-      : null;
+    const activeSubject =
+      subject && playerSubjectProgress
+        ? {
+            subjectId: subject.id,
+            subjectTitle: subject.title,
+            currentLevel: playerSubjectProgress.currentLevel,
+            maximumLevel: playerSubjectProgress.maximumLevel,
+            masteryScore: Math.round(playerSubjectProgress.masteryScore * 100),
+            levelTitle: this.getLevelTitle(subject, playerSubjectProgress.currentLevel),
+          }
+        : null;
 
     const hud = {
       player: playerIdentity,
       level: levelVm,
       activeSubject,
       currencies: [
-        { id: "xp", label: "XP", amount: progression.totalXpEarned, icon: "⚡", tooltip: "Experience points earned" },
-        { id: "mastery", label: "Mastery", amount: activeSubject ? activeSubject.masteryScore : 0, icon: "⭐", tooltip: "Overall mastery score" },
+        {
+          id: "xp",
+          label: "XP",
+          amount: progression.totalXpEarned,
+          icon: "⚡",
+          tooltip: "Experience points earned",
+        },
+        {
+          id: "mastery",
+          label: "Mastery",
+          amount: activeSubject ? activeSubject.masteryScore : 0,
+          icon: "⭐",
+          tooltip: "Overall mastery score",
+        },
       ],
       notifications: [],
     };
@@ -80,16 +107,27 @@ export class CommandCentreAssembler {
     // -- Current quest --
     const currentQuestVm = currentQuest
       ? {
-          questId: (currentQuest as Record<string, unknown>).questId as string ?? "quest-1",
+          questId: ((currentQuest as Record<string, unknown>).questId as string) ?? "quest-1",
           category: "MAIN_QUEST" as QuestCategory,
-          title: (currentQuest as Record<string, unknown>).title as string ?? "Continue Your Journey",
-          narrative: (currentQuest as Record<string, unknown>).narrative as string ?? "Master the next concept in your subject.",
-          objective: (currentQuest as Record<string, unknown>).objective as string ?? "Complete 3 encounters",
+          title:
+            ((currentQuest as Record<string, unknown>).title as string) ?? "Continue Your Journey",
+          narrative:
+            ((currentQuest as Record<string, unknown>).narrative as string) ??
+            "Master the next concept in your subject.",
+          objective:
+            ((currentQuest as Record<string, unknown>).objective as string) ??
+            "Complete 3 encounters",
           estimatedDuration: "15 min",
           difficulty: "BEGINNER" as QuestDifficulty,
           progress: { current: 1, max: 3, percent: 33, label: "1 / 3 encounters" },
           rewards: [{ type: "xp" as const, amount: 100, label: "100 XP" }],
-          primaryAction: { label: "Continue", destination: "/missions/active", disabled: false, disabledReason: null, primary: true },
+          primaryAction: {
+            label: "Continue",
+            destination: "/missions/active",
+            disabled: false,
+            disabledReason: null,
+            primary: true,
+          },
         }
       : null;
 
@@ -129,8 +167,22 @@ export class CommandCentreAssembler {
 
     // -- Recommended actions --
     const recommendedActions = [
-      { id: "continue", label: "Continue Learning", description: "Pick up where you left off", primary: true, destination: "/missions/active", icon: "play" },
-      { id: "review", label: "Review", description: "Strengthen weaker concepts", primary: false, destination: "/reviews", icon: "book" },
+      {
+        id: "continue",
+        label: "Continue Learning",
+        description: "Pick up where you left off",
+        primary: true,
+        destination: "/missions/active",
+        icon: "play",
+      },
+      {
+        id: "review",
+        label: "Review",
+        description: "Strengthen weaker concepts",
+        primary: false,
+        destination: "/reviews",
+        icon: "book",
+      },
     ];
 
     return {
@@ -161,7 +213,8 @@ export class CommandCentreAssembler {
   ): CommandCentrePlayerState {
     if (!progress) return "NEW_PLAYER" as CommandCentrePlayerState;
     if (progress.completedAt) return "SUBJECT_COMPLETED" as CommandCentrePlayerState;
-    if (progress.bossStatus === "available" || progress.bossStatus === "active") return "BOSS_AVAILABLE" as CommandCentrePlayerState;
+    if (progress.bossStatus === "available" || progress.bossStatus === "active")
+      return "BOSS_AVAILABLE" as CommandCentrePlayerState;
     return "ACTIVE_QUEST" as CommandCentrePlayerState;
   }
 
@@ -180,7 +233,9 @@ export class CommandCentreAssembler {
   }
 
   private getXpForLevel(level: number): number {
-    const thresholds = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5200, 6600, 8200, 10000, 12000];
+    const thresholds = [
+      0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5200, 6600, 8200, 10000, 12000,
+    ];
     return thresholds[level - 1] ?? thresholds[thresholds.length - 1] ?? 0;
   }
 }

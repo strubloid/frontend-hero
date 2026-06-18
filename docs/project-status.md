@@ -38,7 +38,7 @@
 | Phase 7     | Advanced Game Experience             | ✅ Complete                  |
 | Phase 8     | Production Readiness                 | ✅ Complete                  |
 | Post-launch | Durable Persistence Hardening        | ✅ Complete                  |
-| **Phase 9** | **Command Centre & Question Supply** | 🚧 In Progress (9B complete) |
+| **Phase 9** | **Command Centre & Question Supply** | 🚧 In Progress (9C complete) |
 | Phase 10    | Subject Campaign Progression         | 📋 Planned                   |
 | Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned                   |
 | Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned                   |
@@ -56,7 +56,7 @@
 | ---- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | 9A   | Full experience audit                                                                             | ✅ Complete (`docs/game-design/current-experience-audit.md`) |
 | 9B   | Subject-level progression model + subject file extensions                                         | ✅ Complete                                                  |
-| 9C   | Command Centre view models + development fixtures                                                 | 📋 Planned                                                   |
+| 9C   | Command Centre view models + development fixtures                                                 | ✅ Complete                                                  |
 | 9D   | Command Centre static composition (responsive layout, HUD, world stage, quest panel, action dock) | 📋 Planned                                                   |
 | 9E   | Player identity + XP + mastery in persistent HUD                                                  | 📋 Planned                                                   |
 | 9F   | Current quest display + quest selection                                                           | 📋 Planned                                                   |
