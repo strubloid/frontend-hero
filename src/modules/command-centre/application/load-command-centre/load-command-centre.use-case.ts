@@ -113,7 +113,7 @@ export class LoadCommandCentreUseCase {
 
       const state = this.determineNodeState(level, progress, isBoss, minimumLevel);
       const position = this.calculateNodePosition(i, totalLevels, isBoss);
-      const completion = this.calculateNodeCompletion(level, progress, state);
+      const completion = this.calculateNodeCompletion(levelDef, progress, state);
 
       nodes.push({
         nodeId: `${subject.id}-level-${level}`,
@@ -177,14 +177,12 @@ export class LoadCommandCentreUseCase {
   }
 
   private calculateNodeCompletion(
-    level: number,
+    levelDef: { requiredSuccessfulEncounters: number } | undefined,
     progress: PlayerSubjectProgress | null,
     state: WorldNodeState,
   ): number {
     if (state === "COMPLETED") return 100;
     if (state === "CURRENT" && progress) {
-      // Estimate completion based on encounter counts relative to level requirements
-      const levelDef = this.getLevelDefForLevel(level, progress);
       if (levelDef && levelDef.requiredSuccessfulEncounters > 0) {
         return Math.min(
           100,
@@ -196,13 +194,6 @@ export class LoadCommandCentreUseCase {
       return 0;
     }
     return 0;
-  }
-
-  private getLevelDefForLevel(
-    _level: number,
-    _progress: PlayerSubjectProgress,
-  ): { requiredSuccessfulEncounters: number } | null {
-    return null; // Will be enhanced in Phase 10 with level-def lookup
   }
 
   private buildUnlockRequirements(

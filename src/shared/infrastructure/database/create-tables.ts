@@ -37,6 +37,7 @@ export function createApplicationTables(sqlite: Database.Database): void {
       version INTEGER NOT NULL,
       schemaVersion INTEGER NOT NULL,
       minimumGameVersion TEXT NOT NULL,
+      progression TEXT,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL
     );

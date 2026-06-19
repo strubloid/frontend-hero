@@ -1,7 +1,7 @@
 # Project Status — Frontend Realms
 
 > **Living document**. Update after completing each phase.
-> Current Phase: **Phase 9 — Command Centre & Question Supply (In Progress)**
+> Current Phase: **Phase 11 — Reviews & Spaced Repetition Audit (Planning)**
 
 ---
 
@@ -39,14 +39,24 @@
 | Phase 8     | Production Readiness                 | ✅ Complete    |
 | Post-launch | Durable Persistence Hardening        | ✅ Complete    |
 | **Phase 9** | **Command Centre & Question Supply** | ✅ Complete    |
-| Phase 10    | Subject Campaign Progression         | 🚧 In Progress |
+| Phase 10    | Subject Campaign Progression   | ✅ Complete |
 | Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned     |
 | Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned     |
 | Phase 13    | E2E Testing & Production Validation  | 📋 Planned     |
 
 ---
 
-## Phase 9 — Command Centre & Question Supply (Current)
+### Phase 10 — Subject Campaign Progression (Complete)
+
+- ✅ **Schema** — Added `progression` TEXT column to `subjects` table (Drizzle + raw SQL)
+- ✅ **Repository** — `DrizzleSubjectRepository` now persists/restores progression from DB (removed hardcoded stub)
+- ✅ **SelectSubjectUseCase** — Players can select and start a subject campaign, creating `PlayerSubjectProgress` and setting `player.currentSubjectId`
+- ✅ **AdvanceSubjectLevelUseCase** — Evaluates all 5 requirement types (encounters, mastery, coverage, reviews, sessions) and advances the level; unlocks boss on second-to-last level; marks subject complete past maximum
+- ✅ **Command centre fix** — Removed `getLevelDefForLevel()` null stub, refactored `calculateNodeCompletion()` to accept `levelDef` directly from caller
+- ✅ **In-memory repositories** — Created `InMemoryPlayerSubjectProgressRepository` and `InMemoryPlayerRepository` for testing
+- ✅ **Tests pass** — 11 new tests (4 SelectSubject, 7 AdvanceSubjectLevel), 325 total across 32 files
+
+### Phase 9 — Command Centre & Question Supply (Complete)
 
 **Goal**: Transform the home page from a marketing landing page into a persistent guided game shell (the Command Centre) and establish the question-supply foundation.
 
@@ -135,12 +145,12 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 | Suite                   | Files  | Tests   | Status            |
 | ----------------------- | ------ | ------- | ----------------- |
 | Unit — domain logic     | 11     | 108     | ✅ All passing    |
-| Unit — application      | 4      | 17      | ✅ All passing    |
+| Unit — application      | 6      | 32      | ✅ All passing    |
 | Unit — repositories     | 6      | 67      | ✅ All passing    |
 | Unit — proxy            | 1      | 15      | ✅ All passing    |
 | Integration             | 1      | 2       | ✅ All passing    |
 | Architecture boundaries | 1      | 1       | ✅ All passing    |
-| **Total**               | **24** | **241** | ✅ All passing    |
+| **Total**               | **32** | **325** | ✅ All passing    |
 | E2E (Playwright)        | 0      | 0       | ❌ Not configured |
 
 ---
@@ -155,8 +165,8 @@ npm run verify
 npm run verify:full
 ```
 
-Phase 9 acceptance requires `npm run verify` to pass on every sub-phase.
+Phase 10 acceptance requires `npm run verify:full` to pass on every sub-phase.
 
 ---
 
-_Last updated: 2026-06-18_
+_Last updated: 2026-06-19_

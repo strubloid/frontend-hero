@@ -117,6 +117,48 @@ export class DrizzleSubjectRepository implements SubjectRepository {
       .values(concepts.map((concept) => this.toConceptPersistence(concept)));
   }
 
+  private parseSubjectProgression(value: string | null | undefined): SubjectProgression {
+    if (!value) {
+      return {
+        minimumLevel: 1,
+        maximumLevel: 10,
+        estimatedDaysPerLevel: 7,
+        bossRequired: true,
+        levels: [
+          {
+            level: 1,
+            title: "Foundations",
+            description: "Core concepts",
+            difficultyRange: { minimum: 1, maximum: 2 },
+            requiredMastery: 65,
+            requiredSuccessfulEncounters: 20,
+            requiredReviewEncounters: 5,
+            concepts: [],
+            allowedChallengeTypes: ["multiple-choice", "code-prediction"],
+          },
+        ],
+      };
+    }
+    try {
+      const parsed = JSON.parse(value) as SubjectProgression;
+      return {
+        minimumLevel: parsed.minimumLevel ?? 1,
+        maximumLevel: parsed.maximumLevel ?? 10,
+        estimatedDaysPerLevel: parsed.estimatedDaysPerLevel ?? 7,
+        bossRequired: parsed.bossRequired ?? true,
+        levels: Array.isArray(parsed.levels) ? parsed.levels : [],
+      };
+    } catch {
+      return {
+        minimumLevel: 1,
+        maximumLevel: 10,
+        estimatedDaysPerLevel: 7,
+        bossRequired: true,
+        levels: [],
+      };
+    }
+  }
+
   private toDomain(
     subjectRow: typeof schema.subjects.$inferSelect,
     conceptRows: ConceptRow[],
@@ -137,25 +179,7 @@ export class DrizzleSubjectRepository implements SubjectRepository {
       version: subjectRow.version,
       schemaVersion: subjectRow.schemaVersion,
       minimumGameVersion: subjectRow.minimumGameVersion,
-      progression: {
-        minimumLevel: 1,
-        maximumLevel: 10,
-        estimatedDaysPerLevel: 7,
-        bossRequired: true,
-        levels: [
-          {
-            level: 1,
-            title: "Foundations",
-            description: "Core concepts",
-            difficultyRange: { minimum: 1, maximum: 2 },
-            requiredMastery: 65,
-            requiredSuccessfulEncounters: 20,
-            requiredReviewEncounters: 5,
-            concepts: [],
-            allowedChallengeTypes: ["multiple-choice", "code-prediction"],
-          },
-        ],
-      },
+      progression: this.parseSubjectProgression(subjectRow.progression),
       domains: Array.from(domains.values()),
       createdAt: new Date(subjectRow.createdAt),
       updatedAt: new Date(subjectRow.updatedAt),
@@ -170,6 +194,7 @@ export class DrizzleSubjectRepository implements SubjectRepository {
       version: subject.version,
       schemaVersion: subject.schemaVersion,
       minimumGameVersion: subject.minimumGameVersion,
+      progression: JSON.stringify(subject.progression),
       createdAt: subject.createdAt.toISOString(),
       updatedAt: subject.updatedAt.toISOString(),
     };

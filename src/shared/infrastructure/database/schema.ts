@@ -35,6 +35,7 @@ export const subjects = sqliteTable("subjects", {
   minimumGameVersion: text("minimumGameVersion").notNull(),
   createdAt: text("createdAt").notNull(),
   updatedAt: text("updatedAt").notNull(),
+  progression: text("progression"),
 });
 
 // ─── Concepts ───────────────────────────────────────────────────────────────
