@@ -1,6 +1,6 @@
 "use client";
 
-import type { WorldNodeViewModel } from "@/modules/command-centre/presentation/view-models/world-node-view-model";
+import type { WorldNodeViewModel } from "@/modules/command-centre/domain/view-models/world-node-view-model";
 import styles from "./world-node.module.scss";
 
 interface WorldNodeProps {
@@ -30,17 +30,62 @@ function getStateIcon(state: string): string {
   }
 }
 
+function getStateLabel(state: string): string {
+  switch (state) {
+    case "COMPLETED":
+      return "completed";
+    case "MASTERED":
+      return "mastered";
+    case "CURRENT":
+      return "current mission";
+    case "LOCKED":
+      return "locked";
+    case "AVAILABLE":
+      return "available";
+    case "REVIEW_REQUIRED":
+      return "needs review";
+    case "BOSS":
+      return "boss encounter";
+    default:
+      return state;
+  }
+}
+
 export default function WorldNode({ node, isSelected, onSelect, onHover }: WorldNodeProps) {
   const isBoss = node.nodeType === "BOSS";
+  const isLocked = node.state === "LOCKED";
   const stateClass = `state${node.state}` as keyof typeof styles;
+
+  const ariaLabel = [
+    `${node.title} ${node.subtitle ? `— ${node.subtitle}` : ""}`,
+    getStateLabel(node.state as string),
+    node.completion > 0 ? `${node.completion} percent complete` : "not started",
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (!isLocked) onSelect(node.nodeId);
+    }
+  }
 
   return (
     <g
       className={`${styles.worldNode} ${styles[stateClass] ?? ""} ${isSelected ? styles.selected : ""} ${isBoss ? styles.boss : ""}`}
-      onClick={() => onSelect(node.nodeId)}
+      onClick={() => {
+        if (!isLocked) onSelect(node.nodeId);
+      }}
       onMouseEnter={() => onHover(node.nodeId)}
       onMouseLeave={() => onHover(null)}
-      style={{ cursor: "pointer" }}
+      role="button"
+      tabIndex={isLocked ? -1 : 0}
+      aria-label={ariaLabel}
+      aria-disabled={isLocked}
+      aria-current={isSelected ? "true" : undefined}
+      onKeyDown={handleKeyDown}
+      style={{ cursor: isLocked ? "default" : "pointer" }}
     >
       {isBoss ? (
         <>
@@ -71,12 +116,12 @@ export default function WorldNode({ node, isSelected, onSelect, onHover }: World
             className={styles.nodeIcon}
             fontSize="12"
           >
-            {getStateIcon(node.state)}
+            {getStateIcon(node.state as string)}
           </text>
         </>
       )}
 
-      {/* Completion ring for current nodes */}
+      {/* Completion ring for current / available nodes */}
       {(node.state === "CURRENT" || node.state === "AVAILABLE") && node.completion > 0 && (
         <circle
           cx={node.position.x}
@@ -98,7 +143,7 @@ export default function WorldNode({ node, isSelected, onSelect, onHover }: World
         textAnchor="middle"
         className={styles.nodeTitle}
       >
-        {node.title}
+        {node.title.length > 14 ? `${node.title.slice(0, 13)}…` : node.title}
       </text>
     </g>
   );

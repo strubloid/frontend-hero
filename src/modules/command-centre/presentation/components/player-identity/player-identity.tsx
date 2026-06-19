@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { PlayerIdentityViewModel } from "@/modules/command-centre/presentation/view-models/player-identity-view-model";
+import type { PlayerIdentityViewModel } from "@/modules/command-centre/domain/view-models/player-identity-view-model";
 import styles from "./player-identity.module.scss";
 
 interface PlayerIdentityProps {

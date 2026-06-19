@@ -1,8 +1,9 @@
 "use client";
 
-import type { WorldNodeViewModel } from "@/modules/command-centre/presentation/view-models/world-node-view-model";
-import type { CurrentQuestViewModel } from "@/modules/command-centre/presentation/view-models/current-quest-view-model";
-import type { RecentProgressViewModel } from "@/modules/command-centre/presentation/view-models/recent-progress-view-model";
+import Link from "next/link";
+import type { WorldNodeViewModel } from "@/modules/command-centre/domain/view-models/world-node-view-model";
+import type { CurrentQuestViewModel } from "@/modules/command-centre/domain/view-models/current-quest-view-model";
+import type { RecentProgressViewModel } from "@/modules/command-centre/domain/view-models/recent-progress-view-model";
 import styles from "./quest-inspector.module.scss";
 
 interface QuestInspectorProps {
@@ -32,6 +33,24 @@ function getNodeStateDescription(state: string): string {
   }
 }
 
+function getStateIcon(state: string): string {
+  switch (state) {
+    case "COMPLETED":
+    case "MASTERED":
+      return "✓";
+    case "CURRENT":
+      return "●";
+    case "AVAILABLE":
+      return "○";
+    case "LOCKED":
+      return "🔒";
+    case "REVIEW_REQUIRED":
+      return "⚠";
+    default:
+      return "○";
+  }
+}
+
 export default function QuestInspector({
   selectedNode,
   currentQuest,
@@ -44,33 +63,33 @@ export default function QuestInspector({
     selectedNode ??
     (hoveredNodeId ? (nodes.find((n) => n.nodeId === hoveredNodeId) ?? null) : null);
 
+  // Use the node-derived quest (passed from parent) or the default current quest
+  const questToShow = selectedNode ? currentQuest : null;
+
   return (
-    <aside className={styles.questInspector}>
+    <aside className={styles.questInspector} aria-label="Quest inspector">
       {nodeToShow ? (
         <div className={styles.inspectorContent}>
+          <div className={styles.inspectorHeader}>
+            <span className={styles.nodeStateBadge}>
+              {getStateIcon(nodeToShow.state as string)} {getNodeStateDescription(nodeToShow.state)}
+            </span>
+            {nodeToShow.nodeType === "BOSS" && <span className={styles.nodeTypeBadge}>Boss</span>}
+          </div>
+
           <h3 className={styles.inspectorTitle}>{nodeToShow.title}</h3>
           {nodeToShow.subtitle && <p className={styles.inspectorSubtitle}>{nodeToShow.subtitle}</p>}
 
           <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>Status</span>
-            <span className={styles.detailValue}>{getNodeStateDescription(nodeToShow.state)}</span>
+            <span className={styles.detailLabel}>Completion</span>
+            <span className={styles.detailValue}>
+              {nodeToShow.completion > 0 ? `${nodeToShow.completion}%` : "—"}
+            </span>
           </div>
-
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>Type</span>
-            <span className={styles.detailValue}>{nodeToShow.nodeType}</span>
-          </div>
-
-          {nodeToShow.completion > 0 && (
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Completion</span>
-              <span className={styles.detailValue}>{nodeToShow.completion}%</span>
-            </div>
-          )}
 
           {nodeToShow.masteryContribution > 0 && (
             <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Mastery</span>
+              <span className={styles.detailLabel}>Mastery Contribution</span>
               <span className={styles.detailValue}>+{nodeToShow.masteryContribution}%</span>
             </div>
           )}
@@ -97,6 +116,35 @@ export default function QuestInspector({
               ))}
             </div>
           )}
+
+          {questToShow && (
+            <>
+              {questToShow.rewards.length > 0 && (
+                <div className={styles.rewardsBlock}>
+                  <h4 className={styles.blockTitle}>Rewards</h4>
+                  <div className={styles.rewardsList}>
+                    {questToShow.rewards.map((reward, i) => (
+                      <span key={i} className={styles.rewardItem}>
+                        {reward.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {questToShow.primaryAction && !questToShow.primaryAction.disabled && (
+                <Link
+                  className={styles.actionButton}
+                  href={questToShow.primaryAction.destination}
+                  title={
+                    questToShow.primaryAction.disabledReason ?? questToShow.primaryAction.label
+                  }
+                >
+                  {questToShow.primaryAction.label}
+                </Link>
+              )}
+            </>
+          )}
         </div>
       ) : currentQuest ? (
         <div className={styles.inspectorContent}>
@@ -113,6 +161,25 @@ export default function QuestInspector({
             <span className={styles.detailValue}>{currentQuest.difficulty}</span>
           </div>
 
+          {currentQuest.rewards.length > 0 && (
+            <div className={styles.rewardsBlock}>
+              <h4 className={styles.blockTitle}>Rewards</h4>
+              <div className={styles.rewardsList}>
+                {currentQuest.rewards.map((reward, i) => (
+                  <span key={i} className={styles.rewardItem}>
+                    {reward.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentQuest.primaryAction && !currentQuest.primaryAction.disabled && (
+            <Link className={styles.actionButton} href={currentQuest.primaryAction.destination}>
+              {currentQuest.primaryAction.label}
+            </Link>
+          )}
+
           <div className={styles.recentProgressBlock}>
             <h4 className={styles.blockTitle}>Recent Progress</h4>
             <div className={styles.recentRow}>
@@ -122,7 +189,7 @@ export default function QuestInspector({
             {recentProgress.masteryChange != null && (
               <div className={styles.recentRow}>
                 <span className={styles.recentIcon}>⭐</span>
-                <span className={styles.recentText}>+{recentProgress.masteryChange}% Mastery</span>
+                <span className={styles.recentText}>{recentProgress.masteryChange}% Mastery</span>
               </div>
             )}
             <div className={styles.recentRow}>
@@ -146,7 +213,7 @@ export default function QuestInspector({
       ) : (
         <div className={styles.inspectorEmpty}>
           <span className={styles.emptyIcon}>🗺</span>
-          <p className={styles.emptyText}>Select a node or quest to see details</p>
+          <p className={styles.emptyText}>Select a campaign level or quest to see details</p>
         </div>
       )}
     </aside>

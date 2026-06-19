@@ -7,6 +7,7 @@ import {
   startMission as startMissionAction,
   submitAnswer as submitAnswerAction,
 } from "@/app/actions/missions";
+import RewardResultScreen from "@/modules/missions/presentation/components/reward-result-screen/reward-result-screen";
 import { useToast } from "@/components/toast-provider";
 
 // ---------------------------------------------------------------------------
@@ -262,6 +263,7 @@ function PlayPageInner() {
         onStart={handleStart}
         onSubmit={handleAnswer}
         onContinue={handleContinue}
+        onReturnToCommandCentre={() => router.push("/")}
       />
     </main>
   );
@@ -278,6 +280,7 @@ function PhaseRenderer(props: {
   onStart: () => void;
   onSubmit: () => void;
   onContinue: () => void;
+  onReturnToCommandCentre: () => void;
 }) {
   const { phase } = props;
 
@@ -432,15 +435,12 @@ function PhaseRenderer(props: {
 
     case "completed":
       return (
-        <div>
-          <h2 style={{ color: "#2ecc71", marginBottom: "1rem" }}>Mission Complete!</h2>
-          <p style={{ color: "#aaa" }}>
-            Final score: {phase.score}/{phase.maxScore}
-          </p>
-          <button onClick={props.onStart} style={{ ...buttonStyle, marginTop: "1rem" }}>
-            New Mission
-          </button>
-        </div>
+        <RewardResultScreen
+          score={phase.score}
+          maxScore={phase.maxScore}
+          onNewMission={props.onStart}
+          onReturnToCommandCentre={props.onReturnToCommandCentre}
+        />
       );
 
     case "error":

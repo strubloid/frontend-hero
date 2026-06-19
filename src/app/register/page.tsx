@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useState, useEffect, useRef } from "react";
+import { useActionState, useState, useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { signIn } from "next-auth/react";
@@ -17,11 +17,11 @@ function RegisterFormInner() {
   const [captchaError, setCaptchaError] = useState(false);
   const [state, formAction, pending] = useActionState(register, initialState);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     if (state.success) {

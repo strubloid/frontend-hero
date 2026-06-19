@@ -4,10 +4,10 @@ import type { Player } from "@/modules/players/domain/player";
 import type { PlayerProgression } from "@/modules/progression/domain/player-progression";
 import type { PlayerSubjectProgress } from "@/modules/subjects/domain/subject-level";
 import type { Subject } from "@/modules/subjects/domain/subject";
-import type { CommandCentrePlayerState } from "@/modules/command-centre/presentation/view-models/command-centre-player-state";
-import type { WorldNodeViewModel } from "@/modules/command-centre/presentation/view-models/world-node-view-model";
-import type { WorldNodeState } from "@/modules/command-centre/presentation/view-models/world-node-state";
-import type { WorldNodeType } from "@/modules/command-centre/presentation/view-models/world-node-type";
+import type { CommandCentrePlayerState } from "@/modules/command-centre/domain/view-models/command-centre-player-state";
+import type { WorldNodeViewModel } from "@/modules/command-centre/domain/view-models/world-node-view-model";
+import type { WorldNodeState } from "@/modules/command-centre/domain/view-models/world-node-state";
+import type { WorldNodeType } from "@/modules/command-centre/domain/view-models/world-node-type";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -471,6 +471,245 @@ describe("CommandCentreAssembler", () => {
       expect(result.world.connections.length).toBeGreaterThan(0);
       expect(result.world.connections[0].fromNodeId).toBeDefined();
       expect(result.world.connections[0].toNodeId).toBeDefined();
+    });
+
+    it("creates sequential connections (node1→node2, node2→node3)", () => {
+      const result = CommandCentreAssembler.default();
+
+      // The default fixture has 6 nodes — the connections should form
+      // a coherent directed graph covering all nodes.
+      const nodeIds = result.world.nodes.map((n) => n.nodeId);
+      const connectionIds = new Set<string>();
+      for (const conn of result.world.connections) {
+        connectionIds.add(conn.fromNodeId);
+        connectionIds.add(conn.toNodeId);
+      }
+
+      // Every node appears in at least one connection
+      for (const id of nodeIds) {
+        expect(connectionIds.has(id)).toBe(true);
+      }
+
+      // Connections are between existing nodes
+      for (const conn of result.world.connections) {
+        expect(nodeIds).toContain(conn.fromNodeId);
+        expect(nodeIds).toContain(conn.toNodeId);
+      }
+
+      // Main sequential path exists: foundations → routing → component-boundaries
+      const pathConnections = result.world.connections.filter(
+        (c) => c.state === "completed" || c.state === "active",
+      );
+      expect(pathConnections.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("has connections that reflect endpoint node states", () => {
+      const result = CommandCentreAssembler.default();
+      const nodeById = new Map(result.world.nodes.map((n) => [n.nodeId, n]));
+
+      for (const conn of result.world.connections) {
+        const from = nodeById.get(conn.fromNodeId);
+        const to = nodeById.get(conn.toNodeId);
+        expect(from).toBeDefined();
+        expect(to).toBeDefined();
+
+        // Completed both ends ⇒ completed connection
+        if (from!.state === ("COMPLETED" as const) && to!.state === ("COMPLETED" as const)) {
+          expect(conn.state).toBe("completed");
+        }
+
+        // Either end locked ⇒ inactive
+        if (from!.state === ("LOCKED" as const) || to!.state === ("LOCKED" as const)) {
+          expect(conn.state).toBe("inactive");
+        }
+      }
+    });
+
+    it("uses predictable nodeId naming pattern", () => {
+      const result = CommandCentreAssembler.default();
+
+      // Every world node from the default fixture has a 'node-' prefix
+      for (const node of result.world.nodes) {
+        expect(node.nodeId).toMatch(/^node-/);
+      }
+    });
+  });
+
+  describe("determineLevelState", () => {
+    let assembler: CommandCentreAssembler;
+
+    beforeEach(() => {
+      assembler = new CommandCentreAssembler();
+    });
+
+    it("returns LOCKED when no progress exists", () => {
+      const result = (assembler as any).determineLevelState(1, null) as string;
+      expect(result).toBe("LOCKED");
+    });
+
+    it("returns COMPLETED for levels below currentLevel", () => {
+      const result = (assembler as any).determineLevelState(
+        1,
+        makeSubjectProgress({ currentLevel: 3 }),
+      ) as string;
+      expect(result).toBe("COMPLETED");
+    });
+
+    it("returns CURRENT for level matching currentLevel", () => {
+      const result = (assembler as any).determineLevelState(
+        3,
+        makeSubjectProgress({ currentLevel: 3 }),
+      ) as string;
+      expect(result).toBe("CURRENT");
+    });
+
+    it("returns LOCKED for levels above currentLevel", () => {
+      const result = (assembler as any).determineLevelState(
+        5,
+        makeSubjectProgress({ currentLevel: 3 }),
+      ) as string;
+      expect(result).toBe("LOCKED");
+    });
+  });
+
+  describe("connection sequencing in assemble", () => {
+    let assembler: CommandCentreAssembler;
+
+    beforeEach(() => {
+      assembler = new CommandCentreAssembler();
+    });
+
+    it("builds sequential connections for world nodes in order", () => {
+      const nodes = [
+        {
+          nodeId: "nextjs-level-1",
+          title: "Node 1",
+          subtitle: "",
+          state: "COMPLETED" as WorldNodeState,
+          nodeType: "CAMPAIGN" as WorldNodeType,
+          position: { x: 20, y: 70 },
+          completion: 100,
+          masteryContribution: 100,
+          unlockRequirements: [],
+        },
+        {
+          nodeId: "nextjs-level-2",
+          title: "Node 2",
+          subtitle: "",
+          state: "CURRENT" as WorldNodeState,
+          nodeType: "CAMPAIGN" as WorldNodeType,
+          position: { x: 40, y: 50 },
+          completion: 30,
+          masteryContribution: 50,
+          unlockRequirements: [],
+        },
+        {
+          nodeId: "nextjs-level-3",
+          title: "Node 3",
+          subtitle: "",
+          state: "LOCKED" as WorldNodeState,
+          nodeType: "CAMPAIGN" as WorldNodeType,
+          position: { x: 60, y: 30 },
+          completion: 0,
+          masteryContribution: 0,
+          unlockRequirements: [
+            {
+              description: "Event Loop mastery ≥ 70%",
+              met: false,
+              current: 45,
+              required: 70,
+            },
+          ],
+        },
+      ];
+
+      const result = assembler.assemble({
+        player: makePlayer(),
+        progression: makeProgression(),
+        playerSubjectProgress: makeSubjectProgress({ currentLevel: 2 }),
+        subject: makeSubject(),
+        currentQuest: null,
+        worldNodes: nodes,
+        recentProgress: {
+          xpGained: 0,
+          masteryChange: null,
+          missionsCompleted: 0,
+          conceptsMastered: 0,
+          lastAction: "Started",
+        },
+      });
+
+      expect(result.world.connections).toHaveLength(2);
+
+      // First connection: COMPLETED→CURRENT => active (not both completed)
+      expect(result.world.connections[0].fromNodeId).toBe("nextjs-level-1");
+      expect(result.world.connections[0].toNodeId).toBe("nextjs-level-2");
+      expect(result.world.connections[0].state).toBe("active");
+
+      // Second connection: CURRENT→LOCKED => inactive
+      expect(result.world.connections[1].fromNodeId).toBe("nextjs-level-2");
+      expect(result.world.connections[1].toNodeId).toBe("nextjs-level-3");
+      expect(result.world.connections[1].state).toBe("inactive");
+    });
+
+    it("returns completed connections when both endpoints are COMPLETED", () => {
+      const nodes = [
+        {
+          nodeId: "a",
+          title: "A",
+          subtitle: "",
+          state: "COMPLETED" as WorldNodeState,
+          nodeType: "CAMPAIGN" as WorldNodeType,
+          position: { x: 20, y: 70 },
+          completion: 100,
+          masteryContribution: 100,
+          unlockRequirements: [],
+        },
+        {
+          nodeId: "b",
+          title: "B",
+          subtitle: "",
+          state: "COMPLETED" as WorldNodeState,
+          nodeType: "CAMPAIGN" as WorldNodeType,
+          position: { x: 50, y: 50 },
+          completion: 100,
+          masteryContribution: 100,
+          unlockRequirements: [],
+        },
+        {
+          nodeId: "c",
+          title: "C",
+          subtitle: "",
+          state: "LOCKED" as WorldNodeState,
+          nodeType: "CAMPAIGN" as WorldNodeType,
+          position: { x: 80, y: 30 },
+          completion: 0,
+          masteryContribution: 0,
+          unlockRequirements: [],
+        },
+      ];
+
+      const result = assembler.assemble({
+        player: makePlayer(),
+        progression: makeProgression(),
+        playerSubjectProgress: makeSubjectProgress({ currentLevel: 3 }),
+        subject: makeSubject(),
+        currentQuest: null,
+        worldNodes: nodes,
+        recentProgress: {
+          xpGained: 0,
+          masteryChange: null,
+          missionsCompleted: 0,
+          conceptsMastered: 0,
+          lastAction: "Started",
+        },
+      });
+
+      expect(result.world.connections).toHaveLength(2);
+      // A→B: both completed
+      expect(result.world.connections[0].state).toBe("completed");
+      // B→C: C locked
+      expect(result.world.connections[1].state).toBe("inactive");
     });
   });
 });

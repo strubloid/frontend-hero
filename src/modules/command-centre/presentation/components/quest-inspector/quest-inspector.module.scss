@@ -139,6 +139,25 @@
   margin: 0;
 }
 
+.actionButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--cc-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--cc-radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  background: #2563eb;
+}
+
 .inspectorEmpty {
   display: flex;
   flex-direction: column;

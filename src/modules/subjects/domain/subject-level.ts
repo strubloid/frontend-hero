@@ -5,7 +5,7 @@
  * Player level and subject level are independent systems.
  */
 
-import { Subject } from "./subject";
+import type { Subject } from "./subject";
 
 // ---------------------------------------------------------------------------
 // Subject Progression — metadata defined in the subject file

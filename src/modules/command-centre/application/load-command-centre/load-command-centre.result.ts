@@ -1,4 +1,4 @@
-import type { CommandCentreViewModel } from "../../presentation/view-models/command-centre-view-model";
+import type { CommandCentreViewModel } from "../../domain/view-models/command-centre-view-model";
 
 export class LoadCommandCentreResult {
   constructor(

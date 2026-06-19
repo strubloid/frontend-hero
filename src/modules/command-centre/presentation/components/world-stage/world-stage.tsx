@@ -1,7 +1,7 @@
 "use client";
 
 import WorldPath from "@/modules/command-centre/presentation/components/world-path/world-path";
-import type { WorldMapViewModel } from "@/modules/command-centre/presentation/view-models/world-map-view-model";
+import type { WorldMapViewModel } from "@/modules/command-centre/domain/view-models/world-map-view-model";
 import styles from "./world-stage.module.scss";
 
 interface WorldStageProps {

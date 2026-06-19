@@ -212,6 +212,7 @@
     transform var(--cc-transition-fast),
     box-shadow var(--cc-transition-fast);
   font-family: inherit;
+  text-decoration: none;
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);

@@ -59,8 +59,8 @@
 | 9C   | Command Centre view models + development fixtures                                                 | ✅ Complete                                                  |
 | 9D   | Command Centre static composition (responsive layout, HUD, world stage, quest panel, action dock) | ✅ Complete                                                  |
 | 9E   | Player identity + XP + mastery in persistent HUD                                                  | ✅ Complete                                                  |
-| 9F   | Current quest display + quest selection                                                           | ✅ Complete                                                    |
-| 9G   | Campaign rail + world node integration                                                            | 📋 Planned                                                   |
+| 9F   | Current quest display + quest selection                                                           | ✅ Complete                                                  |
+| 9G   | Campaign rail + world node integration                                                            | ✅ Complete                                                  |
 | 9H   | Contextual action dock                                                                            | 📋 Planned                                                   |
 | 9I   | Inspector panel (quest info, lock requirements, rewards)                                          | 📋 Planned                                                   |
 | 9J   | Reward result screen after encounter completion                                                   | 📋 Planned                                                   |

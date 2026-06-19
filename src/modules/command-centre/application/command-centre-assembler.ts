@@ -2,12 +2,12 @@ import type { Player } from "@/modules/players/domain/player";
 import type { PlayerProgression } from "@/modules/progression/domain/player-progression";
 import type { PlayerSubjectProgress } from "@/modules/subjects/domain/subject-level";
 import type { Subject } from "@/modules/subjects/domain/subject";
-import type { CommandCentreViewModel } from "../presentation/view-models/command-centre-view-model";
-import type { CommandCentrePlayerState } from "../presentation/view-models/command-centre-player-state";
-import type { CurrentQuestViewModel } from "../presentation/view-models/current-quest-view-model";
-import type { WorldNodeState } from "../presentation/view-models/world-node-state";
-import type { WorldNodeViewModel } from "../presentation/view-models/world-node-view-model";
-import type { CampaignLevelViewModel } from "../presentation/view-models/campaign-rail-view-model";
+import type { CommandCentreViewModel } from "../domain/view-models/command-centre-view-model";
+import type { CommandCentrePlayerState } from "../domain/view-models/command-centre-player-state";
+import type { CurrentQuestViewModel } from "../domain/view-models/current-quest-view-model";
+import type { WorldNodeState } from "../domain/view-models/world-node-state";
+import type { WorldNodeViewModel } from "../domain/view-models/world-node-view-model";
+import type { CampaignLevelViewModel } from "../domain/view-models/campaign-rail-view-model";
 import { buildDefaultCommandCentre } from "../development/development-fixtures";
 
 /**
@@ -163,6 +163,14 @@ export class CommandCentreAssembler {
         primary: false,
         destination: "/reviews",
         icon: "book",
+      },
+      {
+        id: "forge",
+        label: "Encounter Forge",
+        description: "Generate and monitor encounter supply",
+        primary: false,
+        destination: "/encounter-forge",
+        icon: "star",
       },
     ];
 

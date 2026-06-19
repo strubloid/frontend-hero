@@ -1,9 +1,9 @@
-import type { CommandCentreViewModel } from "../presentation/view-models/command-centre-view-model";
-import type { CommandCentrePlayerState } from "../presentation/view-models/command-centre-player-state";
-import type { QuestCategory } from "../presentation/view-models/quest-category";
-import type { QuestDifficulty } from "../presentation/view-models/quest-difficulty";
-import type { WorldNodeState } from "../presentation/view-models/world-node-state";
-import type { WorldNodeType } from "../presentation/view-models/world-node-type";
+import type { CommandCentreViewModel } from "../domain/view-models/command-centre-view-model";
+import type { CommandCentrePlayerState } from "../domain/view-models/command-centre-player-state";
+import type { QuestCategory } from "../domain/view-models/quest-category";
+import type { QuestDifficulty } from "../domain/view-models/quest-difficulty";
+import type { WorldNodeState } from "../domain/view-models/world-node-state";
+import type { WorldNodeType } from "../domain/view-models/world-node-type";
 
 /**
  * Builds a fully-populated, hardcoded CommandCentreViewModel for development

@@ -1,6 +1,7 @@
 "use client";
 
-import type { CurrentQuestViewModel } from "@/modules/command-centre/presentation/view-models/current-quest-view-model";
+import Link from "next/link";
+import type { CurrentQuestViewModel } from "@/modules/command-centre/domain/view-models/current-quest-view-model";
 import styles from "./current-quest-panel.module.scss";
 
 interface CurrentQuestPanelProps {
@@ -118,13 +119,23 @@ export default function CurrentQuestPanel({ quest }: CurrentQuestPanelProps) {
         </div>
       </div>
 
-      <button
-        className={styles.actionButton}
-        disabled={quest.primaryAction.disabled}
-        title={quest.primaryAction.disabledReason ?? quest.primaryAction.label}
-      >
-        {quest.primaryAction.label}
-      </button>
+      {quest.primaryAction.disabled ? (
+        <button
+          className={styles.actionButton}
+          disabled
+          title={quest.primaryAction.disabledReason ?? quest.primaryAction.label}
+        >
+          {quest.primaryAction.label}
+        </button>
+      ) : (
+        <Link
+          className={styles.actionButton}
+          href={quest.primaryAction.destination}
+          title={quest.primaryAction.disabledReason ?? quest.primaryAction.label}
+        >
+          {quest.primaryAction.label}
+        </Link>
+      )}
     </section>
   );
 }

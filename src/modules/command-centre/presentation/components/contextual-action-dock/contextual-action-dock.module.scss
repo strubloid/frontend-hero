@@ -37,6 +37,7 @@
     transform var(--cc-transition-fast),
     box-shadow var(--cc-transition-fast);
   font-family: inherit;
+  text-decoration: none;
 
   &:hover {
     transform: translateY(-1px);
@@ -67,6 +68,7 @@
     background var(--cc-transition-fast),
     color var(--cc-transition-fast);
   font-family: inherit;
+  text-decoration: none;
 
   &:hover {
     background: var(--cc-hover);

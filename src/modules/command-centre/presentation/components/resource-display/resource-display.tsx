@@ -1,6 +1,6 @@
 "use client";
 
-import type { GameCurrencyViewModel } from "@/modules/command-centre/presentation/view-models/game-currency-view-model";
+import type { GameCurrencyViewModel } from "@/modules/command-centre/domain/view-models/game-currency-view-model";
 import styles from "./resource-display.module.scss";
 
 interface ResourceDisplayProps {

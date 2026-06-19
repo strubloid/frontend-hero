@@ -30,3 +30,14 @@ export interface CreateQuestionFromSeedInput {
   correctIndex: number;
   explanation: string;
 }
+
+export const GENERATION_JOB_STATUS = {
+  PENDING: "pending",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+  FAILED: "failed",
+  CANCELLED: "cancelled",
+} as const;
+
+export type GenerationJobStatus =
+  (typeof GENERATION_JOB_STATUS)[keyof typeof GENERATION_JOB_STATUS];

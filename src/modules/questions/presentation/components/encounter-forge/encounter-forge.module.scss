@@ -1,0 +1,236 @@
+.page {
+  min-height: 100vh;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: #070b14;
+  color: #e2e8f0;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+}
+
+.hero {
+  max-width: 900px;
+  margin: 0 auto 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.22), transparent 45%), #0f1729;
+  border: 1px solid #1e293b;
+  border-radius: 22px;
+}
+
+.eyebrow {
+  color: #93c5fd;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0.5rem 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1;
+}
+
+.description {
+  max-width: 720px;
+  margin: 0;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.panel {
+  max-width: 900px;
+  margin: 0 auto 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: #0f1729;
+  border: 1px solid #1e293b;
+  border-radius: 18px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panelHeader h2 {
+  margin: 0 0 0.25rem;
+}
+
+.panelHeader p {
+  margin: 0;
+  color: #64748b;
+}
+
+.healthBadge {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #334155;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.healthHEALTHY {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.healthLOW {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+}
+
+.healthCRITICAL,
+.healthEMPTY {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.metricCard {
+  padding: 1rem;
+  background: #111c30;
+  border: 1px solid #253247;
+  border-radius: 14px;
+}
+
+.metricCard span {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.metricCard strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: #f8fafc;
+  font-size: 1.8rem;
+}
+
+.conceptList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.conceptRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem;
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+}
+
+.conceptRow strong {
+  color: #93c5fd;
+}
+
+.conceptRow em {
+  color: #94a3b8;
+  font-style: normal;
+  font-size: 0.75rem;
+}
+
+.emptyState {
+  margin: 0;
+  color: #64748b;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+
+.field span {
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 0.75rem;
+  color: #e2e8f0;
+  background: #070b14;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.field textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
+.generateButton {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.jobProgress {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+}
+
+.jobProgress span {
+  font-weight: 800;
+}
+
+.jobProgress p {
+  margin: 0.5rem 0 0;
+  color: #94a3b8;
+}
+
+.progressTrack {
+  height: 8px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  background: #1e293b;
+  border-radius: 999px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #22c55e);
+  transition: width 0.3s ease;
+}
+
+.errorText {
+  color: #fca5a5 !important;
+}
+
+@media (max-width: 640px) {
+  .metricGrid,
+  .conceptRow {
+    grid-template-columns: 1fr;
+  }
+}

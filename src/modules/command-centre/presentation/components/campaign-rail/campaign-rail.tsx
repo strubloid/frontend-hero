@@ -1,6 +1,6 @@
 "use client";
 
-import type { CampaignRailViewModel } from "@/modules/command-centre/presentation/view-models/campaign-rail-view-model";
+import type { CampaignRailViewModel } from "@/modules/command-centre/domain/view-models/campaign-rail-view-model";
 import styles from "./campaign-rail.module.scss";
 
 interface CampaignRailProps {

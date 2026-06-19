@@ -3,7 +3,7 @@
 import type {
   WorldMapViewModel,
   WorldConnection,
-} from "@/modules/command-centre/presentation/view-models/world-map-view-model";
+} from "@/modules/command-centre/domain/view-models/world-map-view-model";
 import WorldNode from "@/modules/command-centre/presentation/components/world-node/world-node";
 import styles from "./world-path.module.scss";
 
@@ -36,7 +36,13 @@ export default function WorldPath({
   const nodeMap = new Map(world.nodes.map((n) => [n.nodeId, n]));
 
   return (
-    <svg className={styles.worldPath} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+    <svg
+      className={styles.worldPath}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
+      role="region"
+      aria-label="Campaign world map"
+    >
       {/* Background grid pattern */}
       <defs>
         <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">

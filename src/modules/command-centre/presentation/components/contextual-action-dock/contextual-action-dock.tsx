@@ -1,6 +1,7 @@
 "use client";
 
-import type { RecommendedActionViewModel } from "@/modules/command-centre/presentation/view-models/recommended-action-view-model";
+import Link from "next/link";
+import type { RecommendedActionViewModel } from "@/modules/command-centre/domain/view-models/recommended-action-view-model";
 import styles from "./contextual-action-dock.module.scss";
 
 interface ContextualActionDockProps {
@@ -27,18 +28,27 @@ export default function ContextualActionDock({ actions }: ContextualActionDockPr
     <div className={styles.dock}>
       <div className={styles.dockInner}>
         {primaryAction && (
-          <button className={styles.primaryAction} title={primaryAction.description}>
+          <Link
+            className={styles.primaryAction}
+            href={primaryAction.destination}
+            title={primaryAction.description}
+          >
             <span className={styles.actionIcon}>{getActionIcon(primaryAction.icon)}</span>
             <span className={styles.actionLabel}>{primaryAction.label}</span>
-          </button>
+          </Link>
         )}
 
         <div className={styles.secondaryActions}>
           {secondaryActions.map((action) => (
-            <button key={action.id} className={styles.secondaryAction} title={action.description}>
+            <Link
+              key={action.id}
+              className={styles.secondaryAction}
+              href={action.destination}
+              title={action.description}
+            >
               <span className={styles.actionIcon}>{getActionIcon(action.icon)}</span>
               <span className={styles.actionLabel}>{action.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>

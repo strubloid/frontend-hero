@@ -1,7 +1,7 @@
 "use client";
 
-import type { GameHudViewModel } from "@/modules/command-centre/presentation/view-models/game-hud-view-model";
-import type { HudNotificationViewModel } from "@/modules/command-centre/presentation/view-models/hud-notification-view-model";
+import type { GameHudViewModel } from "@/modules/command-centre/domain/view-models/game-hud-view-model";
+import type { HudNotificationViewModel } from "@/modules/command-centre/domain/view-models/hud-notification-view-model";
 import PlayerIdentity from "@/modules/command-centre/presentation/components/player-identity/player-identity";
 import ExperienceBar from "@/modules/command-centre/presentation/components/experience-bar/experience-bar";
 import MasteryIndicator from "@/modules/command-centre/presentation/components/mastery-indicator/mastery-indicator";
