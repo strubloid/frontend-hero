@@ -20,6 +20,8 @@ export interface QuestionProviderContext {
  * 1. Difficulty adaptation — prefer seeds near the player's mastery-adjusted level
  * 2. Repetition control — skip questions shown recently or too many times
  * 3. Variety enforcement — no repeats within the recent N questions
+ * 4. Forge fallback — supplement with forge-generated questions in the DB when
+ *    seed-based questions are insufficient or depleted
  */
 export class QuestionProvider {
   constructor(
@@ -58,6 +60,9 @@ export class QuestionProvider {
       bySeedId.set(q.seedId, q);
     }
 
+    // Fast set of known seed IDs to identify forge-generated questions later
+    const seedIds = new Set(concept.questionSeeds.map((s) => s.seedId));
+
     // Score each seed by suitability, then pick the best ones
     const seededScores: Array<{ seed: QuestionSeed; score: number }> = [];
 
@@ -86,14 +91,41 @@ export class QuestionProvider {
 
     // Convert selected seeds to Question objects
     const questions: Question[] = [];
+    const usedIds = new Set<string>();
+
     for (const { seed } of selected) {
       const existing = bySeedId.get(seed.seedId);
       if (existing) {
         questions.push(existing);
+        usedIds.add(existing.id);
       } else {
         const question = this.createFromSeed(seed, concept, subjectId);
         const saved = await this.questionRepository.create(question);
         questions.push(saved);
+        usedIds.add(saved.id);
+      }
+    }
+
+    // ── Supplement with forge-generated questions ───────────────────────────
+    // If seed-based questions are insufficient, fall back to forge-generated
+    // questions already persisted in the DB (their seedId doesn't match any
+    // seed in the subject domain model).
+    if (questions.length < this.maxQuestionsPerMission) {
+      const nonSeedQuestions = existingQuestions.filter(
+        (q) => !seedIds.has(q.seedId) && !usedIds.has(q.id) && !avoidedIds.has(q.id),
+      );
+
+      const scoredNonSeed = nonSeedQuestions.map((q) => ({
+        question: q,
+        score: this.scoreNonSeed(q, targetDifficulty),
+      }));
+
+      scoredNonSeed.sort((a, b) => b.score - a.score);
+
+      const needed = this.maxQuestionsPerMission - questions.length;
+      for (const { question } of scoredNonSeed.slice(0, needed)) {
+        questions.push(question);
+        usedIds.add(question.id);
       }
     }
 
@@ -135,6 +167,38 @@ export class QuestionProvider {
       } else {
         score += 15; // never shown: bonus
       }
+    }
+
+    return score;
+  }
+
+  /**
+   * Score a forge-generated (non-seed) question for suitability.
+   *
+   * Same difficulty-match and freshness scoring as seed questions,
+   * minus the seed-specific logic (no "never existed" bonus since
+   * these questions are always persisted).
+   */
+  private scoreNonSeed(question: Question, targetDifficulty: number): number {
+    let score = 0;
+
+    // Difficulty match (0-40 points)
+    const diffDiff = Math.abs(question.difficulty - targetDifficulty);
+    score += Math.max(0, 40 - diffDiff * 15);
+
+    // Freshness score (0-30 points) — fewer times shown = better
+    score += Math.max(0, 30 - question.timesShown * 8);
+
+    // Additional bonus based on last shown recency
+    if (question.lastShownAt) {
+      const daysSinceShown = (Date.now() - question.lastShownAt.getTime()) / (24 * 60 * 60 * 1000);
+      if (daysSinceShown < 1)
+        score -= 20; // shown today: penalty
+      else if (daysSinceShown < 3)
+        score -= 5; // shown recently: slight penalty
+      else score += Math.min(15, daysSinceShown); // older = better
+    } else {
+      score += 15; // never shown: bonus
     }
 
     return score;
