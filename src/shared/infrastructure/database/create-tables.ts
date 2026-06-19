@@ -253,6 +253,8 @@ export function createApplicationTables(sqlite: Database.Database): void {
     );
   `);
 
+  // Columns added after initial table creation
+  ensureColumn(sqlite, "subjects", "progression", "TEXT");
   ensureColumn(sqlite, "concepts", "questionSeeds", "TEXT DEFAULT '[]' NOT NULL");
   ensureColumn(sqlite, "concepts", "practicalChallenges", "TEXT DEFAULT '[]' NOT NULL");
   ensureColumn(sqlite, "concepts", "interviewPrompts", "TEXT DEFAULT '[]' NOT NULL");
