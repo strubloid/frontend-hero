@@ -4,11 +4,11 @@ import { Subject } from "@/modules/subjects/domain/subject";
 import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
 import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 
-// Module-level cache
+// Module-level cache (never caches empty — empty = re-check next time)
 let cachedSubjects: Subject[] | null = null;
 
 export async function getAvailableSubjects(): Promise<Subject[]> {
-  if (cachedSubjects) return cachedSubjects;
+  if (cachedSubjects !== null && cachedSubjects.length > 0) return cachedSubjects;
 
   const repo = new DrizzleSubjectRepository(getSqliteConnection());
   const persisted = await repo.findAll();
@@ -17,7 +17,10 @@ export async function getAvailableSubjects(): Promise<Subject[]> {
     return persisted;
   }
 
-  // Try to load from seed data first
+  // No subjects in DB — try to import from subject files
+  // Clear the wiring cache so missions get fresh data too
+  const { resetWiringCache } = await import("@/app/actions/missions");
+  resetWiringCache();
   const { SubjectImportService } =
     await import("@/modules/subjects/application/subject-import-service");
   const { SubjectFileReader } = await import("@/modules/subjects/application/subject-file-reader");
@@ -49,7 +52,6 @@ export async function getAvailableSubjects(): Promise<Subject[]> {
   try {
     files = fs.readdirSync(subjectsDir).filter((f: string) => f.endsWith(".md"));
   } catch {
-    cachedSubjects = [];
     return [];
   }
 
@@ -68,6 +70,10 @@ export async function getAvailableSubjects(): Promise<Subject[]> {
 
   cachedSubjects = subjects;
   return subjects;
+}
+
+export async function resetSubjectsCache(): Promise<void> {
+  cachedSubjects = null;
 }
 
 export interface SubjectSummary {

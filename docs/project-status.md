@@ -1,48 +1,49 @@
 # Project Status — Frontend Realms
 
-> **Living document**. Update after completing each phase.
-> Current Phase: **Phase 11 — Reviews & Spaced Repetition Audit (Planning)**
+|> **Living document**. Update after completing each phase.
+
+> Current Phase: **Phase 13 — E2E Testing & Production Validation (Planning)**
 
 ---
 
 ## Quick Summary
 
-| Aspect       | Status                                                                  |
-| ------------ | ----------------------------------------------------------------------- |
-| Product      | Gamified frontend engineering learning platform                         |
-| Architecture | Modular monolith — Domain / Application / Infrastructure / Presentation |
-| Framework    | Next.js 16.2.9 (App Router)                                             |
-| Language     | TypeScript (strict)                                                     |
-| Database     | SQLite (dev/test), PostgreSQL (production target)                       |
-| ORM          | Drizzle ORM v7                                                          |
-| Testing      | Vitest (276 unit/integration tests passing)                             |
-| E2E          | ❌ Not yet configured (Playwright planned)                              |
-| CI/CD        | GitHub Actions + Docker + Fly.io                                        |
-| AI Provider  | Big Pickle (via OpenCode Zen) — **not yet integrated**                  |
-| Auth         | NextAuth v5 (Google OAuth + Credentials)                                |
-| Auth Pass    | ✅ Connected to login/register pages                                    |
+| Aspect       | Status                                                                        |
+| ------------ | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| Product      | Gamified frontend engineering learning platform                               |
+| Architecture | Modular monolith — Domain / Application / Infrastructure / Presentation       |
+| Framework    | Next.js 16.2.9 (App Router)                                                   |
+| Language     | TypeScript (strict)                                                           |
+| Database     | SQLite (dev/test), PostgreSQL (production target)                             |
+| ORM          | Drizzle ORM v7                                                                |
+|              | Testing                                                                       | Vitest (337 unit/integration tests passing) |
+| E2E          | ❌ Not yet configured (Playwright planned)                                    |
+| CI/CD        | GitHub Actions + Docker + Fly.io                                              |
+| AI Provider  | Big Pickle (via OpenCode Zen) — ✅ Integrated (demo mode, template questions) |
+| Auth         | NextAuth v5 (Google OAuth + Credentials)                                      |
+| Auth Pass    | ✅ Connected to login/register pages                                          |
 
 ---
 
 ## Phase Overview
 
-| Phase       | Name                                 | Status      |
-| ----------- | ------------------------------------ | ----------- |
-| Phase 0     | Research and Product Definition      | ✅ Complete |
-| Phase 1     | Walking Skeleton                     | ✅ Complete |
-| Phase 2     | Subject Engine                       | ✅ Complete |
-| Phase 3     | Learning Engine                      | ✅ Complete |
-| Phase 4     | Game Foundation                      | ✅ Complete |
-| Phase 5     | Polish & Narrative                   | ✅ Complete |
-| Phase 6     | Experience & Integration             | ✅ Complete |
-| Phase 7     | Advanced Game Experience             | ✅ Complete |
-| Phase 8     | Production Readiness                 | ✅ Complete |
-| Post-launch | Durable Persistence Hardening        | ✅ Complete |
-| **Phase 9** | **Command Centre & Question Supply** | ✅ Complete |
-| Phase 10    | Subject Campaign Progression         | ✅ Complete |
-| Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned  |
-| Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned  |
-| Phase 13    | E2E Testing & Production Validation  | 📋 Planned  |
+| Phase        | Name                                    | Status      |
+| ------------ | --------------------------------------- | ----------- |
+| Phase 0      | Research and Product Definition         | ✅ Complete |
+| Phase 1      | Walking Skeleton                        | ✅ Complete |
+| Phase 2      | Subject Engine                          | ✅ Complete |
+| Phase 3      | Learning Engine                         | ✅ Complete |
+| Phase 4      | Game Foundation                         | ✅ Complete |
+| Phase 5      | Polish & Narrative                      | ✅ Complete |
+| Phase 6      | Experience & Integration                | ✅ Complete |
+| Phase 7      | Advanced Game Experience                | ✅ Complete |
+| Phase 8      | Production Readiness                    | ✅ Complete |
+| Post-launch  | Durable Persistence Hardening           | ✅ Complete |
+| Phase 9      | Command Centre & Question Supply        | ✅ Complete |
+| Phase 10     | Subject Campaign Progression            | ✅ Complete |
+| Phase 11     | Encounter Forge & Batch Generation      | ✅ Complete |
+| Phase 12     | Subject Boss & Campaign Completion      | ✅ Complete |
+| **Phase 13** | **E2E Testing & Production Validation** | 📋 Planned  |
 
 ---
 
@@ -55,6 +56,31 @@
 - ✅ **Command centre fix** — Removed `getLevelDefForLevel()` null stub, refactored `calculateNodeCompletion()` to accept `levelDef` directly from caller
 - ✅ **In-memory repositories** — Created `InMemoryPlayerSubjectProgressRepository` and `InMemoryPlayerRepository` for testing
 - ✅ **Tests pass** — 11 new tests (4 SelectSubject, 7 AdvanceSubjectLevel), 325 total across 32 files
+
+### Phase 11 — Encounter Forge & Batch Generation (Complete)
+
+**Goal**: Build the question-generation pipeline with AI gateway integration, batch generation jobs, and the Encounter Forge UI for monitoring and controlling question supply.
+
+- ✅ **AI Gateway interface** — `ArtificialIntelligenceGateway` with full methods (generateQuestion, generateQuestionBatch, evaluateAnswer, generateExplanation, generateHint, generateMission)
+- ✅ **BigPickleGateway (demo)** — Template-based question generation from 15 reusable patterns with `[concept]` placeholders; isAvailable() flag toggle
+- ✅ **Question inventory service** — Tracks question supply health (CRITICAL/APPROVED/UNSEEN/RECENTLY SEEN per concept)
+- ✅ **Generate questions use case** — Batch generation with per-concept question count, error handling, and duration tracking
+- ✅ **Encounter Forge UI** — `/encounter-forge` page with generation controls (subject ID, concept IDs, question count) and supply display
+- ✅ **Endpoint wiring** — Server actions connect Encounter Forge to the AI gateway and question repository
+- ✅ **Tests** — 10 new tests across gateway, inventory, and generate-questions (337 total)
+
+### Phase 12 — Subject Boss & Campaign Completion (Complete)
+
+**Goal**: Deliver boss encounters at campaign milestones and the subject completion flow.
+
+- ✅ **BossEncounterService** — Manages boss state, attack submission, answer evaluation, and damage calculation
+- ✅ **BossService** — Orchestrates boss lifecycle: start encounter, submit attack, retrieve state, retreat
+- ✅ **Boss API routes** — `/api/boss/start`, `/api/boss/answer`, `/api/boss/state`, `/api/boss/retreat`
+- ✅ **Boss encounter persistence** — Drizzle repositories persist boss progress per player (4 tables)
+- ✅ **Boss encounter page** — `/boss-encounter` renders boss title ("The App Router Wyrm"), Begin Battle, and Retreat controls
+- ✅ **Campaign completion** — AdvanceSubjectLevelUseCase unlocks boss on second-to-last level; marks subject complete past maximum
+- ✅ **Command centre integration** — Campaign rail linked to boss encounter via dynamic subject ID extraction
+- ✅ **Tests** — 18 new tests across boss-service and boss-encounter-service (337 total)
 
 ### Phase 9 — Command Centre & Question Supply (Complete)
 
@@ -129,14 +155,13 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 
 | Gap                          | Impact                                     | Planned Phase |
 | ---------------------------- | ------------------------------------------ | ------------- |
-| AI question generation       | Only 4 hand-written questions exist        | Phase 9L–9N   |
-| No persistent game HUD       | Player cannot see progress from home       | Phase 9D–9E   |
-| No subject-level progression | All subjects are one flat list of concepts | Phase 9B      |
-| No command centre            | Home page is a marketing landing page      | Phase 9C–9J   |
+| AI question generation       | Demo mode generates template questions     | Phase 13      |
+| No command centre            | Home page is a marketing landing page      | Phase 13      |
 | No E2E tests                 | No automated browser-level verification    | Phase 13      |
 | Player identity coupling     | Server actions use hard-coded player IDs   | Phase 13      |
-| Formatting failures          | 3 files failing `npm run format:check`     | Phase 9O      |
-| Inline styles in pages       | Violates SCSS module architecture pattern  | Phase 9D      |
+| Inline styles in pages       | Violates SCSS module architecture pattern  | Phase 13      |
+| No persistent game HUD       | Player cannot see progress from home       | Phase 13      |
+| No subject-level progression | All subjects are one flat list of concepts | Phase 13      |
 
 ---
 
@@ -150,7 +175,7 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 | Unit — proxy            | 1      | 15      | ✅ All passing    |
 | Integration             | 1      | 2       | ✅ All passing    |
 | Architecture boundaries | 1      | 1       | ✅ All passing    |
-| **Total**               | **32** | **325** | ✅ All passing    |
+| **Total**               | **33** | **337** | ✅ All passing    |
 | E2E (Playwright)        | 0      | 0       | ❌ Not configured |
 
 ---
@@ -165,8 +190,8 @@ npm run verify
 npm run verify:full
 ```
 
-Phase 10 acceptance requires `npm run verify:full` to pass on every sub-phase.
+Phases 10–12 acceptance requires `npm run verify:full` to pass on every sub-phase.
 
 ---
 
-_Last updated: 2026-06-19_
+_Last updated: 2026-06-19 (Phases 10–12 complete)_

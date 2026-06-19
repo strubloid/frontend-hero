@@ -46,26 +46,28 @@ class StaticPlayerRepository implements PlayerRepository {
   private players = new Map<string, Player>();
 
   async getById(id: string): Promise<Player | null> {
-    return this.players.get(id) ?? {
-      id,
-      name: "Adventurer",
-      level: 1,
-      experiencePoints: 0,
-      masteryPoints: 0,
-      currentSubjectId: null,
-      currentRegionId: null,
-      lastActiveAt: null,
-      lastReturnBonusClaimedAt: null,
-      selectedTitle: null,
-      selectedTheme: null,
-      email: null,
-      passwordHash: null,
-      emailVerified: null,
-      image: null,
-      workshopTier: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    return (
+      this.players.get(id) ?? {
+        id,
+        name: "Adventurer",
+        level: 1,
+        experiencePoints: 0,
+        masteryPoints: 0,
+        currentSubjectId: null,
+        currentRegionId: null,
+        lastActiveAt: null,
+        lastReturnBonusClaimedAt: null,
+        selectedTitle: null,
+        selectedTheme: null,
+        email: null,
+        passwordHash: null,
+        emailVerified: null,
+        image: null,
+        workshopTier: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    );
   }
 
   async create(player: Player): Promise<Player> {
@@ -134,9 +136,9 @@ describe("BossService", () => {
   it("throws when no boss exists for the region", async () => {
     const service = createService();
 
-    await expect(
-      service.getState("player-1", "unknown-region"),
-    ).rejects.toThrow("No boss encounter found for region: unknown-region");
+    await expect(service.getState("player-1", "unknown-region")).rejects.toThrow(
+      "No boss encounter found for region: unknown-region",
+    );
   });
 
   it("returns active status with intro data on first encounter", async () => {
@@ -281,8 +283,11 @@ describe("BossService", () => {
     const playerRepo = new StaticPlayerRepository();
 
     // Create a minimal BossEncounterService that just creates progress
-    const encounterService: BossEncounterService = {
-      startBossEncounter: async (playerId, boss) => {
+    const encounterService = {
+      startBossEncounter: async (
+        playerId: string,
+        boss: import("@/modules/missions/domain/boss-encounter").BossEncounter,
+      ) => {
         const progress: import("@/modules/missions/domain/boss-encounter").PlayerBossProgress = {
           id: "ephemeral-progress",
           playerId,
@@ -302,7 +307,7 @@ describe("BossService", () => {
       submitAttack: async () => {
         throw new Error("Not implemented — use submitAnswer instead");
       },
-    };
+    } as unknown as BossEncounterService;
 
     const service = createService({
       bossRepo,

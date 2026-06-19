@@ -142,9 +142,7 @@ export default function CommandCentrePage({ vm: externalVm }: CommandCentrePageP
               : selectedNode.completion > 0
                 ? "Continue Quest"
                 : "Start Quest",
-            destination: isBoss
-              ? `/boss-encounter?region=${subjectIdFromNode}`
-              : "/play",
+            destination: isBoss ? `/boss-encounter?region=${subjectIdFromNode}` : "/play",
             disabled: false,
             disabledReason: null,
             primary: true,

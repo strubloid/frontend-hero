@@ -86,6 +86,10 @@ async function wireDependencies(): Promise<MissionActionWiring> {
   return wiringPromise;
 }
 
+export async function resetWiringCache(): Promise<void> {
+  wiringPromise = null;
+}
+
 // ---------------------------------------------------------------------------
 // Seed data: create a default player and load the Next.js subject
 // ---------------------------------------------------------------------------
@@ -146,12 +150,10 @@ async function ensureSeeded(wiring: MissionActionWiring): Promise<void> {
   const result = await subjectImportService.import("nextjs");
   await wiring.subjectRepository.save(result.subject);
 
-  // Pre-generate questions for the first concept
-  const firstDomain = result.subject.domains[0];
-  if (firstDomain) {
-    const firstConcept = firstDomain.concepts[0];
-    if (firstConcept) {
-      await wiring.questionProvider.provideForConcept(firstConcept, result.subject.id);
+  // Pre-generate questions for ALL concepts in the subject
+  for (const domain of result.subject.domains) {
+    for (const concept of domain.concepts) {
+      await wiring.questionProvider.provideForConcept(concept, result.subject.id);
     }
   }
 }

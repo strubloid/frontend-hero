@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { GameHudViewModel } from "@/modules/command-centre/domain/view-models/game-hud-view-model";
 import type { HudNotificationViewModel } from "@/modules/command-centre/domain/view-models/hud-notification-view-model";
 import PlayerIdentity from "@/modules/command-centre/presentation/components/player-identity/player-identity";
@@ -62,18 +63,18 @@ export default function GameHud({ hud }: GameHudProps) {
         </div>
 
         <div className={styles.iconButtons}>
-          <button className={styles.iconBtn} title="Map">
+          <Link href="/world-map" className={styles.iconBtn} title="Map">
             🗺
-          </button>
-          <button className={styles.iconBtn} title="Journal">
+          </Link>
+          <Link href="/subjects" className={styles.iconBtn} title="Journal">
             📖
-          </button>
-          <button className={styles.iconBtn} title="Profile">
+          </Link>
+          <Link href="/profile" className={styles.iconBtn} title="Profile">
             👤
-          </button>
-          <button className={styles.iconBtn} title="Settings">
+          </Link>
+          <Link href="/settings" className={styles.iconBtn} title="Settings">
             ⚙
-          </button>
+          </Link>
         </div>
       </div>
     </header>

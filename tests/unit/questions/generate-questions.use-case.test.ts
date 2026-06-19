@@ -37,7 +37,11 @@ class FakeAiGateway implements ArtificialIntelligenceGateway {
   }
 
   async generateQuestionBatch(): Promise<any> {
-    return { questions: [], summary: { totalGenerated: 0, totalFailed: 0, conceptsCovered: 0, durationMs: 0 }, errors: [] };
+    return {
+      questions: [],
+      summary: { totalGenerated: 0, totalFailed: 0, conceptsCovered: 0, durationMs: 0 },
+      errors: [],
+    };
   }
   async evaluateAnswer(): Promise<any> {
     return { isCorrect: true, correctIndex: 0, explanation: "", score: 1 };
