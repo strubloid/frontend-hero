@@ -26,23 +26,23 @@
 
 ## Phase Overview
 
-| Phase       | Name                                 | Status         |
-| ----------- | ------------------------------------ | -------------- |
-| Phase 0     | Research and Product Definition      | ✅ Complete    |
-| Phase 1     | Walking Skeleton                     | ✅ Complete    |
-| Phase 2     | Subject Engine                       | ✅ Complete    |
-| Phase 3     | Learning Engine                      | ✅ Complete    |
-| Phase 4     | Game Foundation                      | ✅ Complete    |
-| Phase 5     | Polish & Narrative                   | ✅ Complete    |
-| Phase 6     | Experience & Integration             | ✅ Complete    |
-| Phase 7     | Advanced Game Experience             | ✅ Complete    |
-| Phase 8     | Production Readiness                 | ✅ Complete    |
-| Post-launch | Durable Persistence Hardening        | ✅ Complete    |
-| **Phase 9** | **Command Centre & Question Supply** | ✅ Complete    |
-| Phase 10    | Subject Campaign Progression   | ✅ Complete |
-| Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned     |
-| Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned     |
-| Phase 13    | E2E Testing & Production Validation  | 📋 Planned     |
+| Phase       | Name                                 | Status      |
+| ----------- | ------------------------------------ | ----------- |
+| Phase 0     | Research and Product Definition      | ✅ Complete |
+| Phase 1     | Walking Skeleton                     | ✅ Complete |
+| Phase 2     | Subject Engine                       | ✅ Complete |
+| Phase 3     | Learning Engine                      | ✅ Complete |
+| Phase 4     | Game Foundation                      | ✅ Complete |
+| Phase 5     | Polish & Narrative                   | ✅ Complete |
+| Phase 6     | Experience & Integration             | ✅ Complete |
+| Phase 7     | Advanced Game Experience             | ✅ Complete |
+| Phase 8     | Production Readiness                 | ✅ Complete |
+| Post-launch | Durable Persistence Hardening        | ✅ Complete |
+| **Phase 9** | **Command Centre & Question Supply** | ✅ Complete |
+| Phase 10    | Subject Campaign Progression         | ✅ Complete |
+| Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned  |
+| Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned  |
+| Phase 13    | E2E Testing & Production Validation  | 📋 Planned  |
 
 ---
 
