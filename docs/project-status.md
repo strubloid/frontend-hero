@@ -26,23 +26,23 @@
 
 ## Phase Overview
 
-| Phase       | Name                                 | Status                       |
-| ----------- | ------------------------------------ | ---------------------------- |
-| Phase 0     | Research and Product Definition      | ✅ Complete                  |
-| Phase 1     | Walking Skeleton                     | ✅ Complete                  |
-| Phase 2     | Subject Engine                       | ✅ Complete                  |
-| Phase 3     | Learning Engine                      | ✅ Complete                  |
-| Phase 4     | Game Foundation                      | ✅ Complete                  |
-| Phase 5     | Polish & Narrative                   | ✅ Complete                  |
-| Phase 6     | Experience & Integration             | ✅ Complete                  |
-| Phase 7     | Advanced Game Experience             | ✅ Complete                  |
-| Phase 8     | Production Readiness                 | ✅ Complete                  |
-| Post-launch | Durable Persistence Hardening        | ✅ Complete                  |
-| **Phase 9** | **Command Centre & Question Supply** | ✅ Complete             |
-| Phase 10    | Subject Campaign Progression         | 🚧 In Progress          |
-| Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned                   |
-| Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned                   |
-| Phase 13    | E2E Testing & Production Validation  | 📋 Planned                   |
+| Phase       | Name                                 | Status         |
+| ----------- | ------------------------------------ | -------------- |
+| Phase 0     | Research and Product Definition      | ✅ Complete    |
+| Phase 1     | Walking Skeleton                     | ✅ Complete    |
+| Phase 2     | Subject Engine                       | ✅ Complete    |
+| Phase 3     | Learning Engine                      | ✅ Complete    |
+| Phase 4     | Game Foundation                      | ✅ Complete    |
+| Phase 5     | Polish & Narrative                   | ✅ Complete    |
+| Phase 6     | Experience & Integration             | ✅ Complete    |
+| Phase 7     | Advanced Game Experience             | ✅ Complete    |
+| Phase 8     | Production Readiness                 | ✅ Complete    |
+| Post-launch | Durable Persistence Hardening        | ✅ Complete    |
+| **Phase 9** | **Command Centre & Question Supply** | ✅ Complete    |
+| Phase 10    | Subject Campaign Progression         | 🚧 In Progress |
+| Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned     |
+| Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned     |
+| Phase 13    | E2E Testing & Production Validation  | 📋 Planned     |
 
 ---
 
@@ -52,23 +52,23 @@
 
 ### Sub-phases
 
-| Step | Description                                                                                       | Status                                                       |
-| ---- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| 9A   | Full experience audit                                                                             | ✅ Complete (`docs/game-design/current-experience-audit.md`) |
-| 9B   | Subject-level progression model + subject file extensions                                         | ✅ Complete                                                  |
-| 9C   | Command Centre view models + development fixtures                                                 | ✅ Complete                                                  |
-| 9D   | Command Centre static composition (responsive layout, HUD, world stage, quest panel, action dock) | ✅ Complete                                                  |
-| 9E   | Player identity + XP + mastery in persistent HUD                                                  | ✅ Complete                                                  |
-| 9F   | Current quest display + quest selection                                                           | ✅ Complete                                                  |
-| 9G   | Campaign rail + world node integration                                                            | ✅ Complete                                                  |
-|| 9H   | Contextual action dock                                                                            | ✅ Complete                                                  |
-|| 9I   | Inspector panel (quest info, lock requirements, rewards)                                          | ✅ Complete                                                  |
-|| 9J   | Reward result screen after encounter completion                                                   | ✅ Complete                                                  |
-|| 9K   | Question-supply strategy document                                                                 | ✅ Complete                                                  |
-|| 9L   | Big Pickle AI gateway interface + batch generation contract                                       | ✅ Complete                                                  |
-|| 9M   | Question-generation job model + inventory service                                                 | ✅ Complete                                                  |
-|| 9N   | Encounter Forge UI (generation controls, job progress, supply display)                            | ✅ Complete                                                  |
-|| 9O   | Integration testing + verification                                                                | ✅ Complete                                                  |
+| Step | Description                                                                                       | Status                                                                 |
+| ---- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------- |
+| 9A   | Full experience audit                                                                             | ✅ Complete (`docs/game-design/current-experience-audit.md`)           |
+| 9B   | Subject-level progression model + subject file extensions                                         | ✅ Complete                                                            |
+| 9C   | Command Centre view models + development fixtures                                                 | ✅ Complete                                                            |
+| 9D   | Command Centre static composition (responsive layout, HUD, world stage, quest panel, action dock) | ✅ Complete                                                            |
+| 9E   | Player identity + XP + mastery in persistent HUD                                                  | ✅ Complete                                                            |
+| 9F   | Current quest display + quest selection                                                           | ✅ Complete                                                            |
+| 9G   | Campaign rail + world node integration                                                            | ✅ Complete                                                            |
+|      | 9H                                                                                                | Contextual action dock                                                 | ✅ Complete |
+|      | 9I                                                                                                | Inspector panel (quest info, lock requirements, rewards)               | ✅ Complete |
+|      | 9J                                                                                                | Reward result screen after encounter completion                        | ✅ Complete |
+|      | 9K                                                                                                | Question-supply strategy document                                      | ✅ Complete |
+|      | 9L                                                                                                | Big Pickle AI gateway interface + batch generation contract            | ✅ Complete |
+|      | 9M                                                                                                | Question-generation job model + inventory service                      | ✅ Complete |
+|      | 9N                                                                                                | Encounter Forge UI (generation controls, job progress, supply display) | ✅ Complete |
+|      | 9O                                                                                                | Integration testing + verification                                     | ✅ Complete |
 
 ### Audit Findings (Phase 9A)
 
