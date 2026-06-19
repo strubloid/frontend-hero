@@ -261,9 +261,9 @@ export default function CommandCentrePage({ vm: externalVm }: CommandCentrePageP
             onNodeHover={setHoveredNodeId}
           />
 
-          {vm.currentQuest && !selectedNode && (
+          {(nodeDerivedQuest ?? vm.currentQuest) && (
             <div className={styles.questSection}>
-              <CurrentQuestPanel quest={vm.currentQuest} />
+              <CurrentQuestPanel quest={nodeDerivedQuest ?? vm.currentQuest!} />
             </div>
           )}
         </main>
