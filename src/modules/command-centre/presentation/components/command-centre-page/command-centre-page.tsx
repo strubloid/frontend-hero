@@ -112,6 +112,9 @@ export default function CommandCentrePage({ vm: externalVm }: CommandCentrePageP
       }
     }
 
+    // Extract subject ID from nodeId (e.g. "nextjs-level-10" → "nextjs")
+    const subjectIdFromNode = selectedNode.nodeId.replace(/-level-\d+$/, "");
+
     const action: QuestActionViewModel = isCompleted
       ? {
           label: "Completed",
@@ -132,8 +135,16 @@ export default function CommandCentrePage({ vm: externalVm }: CommandCentrePageP
             primary: false,
           }
         : {
-            label: selectedNode.completion > 0 ? "Continue Quest" : "Start Quest",
-            destination: "/play",
+            label: isBoss
+              ? selectedNode.completion > 0
+                ? "Continue Battle"
+                : "Challenge Boss"
+              : selectedNode.completion > 0
+                ? "Continue Quest"
+                : "Start Quest",
+            destination: isBoss
+              ? `/boss-encounter?region=${subjectIdFromNode}`
+              : "/play",
             disabled: false,
             disabledReason: null,
             primary: true,
