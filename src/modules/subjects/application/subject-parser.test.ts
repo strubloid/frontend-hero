@@ -648,7 +648,7 @@ describe("SubjectImportService (integration)", () => {
     expect(eventLoop.interviewPrompts[0].promptId).toBe("interview-001");
 
     // Verify knowledge content
-    expect(eventLoop.knowledge).toContain("JavaScript event loop");
+    expect(eventLoop.knowledge).toContain("the core mechanism that allows JavaScript");
     expect(composition.knowledge).toContain("Component composition");
 
     // Verify common misconceptions

@@ -207,7 +207,7 @@ describe("CommandCentreAssembler", () => {
       expect(result.world.nodes).toHaveLength(3);
       expect(result.world.connections).toHaveLength(2);
       expect(result.recentProgress).toBeDefined();
-      expect(result.recommendedActions).toHaveLength(2);
+      expect(result.recommendedActions).toHaveLength(3);
       expect(result.playerState).toBeDefined();
     });
 

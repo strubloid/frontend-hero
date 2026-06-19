@@ -11,7 +11,9 @@ import { DrizzlePlayerSubjectProgressRepository } from "@/modules/subjects/infra
 import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
 import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 
-export async function loadCommandCentreForCurrentUser(): Promise<CommandCentreViewModel | undefined> {
+export async function loadCommandCentreForCurrentUser(): Promise<
+  CommandCentreViewModel | undefined
+> {
   const session = await auth();
 
   if (!session?.user?.id) {

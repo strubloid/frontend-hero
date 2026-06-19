@@ -38,8 +38,8 @@
 | Phase 7     | Advanced Game Experience             | ✅ Complete                  |
 | Phase 8     | Production Readiness                 | ✅ Complete                  |
 | Post-launch | Durable Persistence Hardening        | ✅ Complete                  |
-| **Phase 9** | **Command Centre & Question Supply** | 🚧 In Progress (9F complete) |
-| Phase 10    | Subject Campaign Progression         | 📋 Planned                   |
+| **Phase 9** | **Command Centre & Question Supply** | ✅ Complete             |
+| Phase 10    | Subject Campaign Progression         | 🚧 In Progress          |
 | Phase 11    | Encounter Forge & Batch Generation   | 📋 Planned                   |
 | Phase 12    | Subject Boss & Campaign Completion   | 📋 Planned                   |
 | Phase 13    | E2E Testing & Production Validation  | 📋 Planned                   |
@@ -61,14 +61,14 @@
 | 9E   | Player identity + XP + mastery in persistent HUD                                                  | ✅ Complete                                                  |
 | 9F   | Current quest display + quest selection                                                           | ✅ Complete                                                  |
 | 9G   | Campaign rail + world node integration                                                            | ✅ Complete                                                  |
-| 9H   | Contextual action dock                                                                            | 📋 Planned                                                   |
-| 9I   | Inspector panel (quest info, lock requirements, rewards)                                          | 📋 Planned                                                   |
-| 9J   | Reward result screen after encounter completion                                                   | 📋 Planned                                                   |
-| 9K   | Question-supply strategy document                                                                 | 📋 Planned                                                   |
-| 9L   | Big Pickle AI gateway interface + batch generation contract                                       | 📋 Planned                                                   |
-| 9M   | Question-generation job model + inventory service                                                 | 📋 Planned                                                   |
-| 9N   | Encounter Forge UI (generation controls, job progress, supply display)                            | 📋 Planned                                                   |
-| 9O   | Integration testing + verification                                                                | 📋 Planned                                                   |
+|| 9H   | Contextual action dock                                                                            | ✅ Complete                                                  |
+|| 9I   | Inspector panel (quest info, lock requirements, rewards)                                          | ✅ Complete                                                  |
+|| 9J   | Reward result screen after encounter completion                                                   | ✅ Complete                                                  |
+|| 9K   | Question-supply strategy document                                                                 | ✅ Complete                                                  |
+|| 9L   | Big Pickle AI gateway interface + batch generation contract                                       | ✅ Complete                                                  |
+|| 9M   | Question-generation job model + inventory service                                                 | ✅ Complete                                                  |
+|| 9N   | Encounter Forge UI (generation controls, job progress, supply display)                            | ✅ Complete                                                  |
+|| 9O   | Integration testing + verification                                                                | ✅ Complete                                                  |
 
 ### Audit Findings (Phase 9A)
 

@@ -5,8 +5,6 @@
  * Player level and subject level are independent systems.
  */
 
-import type { Subject } from "./subject";
-
 // ---------------------------------------------------------------------------
 // Subject Progression — metadata defined in the subject file
 // ---------------------------------------------------------------------------
@@ -129,13 +127,22 @@ export interface PlayerSubjectProgress {
 // ---------------------------------------------------------------------------
 
 /**
+ * Minimal shape of Subject needed for level assignment — avoids circular dependency.
+ */
+interface SubjectForLevels {
+  readonly domains: readonly {
+    readonly concepts: readonly { readonly id: string; readonly level: string }[];
+  }[];
+}
+
+/**
  * Maps concepts to their subject level by scanning their `level` string
  * against the subject's numeric level definitions.
  *
  * This is a pure domain function — no database calls.
  */
 export function assignConceptsToLevel(
-  subject: Subject,
+  subject: SubjectForLevels,
   progression: SubjectProgression,
 ): Map<number, string[]> {
   const levelMap = new Map<number, string[]>();
