@@ -1,7 +1,10 @@
 import type { QuestionRepository } from "@/modules/questions/domain/question-repository";
 import type { QuestionInventoryService as QuestionInventoryServiceContract } from "@/modules/questions/domain/question-inventory-service";
 import { InventoryHealth } from "@/modules/questions/domain/inventory-health";
-import type { InventoryStatus } from "@/modules/questions/domain/inventory-health";
+import type {
+  InventoryStatus,
+  LevelInventoryStatus,
+} from "@/modules/questions/domain/inventory-health";
 
 const HEALTHY_THRESHOLD = 40;
 const LOW_THRESHOLD = 10;
@@ -78,6 +81,39 @@ export class QuestionInventoryService implements QuestionInventoryServiceContrac
     }
 
     return conceptsNeedingGeneration;
+  }
+
+  async getInventoryStatusByLevel(
+    subjectId: string,
+    level: number,
+    levelTitle: string,
+    conceptIds: string[],
+  ): Promise<LevelInventoryStatus> {
+    const questions = await this.questionRepository.getRandomBySubjectId(
+      subjectId,
+      MAX_SUBJECT_QUESTIONS_TO_SCAN,
+    );
+
+    const questionsForLevel = questions.filter((q) => conceptIds.includes(q.conceptId));
+    const byConcept: Array<{ conceptId: string; approved: number; health: InventoryHealth }> = [];
+
+    for (const conceptId of conceptIds) {
+      const count = questionsForLevel.filter((q) => q.conceptId === conceptId).length;
+      byConcept.push({
+        conceptId,
+        approved: count,
+        health: this.determineHealth(count),
+      });
+    }
+
+    const totalApproved = questionsForLevel.length;
+    return {
+      level,
+      title: levelTitle,
+      totalApproved,
+      health: this.determineHealth(totalApproved),
+      byConcept,
+    };
   }
 
   private determineHealth(approved: number): InventoryHealth {

@@ -1,20 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { v4 as uuid } from "uuid";
-import { Player } from "@/modules/players/domain/player";
-import { PlayerRepository } from "@/modules/players/domain/player-repository";
-import { SubjectRepository } from "@/modules/subjects/domain/subject-repository";
-import { Subject } from "@/modules/subjects/domain/subject";
-import { Question } from "@/modules/questions/domain/question";
-import { QuestionRepository } from "@/modules/questions/domain/question-repository";
-import { Mission, MissionAttempt } from "@/modules/missions/domain/mission";
+import Database from "better-sqlite3";
+import { createTables } from "../fixtures/create-tables";
+
+// Real Drizzle repositories (NOT in-memory fakes)
+import { DrizzlePlayerRepository } from "@/modules/players/infrastructure/drizzle-player-repository";
+import { DrizzleSubjectRepository } from "@/modules/subjects/infrastructure/drizzle-subject-repository";
 import {
-  MissionRepository,
-  MissionAttemptRepository,
-} from "@/modules/missions/domain/mission-repository";
-import { ConceptMastery } from "@/modules/mastery/domain/concept-mastery";
-import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
-import { ReviewSchedule } from "@/modules/reviews/domain/review-schedule";
-import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
+  DrizzleMissionRepository,
+  DrizzleMissionAttemptRepository,
+} from "@/modules/missions/infrastructure/drizzle-mission-repository";
+import { DrizzleQuestionRepository } from "@/modules/questions/infrastructure/drizzle-question-repository";
+import { DrizzleMasteryRepository } from "@/modules/mastery/infrastructure/drizzle-mastery-repository";
+import { DrizzleReviewRepository } from "@/modules/reviews/infrastructure/drizzle-review-repository";
+
+// Application use cases + services
 import { MissionSelector } from "@/modules/missions/application/mission-selector";
 import { AnswerEvaluator } from "@/modules/missions/application/answer-evaluator";
 import { QuestionProvider } from "@/modules/questions/application/question-provider";
@@ -27,183 +27,26 @@ import { SubjectSectionParser } from "@/modules/subjects/application/subject-sec
 import { ConceptParser } from "@/modules/subjects/application/concept-parser";
 import { PrerequisiteGraphBuilder } from "@/modules/subjects/application/prerequisite-graph-builder";
 import { SubjectSchemaValidator } from "@/modules/subjects/application/subject-schema-validator";
-
-// ---------------------------------------------------------------------------
-// In-memory repository implementations (same pattern as production actions)
-// ---------------------------------------------------------------------------
-
-class InMemoryPlayerRepository implements PlayerRepository {
-  private store = new Map<string, Player>();
-  async getById(id: string) {
-    return this.store.get(id) ?? null;
-  }
-  async create(player: Player) {
-    this.store.set(player.id, player);
-    return player;
-  }
-  async save(player: Player) {
-    this.store.set(player.id, player);
-    return player;
-  }
-}
-
-class InMemorySubjectRepository implements SubjectRepository {
-  private store = new Map<string, Subject>();
-  set(subject: Subject) {
-    this.store.set(subject.id, subject);
-  }
-  async getById(id: string) {
-    return this.store.get(id) ?? null;
-  }
-  async findAll(): Promise<Subject[]> {
-    return Array.from(this.store.values());
-  }
-  async save(subject: Subject): Promise<void> {
-    this.store.set(subject.id, { ...subject, updatedAt: new Date() });
-  }
-  async create(subject: Subject): Promise<void> {
-    this.store.set(subject.id, subject);
-  }
-  async delete(id: string): Promise<void> {
-    this.store.delete(id);
-  }
-  async exists(id: string): Promise<boolean> {
-    return this.store.has(id);
-  }
-}
-
-class InMemoryMissionRepository implements MissionRepository {
-  private store = new Map<string, Mission>();
-  private activeByPlayer = new Map<string, string>();
-  async getById(id: string) {
-    return this.store.get(id) ?? null;
-  }
-  async create(mission: Mission) {
-    this.store.set(mission.id, mission);
-    this.activeByPlayer.set(mission.playerId, mission.id);
-    return mission;
-  }
-  async save(mission: Mission) {
-    this.store.set(mission.id, mission);
-    return mission;
-  }
-  async getActiveByPlayer(playerId: string) {
-    const id = this.activeByPlayer.get(playerId);
-    if (!id) return null;
-    return this.store.get(id) ?? null;
-  }
-  async getCompletedByPlayer(playerId: string) {
-    return Array.from(this.store.values()).filter(
-      (m) => m.playerId === playerId && m.status === "completed",
-    );
-  }
-}
-
-class InMemoryMissionAttemptRepository implements MissionAttemptRepository {
-  private store = new Map<string, MissionAttempt>();
-  async create(attempt: MissionAttempt) {
-    this.store.set(attempt.id, attempt);
-    return attempt;
-  }
-  async getByMission(missionId: string) {
-    return Array.from(this.store.values()).filter((a) => a.missionId === missionId);
-  }
-  async getByPlayer(playerId: string) {
-    return Array.from(this.store.values()).filter((a) => a.playerId === playerId);
-  }
-}
-
-class InMemoryQuestionRepository implements QuestionRepository {
-  private store = new Map<string, Question>();
-  set(question: Question) {
-    this.store.set(question.id, question);
-  }
-  async getById(id: string) {
-    return this.store.get(id) ?? null;
-  }
-  async create(question: Question) {
-    this.store.set(question.id, question);
-    return question;
-  }
-  async getByConceptId(conceptId: string) {
-    return Array.from(this.store.values()).filter((q) => q.conceptId === conceptId);
-  }
-  async getRandomBySubjectId(subjectId: string, limit: number) {
-    return Array.from(this.store.values())
-      .filter((q) => q.subjectId === subjectId)
-      .slice(0, limit);
-  }
-  async getBySeedAndSubject(seedId: string, subjectId: string) {
-    return (
-      Array.from(this.store.values()).find(
-        (q) => q.seedId === seedId && q.subjectId === subjectId,
-      ) ?? null
-    );
-  }
-}
-
-class InMemoryMasteryRepository implements MasteryRepository {
-  private store = new Map<string, ConceptMastery>();
-  async getByPlayerAndConcept(playerId: string, conceptId: string) {
-    return this.store.get(`${playerId}:${conceptId}`) ?? null;
-  }
-  async getByPlayer(playerId: string): Promise<ConceptMastery[]> {
-    return Array.from(this.store.values()).filter((m) => m.playerId === playerId);
-  }
-  async getByPlayerAndSubject(playerId: string, subjectId: string): Promise<ConceptMastery[]> {
-    return Array.from(this.store.values()).filter(
-      (m) => m.playerId === playerId && m.subjectId === subjectId,
-    );
-  }
-  async save(mastery: ConceptMastery) {
-    this.store.set(`${mastery.playerId}:${mastery.conceptId}`, mastery);
-    return mastery;
-  }
-  async delete(playerId: string, conceptId: string): Promise<void> {
-    this.store.delete(`${playerId}:${conceptId}`);
-  }
-}
-
-class InMemoryReviewRepository implements ReviewRepository {
-  async getByPlayerAndConcept(_p: string, _c: string) {
-    return null;
-  }
-  async getByPlayerAndSubject(_p: string, _s: string) {
-    return [];
-  }
-  async getOverdueReviews(_p: string, _b: Date) {
-    return [];
-  }
-  async getDueReviews(_p: string, _b: Date) {
-    return [];
-  }
-  async save(s: ReviewSchedule) {
-    return s;
-  }
-  async delete(_p: string, _c: string) {}
-}
-
-// ---------------------------------------------------------------------------
-// Subject file path
-// ---------------------------------------------------------------------------
+import { xpToLevel } from "@/modules/progression/domain/player-progression";
 
 const SUBJECTS_DIR = "subjects";
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
+describe("Walking skeleton (real SQLite) — full flow", () => {
+  it("loads subject → seeds questions → starts mission → submits answer → persists XP and level through raw SQL", async () => {
+    // ── 1. Set up REAL SQLite database ──────────────────────────────────────
+    const sqlite = new Database(":memory:");
+    sqlite.pragma("foreign_keys = ON");
+    createTables(sqlite);
 
-describe("Walking skeleton — full flow", () => {
-  it("loads subject → starts mission → submits answer → updates player", async () => {
-    // 1. Set up repositories
-    const playerRepo = new InMemoryPlayerRepository();
-    const subjectRepo = new InMemorySubjectRepository();
-    const missionRepo = new InMemoryMissionRepository();
-    const missionAttemptRepo = new InMemoryMissionAttemptRepository();
-    const questionRepo = new InMemoryQuestionRepository();
-    const masteryRepo = new InMemoryMasteryRepository();
+    const playerRepo = new DrizzlePlayerRepository(sqlite);
+    const subjectRepo = new DrizzleSubjectRepository(sqlite);
+    const missionRepo = new DrizzleMissionRepository(sqlite);
+    const missionAttemptRepo = new DrizzleMissionAttemptRepository(sqlite);
+    const questionRepo = new DrizzleQuestionRepository(sqlite);
+    const masteryRepo = new DrizzleMasteryRepository(sqlite);
+    const reviewRepo = new DrizzleReviewRepository(sqlite);
 
-    // 2. Import the subject from the file system
+    // ── 2. Import the subject from file system ──────────────────────────────
     const subjectImportService = new SubjectImportService(
       new SubjectFileReader(SUBJECTS_DIR),
       new SubjectFrontmatterParser(),
@@ -212,17 +55,37 @@ describe("Walking skeleton — full flow", () => {
       new SubjectSchemaValidator(),
       new PrerequisiteGraphBuilder(),
     );
-
     const importResult = await subjectImportService.import("nextjs");
     expect(importResult.valid).toBe(true);
     expect(importResult.errors).toEqual([]);
-    const subject = importResult.subject;
+    const subject = importResult.subject!;
     expect(subject.id).toBe("nextjs");
-    expect(subject.domains.length).toBeGreaterThan(0);
 
-    subjectRepo.set(subject);
+    // Save to real DB
+    await subjectRepo.create(subject);
 
-    // 3. Create a player
+    // Verify raw SQL persistence
+    const subjectRow = sqlite
+      .prepare("SELECT id, title, version FROM subjects WHERE id = ?")
+      .get("nextjs") as { id: string; title: string; version: number } | undefined;
+    expect(subjectRow).toBeDefined();
+    expect(subjectRow!.title).toBeTruthy();
+
+    // Verify concepts stored
+    const conceptRows = sqlite
+      .prepare("SELECT id, domainName FROM concepts WHERE subjectId = ? ORDER BY id")
+      .all("nextjs") as { id: string; domainName: string }[];
+    expect(conceptRows.length).toBeGreaterThan(2);
+
+    // ── 3. Load subject back through repo (round-trip) ──────────────────────
+    const loadedSubject = await subjectRepo.getById("nextjs");
+    expect(loadedSubject).not.toBeNull();
+    expect(loadedSubject!.domains.length).toBeGreaterThan(0);
+    const firstDomain = loadedSubject!.domains[0];
+    expect(firstDomain.concepts.length).toBeGreaterThan(0);
+    const firstConcept = firstDomain.concepts[0];
+
+    // ── 4. Create a player via real DB ──────────────────────────────────────
     const playerId = uuid();
     const now = new Date();
     await playerRepo.create({
@@ -246,23 +109,32 @@ describe("Walking skeleton — full flow", () => {
       updatedAt: now,
     });
 
-    const savedPlayer = await playerRepo.getById(playerId);
-    expect(savedPlayer).not.toBeNull();
-    expect(savedPlayer!.experiencePoints).toBe(0);
+    // Verify raw persistence
+    const playerRow = sqlite
+      .prepare("SELECT id, level, experiencePoints FROM players WHERE id = ?")
+      .get(playerId) as { id: string; level: number; experiencePoints: number };
+    expect(playerRow.level).toBe(1);
+    expect(playerRow.experiencePoints).toBe(0);
 
-    // 4. Pre-generate questions for the first concept
+    // ── 5. Seed questions for the first concept ─────────────────────────────
     const questionProvider = new QuestionProvider(questionRepo);
-    const firstDomain = subject.domains[0];
-    expect(firstDomain).toBeDefined();
-    const firstConcept = firstDomain!.concepts[0];
-    expect(firstConcept).toBeDefined();
     await questionProvider.provideForConcept(firstConcept!, subject.id);
-    const questions = await questionRepo.getByConceptId(firstConcept!.id);
-    expect(questions.length).toBeGreaterThan(0);
 
-    const reviewRepo = new InMemoryReviewRepository();
+    // Verify questions persisted in real DB
+    const questionRows = sqlite
+      .prepare("SELECT id, conceptId, stem, correctIndex FROM questions WHERE conceptId = ?")
+      .all(firstConcept!.id) as {
+      id: string;
+      conceptId: string;
+      stem: string;
+      correctIndex: number;
+    }[];
+    expect(questionRows.length).toBeGreaterThan(0);
+    expect(questionRows[0].conceptId).toBe(firstConcept!.id);
+    expect(questionRows[0].stem).toBeTruthy();
+    expect(questionRows[0].correctIndex).toBeGreaterThanOrEqual(0);
 
-    // 5. Start a mission
+    // ── 6. Start a mission ─────────────────────────────────────────────────
     const startMissionUseCase = new StartMissionUseCase(
       playerRepo,
       subjectRepo,
@@ -280,19 +152,36 @@ describe("Walking skeleton — full flow", () => {
       type: "encounter",
     });
 
+    if (!missionResult.success) {
+      throw new Error(`Mission start failed: ${missionResult.reason}`);
+    }
+
     expect(missionResult.mission).toBeDefined();
     expect(missionResult.mission.status).toBe("active");
     expect(missionResult.mission.questionIds.length).toBeGreaterThan(0);
     expect(missionResult.mission.score).toBe(0);
 
-    // 6. Get the first question from the mission
+    // Verify mission in raw DB
+    const missionRow = sqlite
+      .prepare("SELECT id, playerId, status, score FROM missions WHERE id = ?")
+      .get(missionResult.mission.id) as {
+      id: string;
+      playerId: string;
+      status: string;
+      score: number;
+    };
+    expect(missionRow).toBeDefined();
+    expect(missionRow.status).toBe("active");
+    expect(missionRow.score).toBe(0);
+
+    // ── 7. Get the first question ──────────────────────────────────────────
     const firstQuestionId = missionResult.mission.questionIds[0];
     const firstQuestion = await questionRepo.getById(firstQuestionId);
     expect(firstQuestion).not.toBeNull();
     expect(firstQuestion!.stem).toBeTruthy();
     expect(firstQuestion!.options.length).toBeGreaterThan(1);
 
-    // 7. Submit a correct answer
+    // ── 8. Submit a correct answer ─────────────────────────────────────────
     const submitAnswerUseCase = new SubmitAnswerUseCase(
       playerRepo,
       missionRepo,
@@ -316,18 +205,37 @@ describe("Walking skeleton — full flow", () => {
     expect(correctResult.score).toBe(1);
     expect(correctResult.updatedMastery).toBeGreaterThan(0);
 
-    // 8. Verify player XP was updated
-    const updatedPlayer = await playerRepo.getById(playerId);
-    expect(updatedPlayer!.experiencePoints).toBe(correctResult.xpAwarded);
+    // ── 9. Verify player XP + LEVEL persisted in raw SQL ───────────────────
+    const afterCorrect = sqlite
+      .prepare("SELECT id, experiencePoints, level FROM players WHERE id = ?")
+      .get(playerId) as { id: string; experiencePoints: number; level: number };
+    expect(afterCorrect.experiencePoints).toBe(correctResult.xpAwarded);
 
-    // 9. Verify mastery was saved
-    const mastery = await masteryRepo.getByPlayerAndConcept(playerId, firstQuestion!.conceptId);
-    expect(mastery).not.toBeNull();
-    expect(mastery!.correctAttempts).toBe(1);
+    // CRITICAL: Level must be recalculated (tests my fix to submit-answer.use-case.ts)
+    const { level: expectedLevelAfterCorrect } = xpToLevel(afterCorrect.experiencePoints);
+    expect(afterCorrect.level).toBe(expectedLevelAfterCorrect);
+    expect(afterCorrect.level).toBeGreaterThanOrEqual(1);
 
-    // 10. Submit an incorrect answer
+    // ── 10. Verify mastery persisted in raw DB ──────────────────────────────
+    const masteryRow = sqlite
+      .prepare(
+        "SELECT playerId, conceptId, correctAttempts FROM conceptMastery WHERE playerId = ? AND conceptId = ?",
+      )
+      .get(playerId, firstQuestion!.conceptId) as
+      | { playerId: string; conceptId: string; correctAttempts: number }
+      | undefined;
+    expect(masteryRow).toBeDefined();
+    expect(masteryRow!.correctAttempts).toBe(1);
+
+    // ── 11. Verify mission attempt persisted ────────────────────────────────
+    const attemptRows = sqlite
+      .prepare("SELECT id, isCorrect FROM missionAttempts WHERE missionId = ?")
+      .all(missionResult.mission.id) as { id: string; isCorrect: number }[];
+    expect(attemptRows.length).toBe(1);
+    expect(attemptRows[0].isCorrect).toBe(1);
+
+    // ── 12. Submit an incorrect answer ─────────────────────────────────────
     const wrongIndex = firstQuestion!.correctIndex === 0 ? 1 : firstQuestion!.correctIndex - 1;
-
     const incorrectResult = await submitAnswerUseCase.execute({
       missionId: missionResult.mission.id,
       playerId,
@@ -337,25 +245,46 @@ describe("Walking skeleton — full flow", () => {
     });
 
     expect(incorrectResult.isCorrect).toBe(false);
-    // Should be at most the same XP as before (incorrect may earn partial XP)
     expect(incorrectResult.updatedMastery).toBeLessThan(correctResult.updatedMastery);
 
-    // 11. Verify mission attempt was recorded
-    const attempts = await missionAttemptRepo.getByMission(missionResult.mission.id);
-    expect(attempts.length).toBe(2);
-    expect(attempts[0].isCorrect).toBe(true);
-    expect(attempts[1].isCorrect).toBe(false);
+    // ── 13. Verify both attempts in raw DB ──────────────────────────────────
+    const allAttempts = sqlite
+      .prepare("SELECT id, isCorrect FROM missionAttempts WHERE missionId = ? ORDER BY attemptedAt")
+      .all(missionResult.mission.id) as { id: string; isCorrect: number }[];
+    expect(allAttempts.length).toBe(2);
+    expect(allAttempts[0].isCorrect).toBe(1);
+    expect(allAttempts[1].isCorrect).toBe(0);
+
+    // ── 14. Verify final player state contains correct XP and level ─────────
+    // After incorrect answer, some partial XP may have been awarded too
+    const afterIncorrect = sqlite
+      .prepare("SELECT experiencePoints, level FROM players WHERE id = ?")
+      .get(playerId) as { experiencePoints: number; level: number };
+    expect(afterIncorrect.experiencePoints).toBeGreaterThanOrEqual(afterCorrect.experiencePoints);
+    const { level: expectedLevelAfterIncorrect } = xpToLevel(afterIncorrect.experiencePoints);
+    expect(afterIncorrect.level).toBe(expectedLevelAfterIncorrect);
+
+    // ── 15. Verify player state read back through repo API matches raw SQL ──
+    const repoPlayer = await playerRepo.getById(playerId);
+    expect(repoPlayer).not.toBeNull();
+    expect(repoPlayer!.experiencePoints).toBe(afterIncorrect.experiencePoints);
+    expect(repoPlayer!.level).toBe(afterIncorrect.level);
+    expect(repoPlayer!.createdAt).toBeInstanceOf(Date);
   });
 
-  it("handles missing player gracefully", async () => {
-    const playerRepo = new InMemoryPlayerRepository();
-    const subjectRepo = new InMemorySubjectRepository();
-    const missionRepo = new InMemoryMissionRepository();
-    const questionRepo = new InMemoryQuestionRepository();
-    const masteryRepo = new InMemoryMasteryRepository();
-    const missionAttemptRepo = new InMemoryMissionAttemptRepository();
+  it("handles missing player gracefully through real DB", async () => {
+    const sqlite = new Database(":memory:");
+    sqlite.pragma("foreign_keys = ON");
+    createTables(sqlite);
 
-    const reviewRepo = new InMemoryReviewRepository();
+    const playerRepo = new DrizzlePlayerRepository(sqlite);
+    const subjectRepo = new DrizzleSubjectRepository(sqlite);
+    const missionRepo = new DrizzleMissionRepository(sqlite);
+    const questionRepo = new DrizzleQuestionRepository(sqlite);
+    const masteryRepo = new DrizzleMasteryRepository(sqlite);
+    const reviewRepo = new DrizzleReviewRepository(sqlite);
+
+    // No player created — should throw
 
     const useCase = new StartMissionUseCase(
       playerRepo,

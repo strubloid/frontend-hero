@@ -4,10 +4,14 @@ import { Suspense } from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  getCurrentPlayerId,
   startMission as startMissionAction,
   submitAnswer as submitAnswerAction,
 } from "@/app/actions/missions";
+import { getCurrentUserSubject } from "@/app/actions/player-subject";
 import RewardResultScreen from "@/modules/missions/presentation/components/reward-result-screen/reward-result-screen";
+import { QuestionRendererRouter } from "@/modules/questions/presentation/components/question-renderers/question-renderer-router";
+import type { SubmitAnswerResult } from "@/modules/missions/application/submit-answer.use-case";
 import { useToast } from "@/components/toast-provider";
 
 // ---------------------------------------------------------------------------
@@ -45,7 +49,7 @@ type Phase =
       question: QuestionDisplay;
       missionId: string;
     }
-  | { state: "completed"; score: number; maxScore: number }
+  | { state: "completed"; score: number; maxScore: number; result: SubmitAnswerResult | null }
   | { state: "error"; message: string };
 
 // ---------------------------------------------------------------------------
@@ -67,16 +71,33 @@ export default function PlayPage() {
 function PlayPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const subjectId = searchParams.get("subject") ?? "nextjs";
+  const requestedSubjectId = searchParams.get("subject");
+  const [subjectId, setSubjectId] = useState<string | null>(requestedSubjectId);
+  const [playerId, setPlayerId] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>({ state: "loading" });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const { addToast } = useToast();
   const xpToastRef = useRef(false);
+  const lastSubmitResultRef = useRef<SubmitAnswerResult | null>(null);
 
   // On mount: check for active mission
   const checkActiveMission = useCallback(async () => {
     try {
-      const res = await fetch("/api/missions/current");
+      const currentPlayerId = await getCurrentPlayerId();
+      setPlayerId(currentPlayerId);
+
+      if (!subjectId) {
+        const currentSubject = await getCurrentUserSubject();
+        if (!currentSubject?.subjectId) {
+          router.push("/subjects");
+          return;
+        }
+        setSubjectId(currentSubject.subjectId);
+      }
+
+      const res = await fetch(
+        `/api/missions/current?playerId=${encodeURIComponent(currentPlayerId)}`,
+      );
       if (!res.ok) {
         setPhase({ state: "error", message: "Failed to reach server" });
         return;
@@ -95,7 +116,7 @@ function PlayPageInner() {
     } catch {
       setPhase({ state: "error", message: "Connection error" });
     }
-  }, []);
+  }, [router, subjectId]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -123,27 +144,48 @@ function PlayPageInner() {
   const handleStart = async () => {
     setPhase({ state: "loading" });
     try {
+      const currentPlayerId = playerId ?? (await getCurrentPlayerId());
+      setPlayerId(currentPlayerId);
+
+      if (!subjectId) {
+        setPhase({
+          state: "error",
+          message: "Select a subject before starting a mission.",
+        });
+        return;
+      }
+
       const result = await startMissionAction({
-        playerId: "default-player",
+        playerId: currentPlayerId,
         subjectId,
         type: "encounter",
       });
 
       // Fetch the next question
-      const res = await fetch("/api/missions/current");
+      const res = await fetch(
+        `/api/missions/current?playerId=${encodeURIComponent(currentPlayerId)}`,
+      );
       const data = await res.json();
 
-      if (data.currentQuestion?.stem && (data.mission?.id || result.mission.id)) {
-        const missionId = data.mission?.id ?? result.mission.id;
-        setPhase({
-          state: "question",
-          question: data.currentQuestion,
-          missionId,
-        });
+      if (result.success) {
+        // result is narrowed to the success variant
+        if (data.currentQuestion?.stem && (data.mission?.id || result.mission.id)) {
+          const missionId = data.mission?.id ?? result.mission.id;
+          setPhase({
+            state: "question",
+            question: data.currentQuestion,
+            missionId,
+          });
+        } else {
+          setPhase({
+            state: "error",
+            message: "Mission started but no question available.",
+          });
+        }
       } else {
         setPhase({
           state: "error",
-          message: "Mission started but no question available.",
+          message: `Cannot start: ${result.reason} (level ${result.level}: ${result.levelTitle} has ${result.totalApproved} questions)`,
         });
       }
     } catch (error) {
@@ -161,9 +203,12 @@ function PlayPageInner() {
     const { missionId, question } = phase;
     setPhase({ state: "submitting" });
     try {
+      const currentPlayerId = playerId ?? (await getCurrentPlayerId());
+      setPlayerId(currentPlayerId);
+
       const result = await submitAnswerAction({
         missionId,
-        playerId: "default-player",
+        playerId: currentPlayerId,
         questionId: question.questionId,
         selectedIndex,
         timeSpentSeconds: 0,
@@ -187,7 +232,12 @@ function PlayPageInner() {
   const handleContinue = async () => {
     setPhase({ state: "loading" });
     try {
-      const res = await fetch("/api/missions/current");
+      const currentPlayerId = playerId ?? (await getCurrentPlayerId());
+      setPlayerId(currentPlayerId);
+
+      const res = await fetch(
+        `/api/missions/current?playerId=${encodeURIComponent(currentPlayerId)}`,
+      );
       const data = await res.json();
 
       if (data.mission?.status === "completed") {
@@ -195,6 +245,7 @@ function PlayPageInner() {
           state: "completed",
           score: data.mission.score,
           maxScore: data.mission.maxScore,
+          result: lastSubmitResultRef.current,
         });
       } else if (data.currentQuestion?.stem && data.mission?.id) {
         setSelectedIndex(null);
@@ -302,6 +353,25 @@ function PhaseRenderer(props: {
 
     case "question": {
       const q = phase.question;
+      const typeLabel =
+        q.type === "code-prediction"
+          ? "⧩ Predict the Output"
+          : q.type === "bug-hunt"
+            ? "🐛 Find the Bug"
+            : q.type === "true-false"
+              ? "☑ True or False"
+              : q.type === "explain-it"
+                ? "✍ Explain It"
+                : q.type?.replace("multiple-choice", "Multiple Choice");
+
+      const typeColors: Record<string, { bg: string; color: string }> = {
+        "code-prediction": { bg: "rgba(147, 51, 234, 0.2)", color: "#c084fc" },
+        "true-false": { bg: "rgba(59, 130, 246, 0.2)", color: "#93c5fd" },
+        "bug-hunt": { bg: "rgba(255, 107, 53, 0.2)", color: "#ff6b35" },
+        "explain-it": { bg: "rgba(34, 197, 94, 0.12)", color: "#86efac" },
+      };
+      const typeColor = typeColors[q.type] ?? { bg: "rgba(34, 197, 94, 0.12)", color: "#86efac" };
+
       return (
         <div>
           <div
@@ -318,39 +388,32 @@ function PhaseRenderer(props: {
             <span>
               Question {q.index + 1} of {q.total}
             </span>
-            <span>Difficulty: {q.difficulty}/5</span>
-          </div>
-          <h2
-            style={{
-              fontSize: "1.15rem",
-              marginBottom: "1.25rem",
-              lineHeight: 1.5,
-              color: "#fff",
-            }}
-          >
-            {q.stem}
-          </h2>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-            }}
-          >
-            {q.options.map((opt, idx) => (
-              <button
-                key={idx}
-                onClick={() => props.onSelect(idx)}
+            <span style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <span
                 style={{
-                  ...optionButtonStyle,
-                  border: props.selectedIndex === idx ? "2px solid #4a9eff" : "2px solid #333",
-                  background: props.selectedIndex === idx ? "#1a2a40" : "#1e1e1e",
+                  padding: "0.2rem 0.5rem",
+                  borderRadius: 6,
+                  background: typeColor.bg,
+                  color: typeColor.color,
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
                 }}
               >
-                {opt}
-              </button>
-            ))}
+                {typeLabel}
+              </span>
+              <span>Difficulty: {q.difficulty}/5</span>
+            </span>
           </div>
+
+          <QuestionRendererRouter
+            type={q.type}
+            stem={q.stem}
+            options={q.options}
+            selectedIndex={props.selectedIndex}
+            disabled={false}
+            onSelect={props.onSelect}
+          />
+
           <button
             onClick={props.onSubmit}
             disabled={props.selectedIndex === null}
@@ -438,6 +501,10 @@ function PhaseRenderer(props: {
         <RewardResultScreen
           score={phase.score}
           maxScore={phase.maxScore}
+          xpAwarded={phase.result?.xpAwarded}
+          masteryGained={phase.result?.updatedMastery}
+          subjectProgress={phase.result?.subjectProgress ?? null}
+          questProgress={phase.result?.questProgress ?? []}
           onNewMission={props.onStart}
           onReturnToCommandCentre={props.onReturnToCommandCentre}
         />
@@ -469,16 +536,5 @@ const buttonStyle: React.CSSProperties = {
   background: "#4a9eff",
   color: "#fff",
   transition: "opacity 0.15s",
-  width: "100%",
-};
-
-const optionButtonStyle: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  fontSize: "0.95rem",
-  textAlign: "left",
-  borderRadius: 6,
-  cursor: "pointer",
-  color: "#e0e0e0",
-  transition: "border 0.15s, background 0.15s",
   width: "100%",
 };

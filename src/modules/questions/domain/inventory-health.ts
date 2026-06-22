@@ -14,6 +14,26 @@ export enum InventoryHealth {
 }
 
 /**
+ * Per-concept health within a subject-level assessment.
+ */
+export interface ConceptInventoryHealth {
+  readonly conceptId: string;
+  readonly approved: number;
+  readonly health: InventoryHealth;
+}
+
+/**
+ * Snapshot of question inventory health for a single subject level.
+ */
+export interface LevelInventoryStatus {
+  readonly level: number;
+  readonly title: string;
+  readonly totalApproved: number;
+  readonly health: InventoryHealth;
+  readonly byConcept: readonly ConceptInventoryHealth[];
+}
+
+/**
  * Snapshot of question inventory health for a single subject.
  */
 export interface InventoryStatus {

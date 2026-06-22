@@ -1,4 +1,4 @@
-import { eq, and, sql } from "drizzle-orm";
+import { desc, eq, and, sql } from "drizzle-orm";
 import * as schema from "@/shared/infrastructure/database/schema";
 import type { QuestionRepository } from "@/modules/questions/domain/question-repository";
 import type { Question } from "@/modules/questions/domain/question";
@@ -66,6 +66,30 @@ export class DrizzleQuestionRepository implements QuestionRepository {
     }
 
     return this.toDomain(rows[0]);
+  }
+
+  async markShown(questionId: string, shownAt: Date): Promise<void> {
+    const timestamp = shownAt.toISOString();
+
+    await this.db
+      .update(schema.questions)
+      .set({
+        timesShown: sql`${schema.questions.timesShown} + 1`,
+        lastShownAt: timestamp,
+        updatedAt: timestamp,
+      })
+      .where(eq(schema.questions.id, questionId));
+  }
+
+  async getRecentlyShownByPlayer(playerId: string, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ questionId: schema.missionAttempts.questionId })
+      .from(schema.missionAttempts)
+      .where(eq(schema.missionAttempts.playerId, playerId))
+      .orderBy(desc(schema.missionAttempts.attemptedAt))
+      .limit(limit);
+
+    return [...new Set(rows.map((row) => row.questionId))];
   }
 
   private toDomain(row: typeof schema.questions.$inferSelect): Question {

@@ -10,6 +10,20 @@ export async function POST(request: NextRequest) {
       type: body.type ?? "encounter",
     });
 
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          error: "Insufficient question supply",
+          reason: result.reason,
+          level: result.level,
+          levelTitle: result.levelTitle,
+          totalApproved: result.totalApproved,
+          missingConcepts: result.missingConcepts,
+        },
+        { status: 400 },
+      );
+    }
+
     // Serialize Date objects to ISO strings
     const serialized = {
       ...result.mission,

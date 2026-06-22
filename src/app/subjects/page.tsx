@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSubjectSummaries } from "@/app/actions/subjects";
+import { selectSubjectForCurrentUser } from "@/app/actions/player-subject";
 import type { SubjectSummary } from "@/app/actions/subjects";
 
 export default function SubjectsPage() {
   const router = useRouter();
   const [subjects, setSubjects] = useState<SubjectSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectingSubjectId, setSelectingSubjectId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getSubjectSummaries()
@@ -16,6 +19,19 @@ export default function SubjectsPage() {
       .catch(() => setSubjects([]))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSelectSubject = async (subjectId: string) => {
+    setSelectingSubjectId(subjectId);
+    setError(null);
+    const result = await selectSubjectForCurrentUser(subjectId);
+    if (result.success) {
+      router.push(`/play?subject=${subjectId}`);
+      return;
+    }
+
+    setError(result.error ?? "Could not select subject.");
+    setSelectingSubjectId(null);
+  };
 
   if (loading) {
     return (
@@ -45,11 +61,13 @@ export default function SubjectsPage() {
         </div>
       ) : (
         <div className="subjects-grid">
+          {error ? <p className="subject-error">{error}</p> : null}
           {subjects.map((subject) => (
             <button
               key={subject.id}
               className="subject-card"
-              onClick={() => router.push(`/play?subject=${subject.id}`)}
+              onClick={() => handleSelectSubject(subject.id)}
+              disabled={selectingSubjectId !== null}
               aria-label={`Study ${subject.title}`}
             >
               <div className="subject-card-header">
@@ -69,7 +87,9 @@ export default function SubjectsPage() {
                 <span className="stat">schema v{subject.schemaVersion}</span>
               </div>
               <div className="subject-card-action">
-                <span className="start-button">Begin Study</span>
+                <span className="start-button">
+                  {selectingSubjectId === subject.id ? "Starting…" : "Begin Study"}
+                </span>
               </div>
             </button>
           ))}
@@ -139,6 +159,17 @@ export default function SubjectsPage() {
           border-color: #3b82f6;
           background: #1e293b;
           transform: translateY(-1px);
+        }
+        .subject-card:disabled {
+          cursor: progress;
+          opacity: 0.72;
+        }
+        .subject-error {
+          color: #fecaca;
+          background: rgba(127, 29, 29, 0.35);
+          border: 1px solid rgba(248, 113, 113, 0.35);
+          border-radius: 8px;
+          padding: 0.75rem 1rem;
         }
         .subject-card:focus-visible {
           outline: 2px solid #3b82f6;

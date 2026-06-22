@@ -194,4 +194,87 @@ describe("DrizzleQuestionRepository", () => {
       expect(results).toEqual([]);
     });
   });
+
+  describe("markShown", () => {
+    it("increments timesShown and persists lastShownAt", async () => {
+      await repository.create(createSampleQuestion({ id: "shown-question" }));
+      const shownAt = new Date("2026-06-19T20:00:00.000Z");
+
+      await repository.markShown("shown-question", shownAt);
+
+      const row = sqlite
+        .prepare("SELECT timesShown, lastShownAt FROM questions WHERE id = ?")
+        .get("shown-question") as { timesShown: number; lastShownAt: string };
+      expect(row.timesShown).toBe(1);
+      expect(row.lastShownAt).toBe(shownAt.toISOString());
+
+      const reloaded = await repository.getById("shown-question");
+      expect(reloaded?.timesShown).toBe(1);
+      expect(reloaded?.lastShownAt?.toISOString()).toBe(shownAt.toISOString());
+    });
+  });
+
+  describe("getRecentlyShownByPlayer", () => {
+    it("returns recently attempted question ids for the player in newest-first order", async () => {
+      sqlite
+        .prepare(
+          `INSERT INTO missionAttempts (
+            id, missionId, playerId, questionId, selectedIndex, isCorrect,
+            timeSpentSeconds, hintsUsed, attemptedAt
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          "attempt-old",
+          "mission-1",
+          "player-1",
+          "q-old",
+          0,
+          1,
+          10,
+          0,
+          "2026-06-18T10:00:00.000Z",
+        );
+      sqlite
+        .prepare(
+          `INSERT INTO missionAttempts (
+            id, missionId, playerId, questionId, selectedIndex, isCorrect,
+            timeSpentSeconds, hintsUsed, attemptedAt
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          "attempt-new",
+          "mission-2",
+          "player-1",
+          "q-new",
+          0,
+          1,
+          10,
+          0,
+          "2026-06-19T10:00:00.000Z",
+        );
+      sqlite
+        .prepare(
+          `INSERT INTO missionAttempts (
+            id, missionId, playerId, questionId, selectedIndex, isCorrect,
+            timeSpentSeconds, hintsUsed, attemptedAt
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          "attempt-other",
+          "mission-3",
+          "player-2",
+          "q-other",
+          0,
+          1,
+          10,
+          0,
+          "2026-06-20T10:00:00.000Z",
+        );
+
+      await expect(repository.getRecentlyShownByPlayer("player-1", 10)).resolves.toEqual([
+        "q-new",
+        "q-old",
+      ]);
+    });
+  });
 });

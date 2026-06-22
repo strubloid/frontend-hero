@@ -9,11 +9,12 @@
 1. Read **this file** (AGENTS.md) — understand the project.
 2. Read **`project-instructions.md`** — the complete project specification.
 3. Read **`docs/project-status.md`** — current phase, what's done, what's next.
-4. Check the **`docs/architecture/`** directory for architecture details.
-5. Check the **`docs/game-design/`** directory for gameplay details.
-6. Identify the **relevant module** in `src/modules/` for your change.
-7. Run **`npm run verify`** before and after your change.
-8. **Never delete tests, weaken assertions, or add broad skips** to pass CI.
+4. Read **`plan.md`** — the current gameplay-connection repair plan for making the full app work as a game.
+5. Check the **`docs/architecture/`** directory for architecture details.
+6. Check the **`docs/game-design/`** directory for gameplay details.
+7. Identify the **relevant module** in `src/modules/` for your change.
+8. Run **`npm run verify`** before and after your change.
+9. **Never delete tests, weaken assertions, or add broad skips** to pass CI.
 
 ---
 
@@ -56,28 +57,45 @@
 
 ## 2. Current Phase
 
-**Current Phase: Post-launch Hardening — Durable Persistence (In Progress)**
+**Current Phase: Phase 13 — E2E Testing & Production Validation (Finalizing)**
 
-Phase 8 delivered production readiness: CI, Docker/Fly deployment, security headers, production audits, health checks, runbooks, backup/migration documentation, and production metadata. Post-launch hardening is now closing the durable-persistence gap by moving from in-memory runtime state toward SQLite-backed storage on a Fly volume, with a future PostgreSQL target once repository coverage is complete.
+Phase 13 has transformed Frontend Realms from a 3-question XP demo into a connected game loop. All core gameplay connections are now wired end-to-end:
 
-**Next Phase: Complete durable repository wiring and restore drill**
+- ✅ Subject selection & progress creation on first login
+- ✅ Question consumption tracking (`timesShown`, `lastShownAt` update, rotation prevention)
+- ✅ Mission completion drives subject level advancement
+- ✅ Boss unlock & completion connected to subject progression
+- ✅ Quest/achievement progress awarded on mission completion
+- ✅ Review scheduling affects mission selection
+- ✅ Encounter Forge shows per-level inventory health with supply gates
+- ✅ Post-mission reward screen shows real persisted state changes
+- ✅ Generated question validation & deduplication
+- ✅ Per-level inventory health gate prevents empty-level mission starts
+- ✅ E2E coverage: play flow, question rotation, negative paths
 
-Finish durable repository implementations for gameplay state, wire app actions away from in-memory singleton stores, add persistence coverage for every repository path, and run a real backup/restore drill. See `docs/project-status.md` and `docs/backups-and-migrations.md` for detailed task breakdown.
+**Current repair plan:** `plan.md` is the active implementation plan. The remaining work is Phase B (subject content coverage — fill in 33 Next.js concept bodies), Phase L (challenge type variety renderers), and final production verification.
+
+**Next Phase: Production readiness**
 
 ### Phase Overview
 
-| Phase       | Name                            | Status         |
-| ----------- | ------------------------------- | -------------- |
-| Phase 0     | Research and Product Definition | ✅ Complete    |
-| Phase 1     | Walking Skeleton                | ✅ Complete    |
-| Phase 2     | Subject Engine                  | ✅ Complete    |
-| Phase 3     | Learning Engine                 | ✅ Complete    |
-| Phase 4     | Game Foundation                 | ✅ Complete    |
-| Phase 5     | Polish & Narrative              | ✅ Complete    |
-| Phase 6     | Experience & Integration        | ✅ Complete    |
-| Phase 7     | Advanced Game Experience        | ✅ Complete    |
-| Phase 8     | Production Readiness            | ✅ Complete    |
-| Post-launch | Durable Persistence Hardening   | 🚧 In Progress |
+| Phase       | Name                                | Status         |
+| ----------- | ----------------------------------- | -------------- |
+| Phase 0     | Research and Product Definition     | ✅ Complete    |
+| Phase 1     | Walking Skeleton                    | ✅ Complete    |
+| Phase 2     | Subject Engine                      | ✅ Complete    |
+| Phase 3     | Learning Engine                     | ✅ Complete    |
+| Phase 4     | Game Foundation                     | ✅ Complete    |
+| Phase 5     | Polish & Narrative                  | ✅ Complete    |
+| Phase 6     | Experience & Integration            | ✅ Complete    |
+| Phase 7     | Advanced Game Experience            | ✅ Complete    |
+| Phase 8     | Production Readiness                | ✅ Complete    |
+| Post-launch | Durable Persistence Hardening       | ✅ Complete    |
+| Phase 9     | Command Centre & Question Supply    | ✅ Complete    |
+| Phase 10    | Subject Campaign Progression        | ✅ Complete    |
+| Phase 11    | Encounter Forge & Batch Generation  | ✅ Complete    |
+| Phase 12    | Subject Boss & Campaign Completion  | ✅ Complete    |
+| Phase 13    | E2E Testing & Production Validation | 🚧 In Progress |
 
 ---
 
@@ -525,13 +543,11 @@ See `docs/architecture/extension-points.md` for the complete Drag-and-Drop examp
 
 ### Current Limitations
 
-1. **No world map or game UI** — The game world is still flat routes (`/`, `/subjects`, `/play`). No world map, regions, mission chains, or visual game environment exists yet.
-2. **No XP/level system** — Player progression is tracked through mastery and review schedules but there's no XP accumulation, level-up, or reward system.
-3. **No Big Pickle integration** — All questions come from subject file seeds. AI generation and evaluation (Phase 5) is not yet implemented.
-4. **No persistent database** — All data uses in-memory repositories. Phase 8 will add a real database.
-5. **No Docker or Fly.io** — Containerization and deployment configuration (Dockerfile, fly.toml) are documented requirements but not yet implemented.
-6. **No CI/CD pipeline** — GitHub Actions workflows need to be created.
-7. **`subjects/nextjs.md` is still sparse** — needs more concept content for a richer learning experience.
+1. **Next.js subject content incomplete** — `subjects/nextjs.md` declares a 10-level progression with 33 concept IDs but currently defines only 3 concept bodies with hand-written seeds. The campaign cannot actually progress through all declared levels until Phase B fills this in.
+2. **Challenge type variety limited** — The game currently uses only multiple-choice questions. Code-prediction, bug-hunt, and other types defined in the extension point system are not yet implemented.
+3. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
+4. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
+5. **Inline styles and presentation polish remain** — Some pages still violate the SCSS module architecture direction and the game loop needs more narrative/feedback polish to feel like a premium game.
 
 ### Architectural Limitations (by Design)
 

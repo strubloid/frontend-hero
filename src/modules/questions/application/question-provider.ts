@@ -22,12 +22,18 @@ export interface QuestionProviderContext {
  * 3. Variety enforcement — no repeats within the recent N questions
  * 4. Forge fallback — supplement with forge-generated questions in the DB when
  *    seed-based questions are insufficient or depleted
+ * 5. Type variety — prefer seeds of different question types for enrichment
  */
 export class QuestionProvider {
   constructor(
     private readonly questionRepository: QuestionRepository,
     private readonly maxQuestionsPerMission: number = 3,
     private readonly recentQuestionWindow: number = 10,
+    private readonly fallbackGenerator?: (
+      concept: Concept,
+      subjectId: string,
+      count: number,
+    ) => Promise<Omit<Question, "id" | "timesShown" | "lastShownAt" | "createdAt" | "updatedAt">[]>,
   ) {}
 
   async provideFor(
@@ -86,8 +92,9 @@ export class QuestionProvider {
     // Sort by score descending (best match first)
     seededScores.sort((a, b) => b.score - a.score);
 
-    // Take the best seeds
-    const selected = seededScores.slice(0, this.maxQuestionsPerMission);
+    // Type-variety selection: pick the best seed per type first,
+    // then fill remaining slots with best remaining seeds
+    const selected = this.selectWithTypeVariety(seededScores, this.maxQuestionsPerMission);
 
     // Convert selected seeds to Question objects
     const questions: Question[] = [];
@@ -129,7 +136,111 @@ export class QuestionProvider {
       }
     }
 
+    // ── Auto-generate fallback questions ────────────────────────────────────
+    // When seeds, forge supplements, and existing DB questions are all
+    // insufficient, use the fallback generator (typically the AI gateway)
+    // to produce template-based questions on the fly.
+    if (questions.length < this.maxQuestionsPerMission && this.fallbackGenerator) {
+      const needed = this.maxQuestionsPerMission - questions.length;
+      const fallback = await this.fallbackGenerator(concept, subjectId, needed);
+
+      for (const fb of fallback) {
+        const now = new Date();
+        const question: Question = {
+          id: uuidv4(),
+          subjectId,
+          conceptId: concept.id,
+          seedId: fb.seedId,
+          type: fb.type,
+          difficulty: fb.difficulty,
+          stem: fb.stem,
+          options: [...fb.options],
+          correctIndex: fb.correctIndex,
+          explanation: fb.explanation,
+          timesShown: 0,
+          lastShownAt: null,
+          qualityRating: 4,
+          createdAt: now,
+          updatedAt: now,
+        };
+        const saved = await this.questionRepository.create(question);
+        questions.push(saved);
+        usedIds.add(saved.id);
+        if (questions.length >= this.maxQuestionsPerMission) break;
+      }
+    }
+
     return questions;
+  }
+
+  async markShown(questionIds: string[], shownAt: Date): Promise<void> {
+    if (!this.questionRepository.markShown) return;
+
+    await Promise.all(
+      questionIds.map((questionId) => this.questionRepository.markShown!(questionId, shownAt)),
+    );
+  }
+
+  async getRecentlyShownByPlayer(playerId: string, limit: number): Promise<string[]> {
+    if (!this.questionRepository.getRecentlyShownByPlayer) return [];
+
+    return this.questionRepository.getRecentlyShownByPlayer(playerId, limit);
+  }
+
+  /**
+   * Select seeds with type diversity: first picks the best-scored seed of each
+   * available type, then fills remaining slots with the highest-scored seeds
+   * regardless of type.
+   */
+  private selectWithTypeVariety(
+    candidates: Array<{ seed: QuestionSeed; score: number }>,
+    count: number,
+  ): Array<{ seed: QuestionSeed; score: number }> {
+    if (candidates.length === 0) return [];
+    if (candidates.length <= 1) return candidates.slice(0, count);
+
+    // Group candidates by type
+    const byType = new Map<string, Array<{ seed: QuestionSeed; score: number }>>();
+    for (const c of candidates) {
+      const arr = byType.get(c.seed.type);
+      if (arr) {
+        arr.push(c);
+      } else {
+        byType.set(c.seed.type, [c]);
+      }
+    }
+
+    // Sort each type's candidates by score descending
+    for (const [, arr] of byType) {
+      arr.sort((a, b) => b.score - a.score);
+    }
+
+    const selected: Array<{ seed: QuestionSeed; score: number }> = [];
+
+    // Phase 1: Pick the best seed from each type (round-robin)
+    const typeIterators = new Map<string, number>();
+    for (const type of byType.keys()) {
+      typeIterators.set(type, 0);
+    }
+
+    const typeKeys = Array.from(byType.keys());
+    let anyLeft = true;
+
+    while (selected.length < count && anyLeft) {
+      anyLeft = false;
+      for (const type of typeKeys) {
+        if (selected.length >= count) break;
+        const idx = typeIterators.get(type) ?? 0;
+        const arr = byType.get(type)!;
+        if (idx < arr.length) {
+          selected.push(arr[idx]);
+          typeIterators.set(type, idx + 1);
+          anyLeft = true;
+        }
+      }
+    }
+
+    return selected;
   }
 
   /**

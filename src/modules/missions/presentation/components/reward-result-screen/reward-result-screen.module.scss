@@ -116,6 +116,84 @@
   border: 1px solid #334155;
 }
 
+.questSummary {
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.62);
+  border: 1px solid #253247;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.questTitle {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.questRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.questName {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.questBar {
+  flex: 2;
+  height: 6px;
+  background: #1e293b;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.questFill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.questCount {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.questComplete {
+  color: #86efac;
+  font-size: 0.85rem;
+}
+
+.levelUpNotice {
+  padding: 0.75rem 1rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 10px;
+  color: #6ee7b7;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.bossUnlockNotice {
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  color: #fca5a5;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 @media (max-width: 640px) {
   .rewardGrid {
     grid-template-columns: 1fr;

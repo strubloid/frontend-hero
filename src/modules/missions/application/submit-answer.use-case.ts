@@ -10,8 +10,20 @@ import { MasteryCalculator, MasteryUpdateInput } from "@/modules/mastery/domain/
 import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
 import { ReviewAlgorithm, ReviewInput } from "@/modules/reviews/domain/review-algorithm";
 import { AnswerEvaluator } from "./answer-evaluator";
-import { calculateAnswerXp } from "@/modules/progression/domain/player-progression";
+import { calculateAnswerXp, xpToLevel } from "@/modules/progression/domain/player-progression";
 import { SubmitAnswerInput, MissionAttempt, Mission } from "@/modules/missions/domain/mission";
+import { QuestService } from "./quest-service";
+import type { RecordSubjectEncounterUseCase } from "@/modules/subjects/application/record-subject-encounter/record-subject-encounter.use-case";
+import type { RecordSubjectEncounterResult } from "@/modules/subjects/application/record-subject-encounter/record-subject-encounter.use-case";
+
+export interface QuestProgressEntry {
+  questId: string;
+  name: string;
+  completedCount: number;
+  requiredCount: number;
+  completed: boolean;
+  rewarded: boolean;
+}
 
 export interface SubmitAnswerResult {
   isCorrect: boolean;
@@ -24,6 +36,8 @@ export interface SubmitAnswerResult {
   updatedMastery: number;
   score: number;
   maxScore: number;
+  subjectProgress: RecordSubjectEncounterResult | null;
+  questProgress: QuestProgressEntry[];
 }
 
 const RETURN_BONUS_MULTIPLIER = 1.5;
@@ -40,6 +54,8 @@ export class SubmitAnswerUseCase {
     private readonly answerEvaluator: AnswerEvaluator,
     private readonly masteryCalculator: MasteryCalculator = new MasteryCalculator(),
     private readonly reviewAlgorithm: ReviewAlgorithm = new ReviewAlgorithm(),
+    private readonly recordSubjectEncounterUseCase?: RecordSubjectEncounterUseCase,
+    private readonly questService?: QuestService,
   ) {}
 
   async execute(input: SubmitAnswerInput): Promise<SubmitAnswerResult> {
@@ -63,6 +79,7 @@ export class SubmitAnswerUseCase {
       input.selectedIndex,
       question.correctIndex,
       question.explanation,
+      question.type,
     );
 
     // --- Phase 2: Create and persist mission attempt ---
@@ -92,6 +109,30 @@ export class SubmitAnswerUseCase {
     }
     await this.missionRepository.save(updatedMission);
 
+    // --- Phase 3b: Record quest progress when mission is completed ---
+    const wasJustCompleted =
+      mission.status !== "completed" && updatedMission.status === "completed";
+    let questProgressResult: QuestProgressEntry[] = [];
+    if (wasJustCompleted && this.questService) {
+      const quests = await this.questService.getPlayerQuests(input.playerId);
+      const matchingQuests = quests.filter((q) => q.missionType === mission.type && !q.completed);
+      for (const quest of matchingQuests) {
+        await this.questService.recordProgress(input.playerId, quest.id, 1);
+      }
+      // Re-fetch to get updated state after recording progress
+      const updatedQuests = await this.questService.getPlayerQuests(input.playerId);
+      questProgressResult = updatedQuests
+        .filter((q) => q.missionType === mission.type)
+        .map((q) => ({
+          questId: q.id,
+          name: q.name,
+          completedCount: q.completedCount,
+          requiredCount: q.requiredCount,
+          completed: q.completed,
+          rewarded: q.rewarded,
+        }));
+    }
+
     // --- Phase 4: Award XP using new formula ---
     const existingMastery = await this.masteryRepository.getByPlayerAndConcept(
       input.playerId,
@@ -116,9 +157,13 @@ export class SubmitAnswerUseCase {
       : baseXpAwarded;
     const returnBonusXp = xpAwarded - baseXpAwarded;
 
+    const newTotalXp = player.experiencePoints + xpAwarded;
+    const { level: newLevel } = xpToLevel(newTotalXp);
+
     const updatedPlayer = {
       ...player,
-      experiencePoints: player.experiencePoints + xpAwarded,
+      experiencePoints: newTotalXp,
+      level: newLevel,
       lastActiveAt: now,
       lastReturnBonusClaimedAt: returnBonusApplied ? now : player.lastReturnBonusClaimedAt,
       updatedAt: now,
@@ -155,6 +200,10 @@ export class SubmitAnswerUseCase {
     const updatedSchedule = this.reviewAlgorithm.apply(reviewInput);
     await this.reviewRepository.save(updatedSchedule.schedule);
 
+    const subjectProgress = this.recordSubjectEncounterUseCase
+      ? await this.recordSubjectEncounterUseCase.execute(mission, updatedMission)
+      : null;
+
     return {
       isCorrect: evaluation.isCorrect,
       correctIndex: evaluation.correctIndex,
@@ -168,6 +217,8 @@ export class SubmitAnswerUseCase {
       updatedMastery: updatedMasteryResult.mastery.masteryScore,
       score: updatedMission.score,
       maxScore: updatedMission.maxScore,
+      subjectProgress,
+      questProgress: questProgressResult,
     };
   }
 }

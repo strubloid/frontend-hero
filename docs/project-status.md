@@ -2,48 +2,48 @@
 
 |> **Living document**. Update after completing each phase.
 
-> Current Phase: **Phase 13 — E2E Testing & Production Validation (Planning)**
+> Current Phase: **Phase 13 — E2E Testing & Production Validation (In Progress)**
 
 ---
 
 ## Quick Summary
 
-| Aspect       | Status                                                                        |
-| ------------ | ----------------------------------------------------------------------------- | ------------------------------------------- |
-| Product      | Gamified frontend engineering learning platform                               |
-| Architecture | Modular monolith — Domain / Application / Infrastructure / Presentation       |
-| Framework    | Next.js 16.2.9 (App Router)                                                   |
-| Language     | TypeScript (strict)                                                           |
-| Database     | SQLite (dev/test), PostgreSQL (production target)                             |
-| ORM          | Drizzle ORM v7                                                                |
-|              | Testing                                                                       | Vitest (337 unit/integration tests passing) |
-| E2E          | ❌ Not yet configured (Playwright planned)                                    |
-| CI/CD        | GitHub Actions + Docker + Fly.io                                              |
-| AI Provider  | Big Pickle (via OpenCode Zen) — ✅ Integrated (demo mode, template questions) |
-| Auth         | NextAuth v5 (Google OAuth + Credentials)                                      |
-| Auth Pass    | ✅ Connected to login/register pages                                          |
+| Aspect       | Status                                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| Product      | Gamified frontend engineering learning platform                                                          |
+| Architecture | Modular monolith — Domain / Application / Infrastructure / Presentation                                  |
+| Framework    | Next.js 16.2.9 (App Router)                                                                              |
+| Language     | TypeScript (strict)                                                                                      |
+| Database     | SQLite (dev/test), PostgreSQL (production target)                                                        |
+| ORM          | Drizzle ORM v7                                                                                           |
+| Testing      | Vitest (378 unit/integration/architecture tests passing)                                                 |
+| E2E          | Playwright configured; 6 tests passing across 3 spec files: play flow, question rotation, negative paths |
+| CI/CD        | GitHub Actions + Docker + Fly.io                                                                         |
+| AI Provider  | Big Pickle-style gateway path integrated (demo/template generation unless real provider set)             |
+| Auth         | NextAuth v5 (Google OAuth + Credentials)                                                                 |
+| Auth Pass    | ✅ Connected to login/register pages                                                                     |
 
 ---
 
 ## Phase Overview
 
-| Phase        | Name                                    | Status      |
-| ------------ | --------------------------------------- | ----------- |
-| Phase 0      | Research and Product Definition         | ✅ Complete |
-| Phase 1      | Walking Skeleton                        | ✅ Complete |
-| Phase 2      | Subject Engine                          | ✅ Complete |
-| Phase 3      | Learning Engine                         | ✅ Complete |
-| Phase 4      | Game Foundation                         | ✅ Complete |
-| Phase 5      | Polish & Narrative                      | ✅ Complete |
-| Phase 6      | Experience & Integration                | ✅ Complete |
-| Phase 7      | Advanced Game Experience                | ✅ Complete |
-| Phase 8      | Production Readiness                    | ✅ Complete |
-| Post-launch  | Durable Persistence Hardening           | ✅ Complete |
-| Phase 9      | Command Centre & Question Supply        | ✅ Complete |
-| Phase 10     | Subject Campaign Progression            | ✅ Complete |
-| Phase 11     | Encounter Forge & Batch Generation      | ✅ Complete |
-| Phase 12     | Subject Boss & Campaign Completion      | ✅ Complete |
-| **Phase 13** | **E2E Testing & Production Validation** | 📋 Planned  |
+| Phase        | Name                                    | Status         |
+| ------------ | --------------------------------------- | -------------- |
+| Phase 0      | Research and Product Definition         | ✅ Complete    |
+| Phase 1      | Walking Skeleton                        | ✅ Complete    |
+| Phase 2      | Subject Engine                          | ✅ Complete    |
+| Phase 3      | Learning Engine                         | ✅ Complete    |
+| Phase 4      | Game Foundation                         | ✅ Complete    |
+| Phase 5      | Polish & Narrative                      | ✅ Complete    |
+| Phase 6      | Experience & Integration                | ✅ Complete    |
+| Phase 7      | Advanced Game Experience                | ✅ Complete    |
+| Phase 8      | Production Readiness                    | ✅ Complete    |
+| Post-launch  | Durable Persistence Hardening           | ✅ Complete    |
+| Phase 9      | Command Centre & Question Supply        | ✅ Complete    |
+| Phase 10     | Subject Campaign Progression            | ✅ Complete    |
+| Phase 11     | Encounter Forge & Batch Generation      | ✅ Complete    |
+| Phase 12     | Subject Boss & Campaign Completion      | ✅ Complete    |
+| **Phase 13** | **E2E Testing & Production Validation** | 🚧 In Progress |
 
 ---
 
@@ -81,6 +81,40 @@
 - ✅ **Campaign completion** — AdvanceSubjectLevelUseCase unlocks boss on second-to-last level; marks subject complete past maximum
 - ✅ **Command centre integration** — Campaign rail linked to boss encounter via dynamic subject ID extraction
 - ✅ **Tests** — 18 new tests across boss-service and boss-encounter-service (337 total)
+
+### Phase 13 — E2E Testing & Production Validation (In Progress)
+
+**Goal**: Replace shallow browser checks with production-like E2E verification that proves gameplay, XP/level persistence, question generation, and page flows work through real HTTP/UI paths.
+
+- ✅ **Playwright configured** — `playwright.config.ts` added with Chromium browser testing and dev-server support
+- ✅ **E2E npm scripts** — `npm run test:e2e` and `npm run test:e2e:ui` added
+- ✅ **Real backend-state assertions started** — `tests/e2e/play-flow.spec.ts` verifies player XP/level via HTTP instead of only checking visible UI
+- ✅ **XP level persistence fixed** — `SubmitAnswerUseCase` now recalculates `level` from total XP using `xpToLevel()` and persists it with the player
+- ✅ **Question supply gap fixed** — `nextjs.app-router` no longer has zero seeds, and `QuestionProvider` can call a fallback generator when a concept lacks enough persisted/seeded questions
+- ✅ **Encounter Forge simplified** — generation now accepts `{ subjectId, count }`; concepts and difficulties are loaded/distributed by the system instead of requiring manual concept IDs
+- ✅ **Encounter Forge selectors** — subject dropdown and concept checklist are loaded from persisted subjects/concepts
+- ✅ **Verification passing** — `npm run verify` passes (format, lint, type-check, depcruise, production audit, dependency audit, build)
+- ✅ **Unit/integration tests passing** — `npx vitest run` passes 378 tests across 35 files
+- ✅ **Player read API added** — `/api/player?playerId=default-player` returns real persisted player state as JSON for E2E verification
+- ✅ **Protected play-flow E2E fixed** — the test creates a real credentials user, signs in through `/login`, reaches `/play`, answers questions, verifies the logged-in user receives XP through `/api/player`, and confirms the Command Centre HUD shows the earned XP
+- ✅ **Subject E2E assertion tightened** — the subjects page test now checks visible `Next.js` UI via roles instead of raw lowercase body text
+- ✅ **E2E passing** — `npm run test:e2e` passes 4/4 Playwright tests
+- ✅ **Next.js subject content coverage** — all 33 frontmatter concept IDs now have full definitions with ≥3 hand-written seeds each
+- ✅ **Question consumption/rotation** — `markShown()` and `getRecentlyShownByPlayer()` repository methods added; `timesShown` and `lastShownAt` update on mission creation; recent question/concept IDs flow into `QuestionProvider` for repetition avoidance
+- ✅ **Authenticated subject selection** — players without `currentSubjectId` are routed to subject selection; `SelectSubjectUseCase` creates `PlayerSubjectProgress` and sets `player.currentSubjectId`
+- ✅ **Mission completion → subject progress** — `RecordSubjectEncounterUseCase` persists encounter completion to `PlayerSubjectProgress` (counters for successful/review/practical encounters, mastery/retention scores); `AdvanceSubjectLevelUseCase` called after recording; result reports level advancement, boss unlock status, requirements remaining
+- ✅ **Mastery/review gates** — `MissionSelector` prioritizes review missions for due/weak concepts; mastery cannot reach "mastered" from one correct answer; weak prerequisites visible in Command Centre requirements
+- ✅ **Connected reward screen** — post-mission display shows real XP awarded, mastery changes, subject progress (level advanced, boss unlocked), and quest progress bars; no more fake "Next quest updated" labels
+- ✅ **Quest/achievement progression** — `SubmitAnswerUseCase` calls `QuestService.recordProgress()` on mission completion; quests reflected in DB and reward summary
+- ✅ **Boss unlock/completion** — `AdvanceSubjectLevelUseCase` unlocks boss at second-to-last level; Command Centre shows "Challenge Boss" when available; boss defeat marks campaign progress and awards achievements
+- ✅ **Generated question validation** — `GeneratedQuestionValidator` rejects questions missing required fields, with inconsistent correct answers, duplicate options, invalid concept IDs, or empty explanations; `GeneratedQuestionDeduper` prevents duplicate content via normalized stem hashing
+- ✅ **Question rotation E2E test** — `tests/e2e/question-rotation.spec.ts` proves question IDs change between consecutive missions
+- ✅ **Negative-path E2E tests** — `tests/e2e/negative-tests.spec.ts` covers unauthenticated access, invalid API calls, and error states
+
+#### Remaining Phase 13 work
+
+1. Re-run `npm run verify:full` before marking Phase 13 complete.
+2. Add Docker build + container verification to full suite.
 
 ### Phase 9 — Command Centre & Question Supply (Complete)
 
@@ -153,30 +187,21 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 
 ## Known Gaps
 
-| Gap                          | Impact                                     | Planned Phase |
-| ---------------------------- | ------------------------------------------ | ------------- |
-| AI question generation       | Demo mode generates template questions     | Phase 13      |
-| No command centre            | Home page is a marketing landing page      | Phase 13      |
-| No E2E tests                 | No automated browser-level verification    | Phase 13      |
-| Player identity coupling     | Server actions use hard-coded player IDs   | Phase 13      |
-| Inline styles in pages       | Violates SCSS module architecture pattern  | Phase 13      |
-| No persistent game HUD       | Player cannot see progress from home       | Phase 13      |
-| No subject-level progression | All subjects are one flat list of concepts | Phase 13      |
+| Gap                      | Impact                                                                                                  | Planned Phase |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- | ------------- |
+| AI question generation   | Demo/template generation unless real provider is configured                                             | Phase 13      |
+| Player identity coupling | Server actions use hard-coded player IDs                                                                | Phase 14      |
+| Inline styles in pages   | Violates SCSS module architecture pattern                                                               | Phase 14      |
+| Challenge type variety   | All current questions are multiple-choice; code-prediction, bug-hunt, and explain-it types still needed | Phase 14      |
 
 ---
 
 ## Testing Status
 
-| Suite                   | Files  | Tests   | Status            |
-| ----------------------- | ------ | ------- | ----------------- |
-| Unit — domain logic     | 11     | 108     | ✅ All passing    |
-| Unit — application      | 6      | 32      | ✅ All passing    |
-| Unit — repositories     | 6      | 67      | ✅ All passing    |
-| Unit — proxy            | 1      | 15      | ✅ All passing    |
-| Integration             | 1      | 2       | ✅ All passing    |
-| Architecture boundaries | 1      | 1       | ✅ All passing    |
-| **Total**               | **33** | **337** | ✅ All passing    |
-| E2E (Playwright)        | 0      | 0       | ❌ Not configured |
+| Suite                 | Files | Tests | Status                              |
+| --------------------- | ----- | ----- | ----------------------------------- |
+| Unit/integration/arch | 35    | 378   | ✅ All passing (`npx vitest run`)   |
+| E2E (Playwright)      | 3     | 6     | ✅ All passing (`npm run test:e2e`) |
 
 ---
 
@@ -188,10 +213,13 @@ npm run verify
 
 # Full verification (verify + tests)
 npm run verify:full
+
+# Browser E2E verification
+npm run test:e2e
 ```
 
-Phases 10–12 acceptance requires `npm run verify:full` to pass on every sub-phase.
+Phase acceptance requires `npm run verify:full` to pass. Phase 13 also requires `npm run test:e2e` to pass because its goal is browser-level production validation.
 
 ---
 
-_Last updated: 2026-06-19 (Phases 10–12 complete)_
+_Last updated: 2026-06-19 (Phase 13 — all gameplay connections enabled; reward screen, quests, boss unlock, rotations, validation, and expanded E2E complete)_

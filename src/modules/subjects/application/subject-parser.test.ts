@@ -592,73 +592,42 @@ describe("SubjectImportService (integration)", () => {
   it("parses subjects/nextjs.md end-to-end", async () => {
     const result = await importService.import("nextjs");
 
-    // Verify valid
     expect(result.valid).toBe(true);
     expect(result.errors).toHaveLength(0);
-
-    // Verify subject metadata
     expect(result.subject.id).toBe("nextjs");
     expect(result.subject.title).toBe("Next.js");
-    expect(result.subject.version).toBe(1);
+    expect(result.subject.version).toBe(3);
     expect(result.subject.schemaVersion).toBe(1);
+    expect(result.subject.progression?.levels).toHaveLength(10);
 
-    // Verify 2 domains
-    expect(result.subject.domains).toHaveLength(2);
-    expect(result.subject.domains[0].name).toBe("JavaScript Foundations");
-    expect(result.subject.domains[1].name).toBe("React Foundations");
+    const progressionConceptIds = new Set(
+      result.subject.progression?.levels.flatMap((level) => level.concepts) ?? [],
+    );
+    const bodyConcepts = result.subject.domains.flatMap((domain) => domain.concepts);
+    const bodyConceptIds = new Set(bodyConcepts.map((concept) => concept.id));
 
-    // Verify concepts in first domain
-    expect(result.subject.domains[0].concepts).toHaveLength(1);
-    expect(result.subject.domains[0].concepts[0].id).toBe("javascript.event-loop");
-    expect(result.subject.domains[0].concepts[0].level).toBe("foundation");
-    expect(result.subject.domains[0].concepts[0].difficulty).toBe(2);
+    expect(result.subject.domains).toHaveLength(10);
+    expect(progressionConceptIds.size).toBe(33);
+    expect(bodyConcepts).toHaveLength(33);
 
-    // Verify concepts in second domain
-    expect(result.subject.domains[1].concepts).toHaveLength(1);
-    expect(result.subject.domains[1].concepts[0].id).toBe("react.component-composition");
-    expect(result.subject.domains[1].concepts[0].level).toBe("foundation");
-    expect(result.subject.domains[1].concepts[0].difficulty).toBe(1);
+    for (const conceptId of progressionConceptIds) {
+      expect(bodyConceptIds.has(conceptId), `missing body for ${conceptId}`).toBe(true);
+    }
 
-    // Verify question seeds on first concept
-    const eventLoop = result.subject.domains[0].concepts[0];
-    expect(eventLoop.questionSeeds).toHaveLength(2);
-    expect(eventLoop.questionSeeds[0].seedId).toBe("seed-001");
-    expect(eventLoop.questionSeeds[0].type).toBe("multiple-choice");
-    expect(eventLoop.questionSeeds[0].difficulty).toBe(1);
-    expect(eventLoop.questionSeeds[0].stem).toContain("setTimeout");
-    expect(eventLoop.questionSeeds[0].options).toHaveLength(4);
-    expect(eventLoop.questionSeeds[0].correctIndex).toBe(1);
-    expect(eventLoop.questionSeeds[0].explanation).toBeTruthy();
+    for (const concept of bodyConcepts) {
+      expect(progressionConceptIds.has(concept.id), `${concept.id} is not in progression`).toBe(
+        true,
+      );
+      expect(
+        concept.questionSeeds.length,
+        `${concept.id} needs at least 3 seeds`,
+      ).toBeGreaterThanOrEqual(3);
+      expect(
+        concept.practicalChallenges.length,
+        `${concept.id} needs a practical challenge`,
+      ).toBeGreaterThanOrEqual(1);
+    }
 
-    expect(eventLoop.questionSeeds[1].seedId).toBe("seed-002");
-    expect(eventLoop.questionSeeds[1].difficulty).toBe(2);
-
-    // Verify question seeds on second concept
-    const composition = result.subject.domains[1].concepts[0];
-    expect(composition.questionSeeds).toHaveLength(2);
-    expect(composition.questionSeeds[0].seedId).toBe("seed-001");
-    expect(composition.questionSeeds[0].difficulty).toBe(1);
-    expect(composition.questionSeeds[1].seedId).toBe("seed-002");
-    expect(composition.questionSeeds[1].difficulty).toBe(1);
-
-    // Verify practical challenges and interview prompts
-    expect(eventLoop.practicalChallenges).toHaveLength(1);
-    expect(eventLoop.practicalChallenges[0].challengeId).toBe("challenge-001");
-    expect(eventLoop.interviewPrompts).toHaveLength(1);
-    expect(eventLoop.interviewPrompts[0].promptId).toBe("interview-001");
-
-    // Verify knowledge content
-    expect(eventLoop.knowledge).toContain("the core mechanism that allows JavaScript");
-    expect(composition.knowledge).toContain("Component composition");
-
-    // Verify common misconceptions
-    expect(eventLoop.commonMisconceptions).toHaveLength(3);
-
-    // Verify examples
-    expect(eventLoop.examples).toHaveLength(1);
-    expect(eventLoop.examples[0]).toContain("console.log");
-
-    // Verify graph
-    expect(result.graph.getAllConceptIds()).toHaveLength(2);
+    expect(result.graph.getAllConceptIds()).toHaveLength(33);
   });
 });

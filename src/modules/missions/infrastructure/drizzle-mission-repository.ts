@@ -60,6 +60,21 @@ export class DrizzleMissionRepository implements MissionRepository {
     return this.toDomain(rows[0]);
   }
 
+  async getLastByPlayer(playerId: string): Promise<Mission | null> {
+    const rows = await this.db
+      .select()
+      .from(schema.missions)
+      .where(eq(schema.missions.playerId, playerId))
+      .orderBy(desc(schema.missions.startedAt))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return this.toDomain(rows[0]);
+  }
+
   async getCompletedByPlayer(playerId: string): Promise<Mission[]> {
     const rows = await this.db
       .select()

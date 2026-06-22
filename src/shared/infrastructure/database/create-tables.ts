@@ -251,6 +251,24 @@ export function createApplicationTables(sqlite: Database.Database): void {
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS playerSubjectProgress (
+      id TEXT PRIMARY KEY,
+      playerId TEXT NOT NULL,
+      subjectId TEXT NOT NULL,
+      currentLevel INTEGER DEFAULT 1 NOT NULL,
+      maximumLevel INTEGER NOT NULL,
+      masteryScore REAL DEFAULT 0 NOT NULL,
+      retentionScore REAL DEFAULT 0 NOT NULL,
+      successfulEncounterCount INTEGER DEFAULT 0 NOT NULL,
+      reviewEncounterCount INTEGER DEFAULT 0 NOT NULL,
+      practicalEncounterCount INTEGER DEFAULT 0 NOT NULL,
+      distinctStudySessionCount INTEGER DEFAULT 0 NOT NULL,
+      bossStatus TEXT DEFAULT 'locked' NOT NULL,
+      startedAt TEXT NOT NULL,
+      completedAt TEXT,
+      updatedAt TEXT NOT NULL
+    );
   `);
 
   // Columns added after initial table creation
@@ -260,6 +278,35 @@ export function createApplicationTables(sqlite: Database.Database): void {
   ensureColumn(sqlite, "concepts", "interviewPrompts", "TEXT DEFAULT '[]' NOT NULL");
   ensureColumn(sqlite, "conceptMastery", "demonstratedContexts", "TEXT DEFAULT '[]' NOT NULL");
   ensureColumn(sqlite, "conceptMastery", "commonMistakes", "TEXT DEFAULT '[]' NOT NULL");
+
+  ensureColumn(sqlite, "playerSubjectProgress", "masteryScore", "REAL DEFAULT 0 NOT NULL");
+  ensureColumn(sqlite, "playerSubjectProgress", "retentionScore", "REAL DEFAULT 0 NOT NULL");
+  ensureColumn(
+    sqlite,
+    "playerSubjectProgress",
+    "successfulEncounterCount",
+    "INTEGER DEFAULT 0 NOT NULL",
+  );
+  ensureColumn(
+    sqlite,
+    "playerSubjectProgress",
+    "reviewEncounterCount",
+    "INTEGER DEFAULT 0 NOT NULL",
+  );
+  ensureColumn(
+    sqlite,
+    "playerSubjectProgress",
+    "practicalEncounterCount",
+    "INTEGER DEFAULT 0 NOT NULL",
+  );
+  ensureColumn(
+    sqlite,
+    "playerSubjectProgress",
+    "distinctStudySessionCount",
+    "INTEGER DEFAULT 0 NOT NULL",
+  );
+  ensureColumn(sqlite, "playerSubjectProgress", "bossStatus", "TEXT DEFAULT 'locked' NOT NULL");
+  ensureColumn(sqlite, "playerSubjectProgress", "completedAt", "TEXT");
 
   // Auth columns added after initial table creation
   ensureColumn(sqlite, "players", "email", "TEXT");

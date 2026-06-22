@@ -5,6 +5,7 @@ export interface MissionRepository {
   create(mission: Mission): Promise<Mission>;
   save(mission: Mission): Promise<Mission>;
   getActiveByPlayer(playerId: string): Promise<Mission | null>;
+  getLastByPlayer(playerId: string): Promise<Mission | null>;
   getCompletedByPlayer(playerId: string): Promise<Mission[]>;
 }
 

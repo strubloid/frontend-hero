@@ -56,8 +56,10 @@ export type QuestionType =
   | "true-false"
   | "fill-blank"
   | "code-prediction"
+  | "bug-hunt"
   | "matching"
-  | "ordering";
+  | "ordering"
+  | "explain-it";
 
 export interface PracticalChallenge {
   challengeId: string;

@@ -77,7 +77,6 @@ describe("proxy", () => {
     it.each(["/play", "/play/mission/123", "/profile", "/boss-encounter", "/world-map"])(
       "redirects unauthenticated user from %s to /login",
       async (path) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const req = new (await import("next/server")).NextRequest(
           `http://localhost:3000${path}`,
         ) as any;
@@ -96,7 +95,6 @@ describe("proxy", () => {
       async (path) => {
         mockGetToken.mockResolvedValue({ sub: "test-user-id", name: "Test" });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const req = new (await import("next/server")).NextRequest(
           `http://localhost:3000${path}`,
         ) as any;
@@ -112,7 +110,6 @@ describe("proxy", () => {
     it("redirects authenticated user from /login to /play", async () => {
       mockGetToken.mockResolvedValue({ sub: "test-user-id" });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = new (await import("next/server")).NextRequest(
         "http://localhost:3000/login",
       ) as any;
@@ -125,7 +122,6 @@ describe("proxy", () => {
     it("redirects authenticated user from /register to /play", async () => {
       mockGetToken.mockResolvedValue({ sub: "test-user-id" });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = new (await import("next/server")).NextRequest(
         "http://localhost:3000/register",
       ) as any;
@@ -136,7 +132,6 @@ describe("proxy", () => {
     });
 
     it("allows unauthenticated user through /login", async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = new (await import("next/server")).NextRequest(
         "http://localhost:3000/login",
       ) as any;
@@ -146,7 +141,6 @@ describe("proxy", () => {
     });
 
     it("allows unauthenticated user through /register", async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = new (await import("next/server")).NextRequest(
         "http://localhost:3000/register",
       ) as any;
@@ -160,14 +154,13 @@ describe("proxy", () => {
     it("allows all users through /", async () => {
       // Authenticated
       mockGetToken.mockResolvedValue({ sub: "test" });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const req = new (await import("next/server")).NextRequest("http://localhost:3000/") as any;
       const res = await middleware(req);
       expect((res as any).status).toBe(200);
     });
 
     it("allows unauthenticated users through /", async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = new (await import("next/server")).NextRequest("http://localhost:3000/") as any;
       const res = await middleware(req);
       expect((res as any).status).toBe(200);
@@ -176,7 +169,6 @@ describe("proxy", () => {
 
   describe("getToken secret", () => {
     it("passes AUTH_SECRET to getToken", async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = new (await import("next/server")).NextRequest(
         "http://localhost:3000/play",
       ) as any;

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getActiveMission, getDefaultSubject, getQuestion } from "@/app/actions/missions";
+import {
+  getActiveMission,
+  getLastMission,
+  getDefaultSubject,
+  getQuestion,
+} from "@/app/actions/missions";
 
 function serializeDates<T>(obj: T): T {
   if (obj === null || obj === undefined) return obj;
@@ -22,6 +27,18 @@ export async function GET(request: NextRequest) {
     const subject = await getDefaultSubject();
 
     if (!mission) {
+      // No active mission — check for a recently completed one
+      const lastMission = await getLastMission(playerId);
+
+      if (lastMission?.status === "completed") {
+        return NextResponse.json({
+          hasActiveMission: false,
+          subjectName: subject?.title ?? null,
+          mission: serializeDates(lastMission),
+          currentQuestion: null,
+        });
+      }
+
       return NextResponse.json({
         hasActiveMission: false,
         subjectName: subject?.title ?? null,

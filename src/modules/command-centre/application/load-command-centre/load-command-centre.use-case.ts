@@ -40,7 +40,7 @@ export class LoadCommandCentreUseCase {
       return new LoadCommandCentreResult(null, "Player not found");
     }
 
-    const progression = await this.progressionRepo.getByPlayerId(player.id);
+    const storedProgression = await this.progressionRepo.getByPlayerId(player.id);
     const activeSubjectId = player.currentSubjectId;
 
     let playerSubjectProgress: PlayerSubjectProgress | null = null;
@@ -63,21 +63,21 @@ export class LoadCommandCentreUseCase {
     // Build recent progress summary
     const recentProgress = this.buildRecentProgress(playerSubjectProgress);
 
-    // Default progression fallback for new players
-    const defaultProgression = progression ?? {
-      id: `${player.id}-progress`,
-      playerId: player.id,
-      level: 1,
-      currentXp: 0,
-      xpToNextLevel: 100,
-      totalXpEarned: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    // Player.experiencePoints is the gameplay source of truth updated by
+    // SubmitAnswerUseCase. The older progression table can lag behind, so the
+    // Command Centre HUD derives XP/level from the player row to avoid showing
+    // stale 0 XP after a completed encounter.
+    const progression = this.buildProgressionFromPlayer(
+      player.id,
+      player.level,
+      player.experiencePoints,
+      storedProgression?.createdAt,
+      storedProgression?.updatedAt,
+    );
 
     const vm = this.assembler.assemble({
       player,
-      progression: defaultProgression,
+      progression,
       playerSubjectProgress,
       subject,
       currentQuest,
@@ -91,6 +91,30 @@ export class LoadCommandCentreUseCase {
   // ---------------------------------------------------------------------------
   // World node builders
   // ---------------------------------------------------------------------------
+
+  private buildProgressionFromPlayer(
+    playerId: string,
+    level: number,
+    totalXp: number,
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+  ) {
+    const currentLevelThreshold = XP_THRESHOLDS[level - 1] ?? 0;
+    const nextLevelThreshold = XP_THRESHOLDS[level] ?? totalXp;
+    const currentXp = Math.max(0, totalXp - currentLevelThreshold);
+    const xpToNextLevel = Math.max(0, nextLevelThreshold - totalXp);
+
+    return {
+      id: `${playerId}-progress`,
+      playerId,
+      level,
+      currentXp,
+      xpToNextLevel,
+      totalXpEarned: totalXp,
+      createdAt,
+      updatedAt,
+    };
+  }
 
   private buildWorldNodes(
     subject: Subject | null,

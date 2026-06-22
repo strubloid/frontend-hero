@@ -8,10 +8,19 @@ import { MasteryRepository } from "@/modules/mastery/domain/mastery-repository";
 import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
 import { PrerequisiteGraphBuilder } from "@/modules/subjects/application/prerequisite-graph-builder";
 import { StartMissionInput, Mission } from "@/modules/missions/domain/mission";
+import type { QuestionInventoryService } from "@/modules/questions/domain/question-inventory-service";
+import { getLevelDefinition, SubjectProgression } from "@/modules/subjects/domain/subject-level";
 
-export interface StartMissionResult {
-  mission: Mission;
-}
+export type StartMissionResult =
+  | { readonly success: true; readonly mission: Mission }
+  | {
+      readonly success: false;
+      readonly reason: "insufficient_question_supply";
+      readonly level: number;
+      readonly levelTitle: string;
+      readonly totalApproved: number;
+      readonly missingConcepts: string[];
+    };
 
 export class StartMissionUseCase {
   constructor(
@@ -23,6 +32,7 @@ export class StartMissionUseCase {
     private readonly graphBuilder: PrerequisiteGraphBuilder,
     private readonly masteryRepository?: MasteryRepository,
     private readonly reviewRepository?: ReviewRepository,
+    private readonly inventoryService?: QuestionInventoryService,
   ) {}
 
   async execute(input: StartMissionInput): Promise<StartMissionResult> {
@@ -53,16 +63,63 @@ export class StartMissionUseCase {
       masteries.filter((m) => m.masteryScore >= 0.5).map((m) => m.conceptId),
     );
     const availableConceptIds = graph.getAvailableConcepts(masteredConceptIds);
+    const recentQuestionIds = await this.getRecentQuestionIds(input.playerId);
 
     const missionPlan: MissionPlan = this.missionSelector.select({
       subject,
       masteries,
       schedules,
-      recentConceptIds: [], // will be populated from session history in future
+      recentConceptIds: [], // concept history is derived from mastery/review state for now
       availableConceptIds,
     });
 
-    const questions = await this.questionProvider.provideFor(missionPlan, subject);
+    // ── Inventory health gate ──────────────────────────────────────────────
+    // Check whether the selected mission plan's concept has enough questions.
+    // If the level is empty, return a typed failure so the UI can redirect
+    // to Encounter Forge instead of silently producing a stub mission.
+    if (this.inventoryService && subject.progression) {
+      const levelDef = getLevelDefinition(subject.progression, subject.progression.minimumLevel);
+      // Use the minimum level definition; for multi-concept levels check all
+      const relevantLevel = levelDef ?? subject.progression.levels[0];
+      const levelConcepts = [...relevantLevel.concepts];
+      const levelStatus = await this.inventoryService.getInventoryStatusByLevel(
+        input.subjectId,
+        relevantLevel.level,
+        relevantLevel.title,
+        levelConcepts,
+      );
+
+      if (levelStatus.health === "EMPTY") {
+        return {
+          success: false,
+          reason: "insufficient_question_supply" as const,
+          level: relevantLevel.level,
+          levelTitle: relevantLevel.title,
+          totalApproved: 0,
+          missingConcepts: levelConcepts,
+        };
+      }
+
+      // Check the specific concept — if the concept is empty but others aren't,
+      // report it so the system can generate targeted questions
+      const conceptStatus = levelStatus.byConcept.find(
+        (c) => c.conceptId === missionPlan.conceptId,
+      );
+      if (conceptStatus && conceptStatus.health === "EMPTY") {
+        return {
+          success: false,
+          reason: "insufficient_question_supply" as const,
+          level: relevantLevel.level,
+          levelTitle: relevantLevel.title,
+          totalApproved: levelStatus.totalApproved,
+          missingConcepts: [missionPlan.conceptId],
+        };
+      }
+    }
+
+    const questions = await this.questionProvider.provideFor(missionPlan, subject, {
+      recentQuestionIds,
+    });
 
     const now = new Date();
     const mission: Mission = {
@@ -82,6 +139,15 @@ export class StartMissionUseCase {
     };
 
     const saved = await this.missionRepository.create(mission);
-    return { mission: saved };
+    await this.questionProvider.markShown(saved.questionIds, now);
+    return { success: true as const, mission: saved };
+  }
+
+  private async getRecentQuestionIds(playerId: string): Promise<string[]> {
+    const attemptedQuestionIds = await this.questionProvider.getRecentlyShownByPlayer(playerId, 30);
+    const recentMissions = (await this.missionRepository.getCompletedByPlayer(playerId)).slice(-5);
+    const missionQuestionIds = recentMissions.flatMap((mission) => mission.questionIds);
+
+    return [...new Set([...attemptedQuestionIds, ...missionQuestionIds])];
   }
 }

@@ -16,6 +16,7 @@ const REQUIRED_TABLES = [
   "missions",
   "playerAchievements",
   "playerProgression",
+  "playerSubjectProgress",
   "players",
   "questProgress",
   "questions",
@@ -61,6 +62,43 @@ describe("database connection bootstrap", () => {
 
       expect(count).toBe(REQUIRED_TABLES.length);
       second.close();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("creates player subject progress table with persistence columns", () => {
+    const directory = mkdtempSync(join(tmpdir(), "frontend-realms-db-"));
+    const dbPath = join(directory, "frontend-realms.db");
+
+    try {
+      const sqlite = openSqliteDatabase(dbPath);
+      const table = sqlite
+        .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?")
+        .get("playerSubjectProgress") as { name: string } | undefined;
+      const columns = sqlite.prepare("PRAGMA table_info(playerSubjectProgress)").all() as {
+        name: string;
+      }[];
+
+      expect(table?.name).toBe("playerSubjectProgress");
+      expect(columns.map((column) => column.name)).toEqual([
+        "id",
+        "playerId",
+        "subjectId",
+        "currentLevel",
+        "maximumLevel",
+        "masteryScore",
+        "retentionScore",
+        "successfulEncounterCount",
+        "reviewEncounterCount",
+        "practicalEncounterCount",
+        "distinctStudySessionCount",
+        "bossStatus",
+        "startedAt",
+        "completedAt",
+        "updatedAt",
+      ]);
+      sqlite.close();
     } finally {
       rmSync(directory, { recursive: true, force: true });
     }

@@ -7,9 +7,11 @@ export interface QuestDisplay {
   name: string;
   description: string;
   frequency: "daily" | "weekly";
+  missionType: string;
   requiredCount: number;
   completedCount: number;
   completed: boolean;
+  rewarded: boolean;
   rewardXp: number;
   activeUntil: string;
 }
@@ -55,9 +57,11 @@ export class QuestService {
         name: quest.name,
         description: quest.description,
         frequency: quest.frequency,
+        missionType: quest.missionType,
         requiredCount: quest.requiredCount,
         completedCount: currentCount,
         completed: isCompleted,
+        rewarded: progress?.rewarded ?? false,
         rewardXp: quest.rewardXp,
         activeUntil: quest.activeUntil?.toISOString() ?? "",
       });

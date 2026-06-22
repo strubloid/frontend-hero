@@ -118,6 +118,13 @@ class MockMissionRepository implements MissionRepository {
     return this.store.get(id) ?? null;
   }
 
+  async getLastByPlayer(playerId: string): Promise<Mission | null> {
+    const missions = Array.from(this.store.values())
+      .filter((m) => m.playerId === playerId)
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
+    return missions[0] ?? null;
+  }
+
   async getCompletedByPlayer(playerId: string): Promise<Mission[]> {
     return Array.from(this.store.values()).filter(
       (m) => m.playerId === playerId && m.status === "completed",
@@ -387,6 +394,10 @@ describe("StartMissionUseCase", () => {
     };
 
     const result = await useCase.execute(input);
+
+    if (!result.success) {
+      throw new Error(`Expected successful mission start, got: ${result.reason}`);
+    }
 
     expect(result.mission).toBeDefined();
     expect(result.mission.id).toBeTruthy();
