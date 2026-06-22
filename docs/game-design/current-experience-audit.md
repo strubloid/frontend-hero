@@ -1,348 +1,352 @@
-# Current Experience Audit
+# Current Experience Audit — Frontend Realms
 
-> **Phase A deliverable** — Documented analysis of the existing Frontend Realms experience before the Command Centre and question-supply redesign.
+> **Date:** 2026-06-22
+> **Purpose:** Identify why the current app feels like a static question tool rather than a pixel-art learning RPG/adventure game, and specify exactly what must change.
+> **Method:** Read all game-design docs, inspected every page/component/module, ran all tests, cross-referenced against user's "Frontend Realms" rebranding requirements.
 
 ---
 
-## 1. Current Home Page Structure
+## Executive Summary
 
-The current route `/` (`src/app/page.tsx`) is a pure marketing landing page:
+The codebase is **architecturally sound** — clean modular monolith, 378 tests green, 11 E2E passing, 0 architecture violations, subject content fully populated. The gameplay **infrastructure** (auth, question rotation, mission flow, subject progression, boss flow, encounter forge) is largely in place.
+
+**The problem is visual and experiential, not functional.** The app looks and feels like a dark-themed admin panel with game mechanics bolted on. It does not look, sound, or feel like a pixel-art RPG.
+
+---
+
+## 1. What Works Well (Solid Infrastructure)
+
+| Area                | Status | Evidence                                                                        |
+| ------------------- | ------ | ------------------------------------------------------------------------------- |
+| Authentication      | ✅     | NextAuth v5, Google OAuth + credentials, hCaptcha, middleware                   |
+| Question rotation   | ✅     | `timesShown`/`lastShownAt` update, different question stems across missions     |
+| Subject content     | ✅     | `subjects/nextjs.md` has 33 concepts with hand-written seeds (Phase B complete) |
+| DB schema           | ✅     | All 16+ domain tables exist, `playerSubjectProgress` created                    |
+| Mission flow        | ✅     | StartMission → SubmitAnswer → feedback → complete, state machine                |
+| Subject progression | ✅     | `AdvanceSubjectLevelUseCase` wired after mission completion                     |
+| Boss flow           | ✅     | Intro → phase question → feedback → victory/defeat, state machine               |
+| Encounter Forge     | ✅     | Inventory by level/concept, health thresholds, generation pipeline              |
+| Command Centre      | ✅     | Real data via `LoadCommandCentreUseCase`, world nodes built dynamically         |
+| Subject selection   | ✅     | `/subjects` selects subject, creates `PlayerSubjectProgress`                    |
+| Test coverage       | ✅     | 378 unit/integration tests, 11 E2E, all passing                                 |
+| Architecture        | ✅     | 0 dependency violations, clean layer separation                                 |
+
+---
+
+## 2. Critical Gaps (Must Fix for Rebranding)
+
+### 2.1 No Pixel-Art Game Identity
+
+**Current:** Dark theme with gradient backgrounds (`#121212`, `#0a0a1a`), system UI font (`system-ui, sans-serif`), emoji icons (⚡, 🛡, ▲), glow effects and CSS gradients. Looks like a modern dark dashboard.
+
+**Required:** Pixel-art aesthetic with:
+
+- Pixel grid backgrounds (matrix-style)
+- Tile-based world map
+- Retro RPG color palette
+- Pixel fonts (Press Start 2P, etc.)
+- Character sprite / avatar
+
+**Current files violating:**
+
+- `src/app/page.tsx` — inline styles, modern gradient
+- `src/app/play/page.tsx` — inline styles, dark theme
+- `src/app/world-map/page.tsx` — 600+ lines of `<style>` tags, emoji icons
+- `src/app/subjects/page.tsx` — uses class names but no pixel styling
+- `src/app/boss-encounter/page.tsx` — inline styles
+- `src/app/login/page.tsx` — inline styles
+- All encounter forge components — SCSS but modern not pixel
+
+### 2.2 Two Disconnected World Maps
+
+**Current architecture has TWO world map UIs:**
+
+1. **Command Centre WorldStage** (`src/modules/command-centre/presentation/components/world-stage/`) — The REAL world map. Built dynamically from subject progression. Uses SCSS modules. Correctly shows level nodes (CAMPAIGN, BOSS, REVIEW, LOCKED states). This is the canonical game map.
+
+2. **Separate `/world-map` route** (`src/app/world-map/page.tsx`) — A DUPLICATE world map with its own complete implementation. Uses inline `<style>` tags. Has particle canvas, SVG connections, region cards with emoji. But **hardcodes `player-1`** and runs its own region derivation from subject domains. Not integrated with command centre.
+
+**Impact:** Two versions of the "world" that don't connect. The `/world-map` route has dead code paths and doesn't use the authenticated player.
+
+### 2.3 No Country/Region Task System
+
+**Current:** Progress is tracked through "levels" within a subject. Each level has concepts and encounters. No concept of "countries" with tasks/stages.
+
+**Required:**
+
+- World map shows countries/regions (not just levels)
+- Each country has 10 tasks/stages
+- ≥80% completion unlocks adjacent countries
+- All 10 tasks → boss unlock
+- Country completion rewards (XP, cosmetics, achievements)
+
+**Gaps:**
+
+- No `worldRegions` table in schema
+- No `regionTasks` table
+- No `regionAdjacency` data
+- No `sceneObjects` / keyword collectibles
+- No task progression tracking per region
+
+### 2.4 No Animated Transitions or Travel
+
+**Current:** Standard Next.js page navigation. No slide transitions, no travel animations, no loading screens when "traveling" between regions.
+
+**Required:**
+
+- Slide transitions between: Command Centre → World Map → Region → Encounter
+- Travel animation when moving between regions
+- Loading states that feel like "traveling" rather than "loading data"
+
+### 2.5 Hardcoded Player ID
+
+**Critical file:**
+
+- `src/app/actions/world-map.ts` line 93: `getWorldMap("player-1", "nextjs")`
+- The action uses a fixed module-level `sqlite` singleton and hardcoded `"player-1"`
+
+**Impact:** The `/world-map` page shows data for player-1, not the authenticated user. New users see no regions.
+
+### 2.6 Inline Styles Everywhere
+
+Several major pages use inline `style={{}}` objects or `<style>{` tags instead of SCSS modules:
+
+| Page                       | Styling Method                      |
+| -------------------------- | ----------------------------------- |
+| `/page.tsx` (home)         | Inline `style={{}}`                 |
+| `/play/page.tsx`           | Inline `style={{}}`                 |
+| `/world-map/page.tsx`      | 600+ lines of `<style>{` + inline   |
+| `/boss-encounter/page.tsx` | Inline `style={{}}`                 |
+| `/subjects/page.tsx`       | Class names but no SCSS module      |
+| `/login/page.tsx`          | Inline + `auth.module.scss` (mixed) |
+
+Command Centre modules use proper SCSS modules. This inconsistency needs to be resolved.
+
+### 2.7 No Level-Up / Achievement Celebration
+
+**Current:** XP is shown as toast notifications (`+75 XP`). No level-up animation, no banner, no particle effects, no celebration sequence when:
+
+- Player levels up
+- Subject level advances
+- Boss is defeated
+- Achievement is earned
+
+**Required:**
+
+- Full-screen level-up banner animation
+- Achievement unlocked popup
+- Boss defeat celebration with rewards reveal
+- Reduced-motion-safe alternatives
+
+### 2.8 Limited Visual Feedback During Encounters
+
+**Current:** Question → select answer → feedback shows correct/incorrect + explanation. No health bar for boss encounters. No timer visual. No progress indicator for mission stages.
+
+**Required:**
+
+- Enemy health bar that depletes on correct answers
+- Player damage animation on wrong answers
+- Combo/streak visual indicator
+- Mission progress as a route/path visualization
+
+### 2.9 Missing Game-Like Pages
+
+| Route                | Status                    | Notes                                   |
+| -------------------- | ------------------------- | --------------------------------------- |
+| `/` (Command Centre) | ✅ Exists, real data      | Needs pixel/HUD makeover                |
+| `/play`              | ✅ Exists                 | Inline styles, no game feel             |
+| `/world-map`         | ⚠️ Exists                 | Duplicate, hardcoded, needs unification |
+| `/boss-encounter`    | ✅ Exists                 | Inline styles, needs boss UI            |
+| `/encounter-forge`   | ✅ Exists                 | Modern SCSS, no game feel               |
+| `/subjects`          | ✅ Exists                 | Needs pixel makeover                    |
+| `/collections`       | 🚫 Exists but unevaluated | Need to check                           |
+| `/profile`           | 🚫 Exists but unevaluated | Need to check                           |
+| `/settings`          | 🚫 Exists but unevaluated | Need to check                           |
+| `/achievements`      | ❌ Missing                | No dedicated achievements page          |
+| `/skill-tree`        | ❌ Missing                | No skill tree page                      |
+| `/reviews`           | ❌ Missing                | No dedicated review page                |
+| `/quests`            | ❌ Missing                | No daily/weekly quest page              |
+
+### 2.10 Narrative / Story Missing
+
+**Current:** No persistent narrative. Quests are functional ("Complete 3 encounters on component patterns"). No story fragments, no world lore, no character dialogue.
+
+**Required:**
+
+- Story fragments unlocked by completing regions
+- NPC-like guidance/mentor
+- Narrative introduction when entering a new region
+- World-building text on loading screens
+
+---
+
+## 3. Map: Desired States → Gaps
+
+| Desired State (from user)                       | Current State                             | Gap                                  |
+| ----------------------------------------------- | ----------------------------------------- | ------------------------------------ |
+| "Pixel-art learning RPG"                        | Dark dashboard with emoji                 | No pixel art, no retro aesthetic     |
+| "World map: Mario/Minecraft/pixel vibe"         | Inline CSS world map with particle canvas | No tile grid, no pixel terrain       |
+| "Country/region = subject area, 10 tasks"       | Levels with encounters, no country model  | No region tasks, no task progression |
+| "≥80% unlocks adjacent"                         | Level-based sequential unlock             | Not task-percentage based            |
+| "All 10 triggers boss"                          | Boss at final level, not task-based       | No connection between tasks and boss |
+| "Command Centre → World Map → slide transition" | Static Next.js navigation                 | No animated transitions              |
+| "Keyword objects on map"                        | No object system                          | No collectible items                 |
+| "XP/mastery/level-up banner"                    | Toast notification                        | No celebration UX                    |
+| "Unlock animation"                              | No animation                              | No unlock sequence                   |
+| "Pixel-art character avatar"                    | No avatar                                 | No character representation          |
+| "Matrix/pixel background energy"                | Solid dark background                     | No animated pixel background         |
+| "HUD consistent across pages"                   | Some pages inline, some SCSS              | No consistent game overlay           |
+| "NPC dialogue / story"                          | No story system                           | No narrative layer                   |
+
+---
+
+## 4. Recommended Execution Order
+
+The order is designed to produce visible game-feel improvements early while building toward a complete transformation.
+
+### Phase 1: Audit (this document) ⬅️ YOU ARE HERE
+
+### Phase 2: Build the Unified World Map (Countries & Regions)
+
+**Goal:** Replace the two separate world maps with one canonical pixel-art world map that uses authenticated player data and shows countries/regions with task-based progression.
+
+**Key changes:**
+
+- Add `worldRegions`, `regionTasks`, `regionAdjacency` tables to schema
+- Add `worldRegionRepository`, `regionTaskRepository`
+- Build region factory (10 tasks per region, ≥80% unlocks adjacent)
+- Create a single WorldMap component with pixel-art tile grid
+- Wire authenticated player to world map (no hardcoded `player-1`)
+- Connect region entry to encounter flow
+- Add `/collections` as scene-object inventory page
+
+### Phase 3: Visual Game Identity
+
+**Goal:** Apply pixel-art visual identity to every page.
+
+**Key changes:**
+
+- Add shared game HUD overlay component (applied globally)
+- Replace all inline styles with SCSS modules
+- Build pixel-art design system (colors, fonts, tiles, borders)
+- Add pixel font (Press Start 2P via next/font)
+- Create animated matrix/pixel background
+- Build character avatar system
+- Add animated transitions between pages (framer-motion or CSS)
+
+### Phase 4: Game Feel — Encounters & Feedback
+
+**Goal:** Make encounters feel like boss battles and learning adventures.
+
+**Key changes:**
+
+- Add health bar to boss encounters
+- Add combo/streak visual indicator
+- Add timer visual for speed bonus
+- Build level-up / achievement celebration banners
+- Add enemy sprite states (healthy → damaged → defeated)
+- Add answer animation (correct = hit enemy, wrong = player takes damage)
+
+### Phase 5: Narrative & Story Layer
+
+**Goal:** Add story fragments, NPC dialogue, and world-building text.
+
+**Key changes:**
+
+- Add story fragments table
+- Create lore/narrative text for each region
+- Add NPC guide character
+- Build dialogue bubble component
+- Show narrative on region entry
+
+### Phase 6: Polish & Production Readiness
+
+**Goal:** Final quality pass, accessibility, responsive, test coverage.
+
+**Key changes:**
+
+- Add E2E tests for new game feel (regions, tasks, transitions)
+- Add visual regression tests
+- Accessibility audit (keyboard navigation, reduced motion)
+- Performance optimization
+- `npm run verify:full` green
+
+---
+
+## 5. Files That Must Change (Master List)
+
+### New Files Needed
 
 ```
-┌─────────────────────────────────────┐
-│            ⚔ (emoji icon)           │
-│          Frontend Realms            │
-│  A gamified journey to senior-level │
-│  frontend engineering.              │
-│                                     │
-│  "The Frontend Realms stretch... "  │
-│  (lore quotation in blockquote)     │
-│                                     │
-│  [Enter the Realms]  [Continue]     │
-│  [Profile]          [Subjects]      │
-│                                     │
-│  ┌──────┐ ┌──────┐ ┌──────┐       │
-│  │ World│ │ Boss │ │Spaced│       │
-│  │ Map  │ │Encntr│ │Repet.│       │
-│  ├──────┤ ├──────┤ ├──────┤       │
-│  │Adapt.│ │Achiev│ │Interv│       │
-│  │Diff. │ │ments │ │Prep  │       │
-│  └──────┘ └──────┘ └──────┘       │
-│                                     │
-│  v0.2.0 · Game Foundation          │
-└─────────────────────────────────────┘
+src/modules/game-world/domain/world-region.ts       ← Country/region entity
+src/modules/game-world/domain/region-task.ts         ← Task entity (10 per region)
+src/modules/game-world/domain/region-adjacency.ts    ← Adjacency rules
+src/modules/game-world/domain/world-region-repository.ts
+src/modules/game-world/domain/region-task-repository.ts
+src/modules/game-world/infrastructure/drizzle-world-region-repository.ts
+src/modules/game-world/infrastructure/drizzle-region-task-repository.ts
+src/modules/game-world/application/region-factory.ts  ← Creates regions from subjects
+src/modules/game-world/presentation/components/pixel-world-map/  ← Canonical world map
+src/modules/game-world/presentation/components/region-card/
+src/modules/shared/presentation/components/game-hud-overlay/     ← Global HUD
+src/modules/shared/presentation/components/pixel-background/     ← Animated bg
+src/modules/shared/presentation/styles/pixel-design-system.scss  ← Tokens
+src/modules/shared/presentation/components/celebration-banner/   ← Level-up etc.
 ```
 
-### Problems
+### Files to Modify (Major Reworks)
 
-| Issue                        | Detail                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| **Marketing tone**           | Explains what the product is rather than immersing the player            |
-| **No game state**            | Zero player data on screen — no XP, level, mastery, or active quest      |
-| **Static content**           | Same view for new player and returning player                            |
-| **Feature grid**             | Six cards explain systems instead of letting the player interact         |
-| **Equally weighted actions** | Four buttons with no visual hierarchy                                    |
-| **Emoji artwork**            | Emoji as primary visual identity                                         |
-| **Inline styles**            | All CSS in `<style>` tag — not using SCSS modules                        |
-| **No responsive design**     | Single-column grid breakpoint only; desktop is a stretched mobile column |
-| **No game HUD**              | No persistent identity, progress, or actions                             |
-| **Background**               | Empty black with no atmospheric elements                                 |
-| **Version text**             | Floats without purpose                                                   |
+```
+src/app/world-map/page.tsx                          ← Replace entirely with canonical component
+src/app/page.tsx                                    ← Replace inline styles, add pixel identity
+src/app/play/page.tsx                               ← Replace inline styles, add game feel
+src/app/play/page.tsx (render section)               ← Add health bar, combo, enemy sprite
+src/app/boss-encounter/page.tsx                     ← Replace inline styles, add pixel boss UI
+src/app/subjects/page.tsx                           ← Add pixel styling
+src/app/actions/world-map.ts                        ← Wire authenticated player, not hardcoded
+src/shared/infrastructure/database/schema.ts        ← Add region tables
+src/shared/infrastructure/database/create-tables.ts ← Add region tables
+```
 
-The page describes a game but does not behave like one.
+### Files to Modify (Incremental Improvements)
 
----
-
-## 2. Question Supply Audit
-
-### Existing Question Count
-
-| Source                                               | Count                                              |
-| ---------------------------------------------------- | -------------------------------------------------- |
-| `subjects/nextjs.md` — JavaScript Foundations domain | 2 concepts                                         |
-| — `javascript.event-loop`                            | 2 question seeds                                   |
-| — `javascript.call-stack`                            | 0 question seeds (referenced as prerequisite only) |
-| — `javascript.promises`                              | 0 question seeds (referenced as prerequisite only) |
-| `subjects/nextjs.md` — React Foundations domain      | 2 concepts                                         |
-| — `react.component-composition`                      | 2 question seeds                                   |
-| — `react.jsx-syntax`                                 | 0 question seeds (referenced but not defined)      |
-| **Total question seeds in the entire project**       | **4**                                              |
-
-### Question Type Distribution
-
-| Type              | Count |
-| ----------------- | ----- |
-| `multiple-choice` | 4     |
-| `multiple-select` | 0     |
-| `true-false`      | 0     |
-| `fill-blank`      | 0     |
-| `code-prediction` | 0     |
-| `matching`        | 0     |
-| `ordering`        | 0     |
-
-All four questions are difficulty 1–2 foundational multiple-choice. No intermediate, advanced, or senior content exists.
-
-### Duplicate Risk
-
-No duplicate detection exists. Two questions with identical options and different stems would both enter the bank.
-
-### AI Integration
-
-The `artificial-intelligence` module (`src/modules/artificial-intelligence/`) **does not exist**. There is:
-
-- No `ArtificialIntelligenceGateway` interface
-- No Big Pickle integration
-- No batch generation
-- No question validation pipeline
-- No generation job system
-- No question inventory monitoring
-
-The architecture documents reference AI integration as a planned extension point (covered in `docs/architecture/extension-points.md`) but it was never implemented.
-
-### Question Persistence
-
-The `questions` table in the Drizzle schema (`src/shared/infrastructure/database/schema.ts`) stores:
-
-- `id`, `subjectId`, `conceptId`, `seedId`, `type`, `difficulty`, `stem`, `options`, `correctIndex`, `explanation`, `timesShown`, `lastShownAt`, `qualityRating`
-
-The `QuestionRepository` interface provides:
-
-- `getById`, `create`, `getByConceptId`, `getRandomBySubjectId`, `getBySeedAndSubject`
-
-No methods for: inventory counting, batch retrieval, duplicate detection, approval workflow, or health checks.
-
-### Question Provider
-
-The `QuestionProvider` (`src/modules/questions/application/question-provider.ts`) selects from concept `QuestionSeed` definitions embedded in subject files. It has:
-
-- Difficulty adaptation based on mastery
-- Repetition control (recent questions, shown count)
-- Variety enforcement
-
-But it only selects from pre-defined seeds — it cannot call an AI provider to generate new content.
+```
+src/modules/game-world/domain/world-map-service.ts  ← Add region unlock by task %
+src/modules/missions/presentation/components/reward-result-screen/ ← Add celebration animation
+src/modules/questions/presentation/components/encounter-forge/     ← Add pixel styling
+```
 
 ---
 
-## 3. Existing Reusable Data
+## 6. Non-Negotiable Rules
 
-### Player State
-
-The `Player` entity (`src/modules/players/domain/player.ts`) carries:
-
-- `level`, `experiencePoints`, `masteryPoints`
-- `currentSubjectId`, `currentRegionId`
-- `selectedTitle`, `selectedTheme`
-- `lastActiveAt`, `lastReturnBonusClaimedAt`
-
-### Player Progression
-
-The `PlayerProgression` entity (`src/modules/progression/domain/player-progression.ts`) carries:
-
-- `level`, `currentXp`, `xpToNextLevel`, `totalXpEarned`
-- XP calculation: `calculateAnswerXp()`, `addXp()`, `xpToLevel()`
-- Level thresholds array (levels 1–15)
-
-### Mastery
-
-The `ConceptMastery` entity (`src/modules/mastery/domain/concept-mastery.ts`) carries:
-
-- `masteryScore`, `confidenceScore`, `retentionScore`
-- `correctAttempts`, `incorrectAttempts`, `consecutiveCorrectAnswers`
-- `demonstratedContexts`, `commonMistakes`
-- `nextReviewAt`
-
-### World Map
-
-The `Region` entity (`src/modules/game-world/domain/region.ts`) carries:
-
-- `order`, `requiredConceptIds`, `requiredMastery`
-- `bossConceptId`, `bossDefeated`, `unlocked`
-- `subjectId`
-
-The `WorldMapService` (`src/modules/game-world/domain/world-map-service.ts`) provides:
-
-- `checkUnlocks()` — evaluates concept mastery against region gates
-- `getUnlockDetails()` — returns blocked-by information
-- `getProgress()` — overall world map progress
-
-### Achievements
-
-The `Achievement` entity (`src/modules/rewards/domain/achievement.ts`) supports:
-
-- 12 condition types (concepts mastered, missions completed, bosses defeated, etc.)
-- Reward grants (titles, cosmetics, XP bonuses)
-- Player titles
-
-### Missions
-
-The `Mission` entity (`src/modules/missions/domain/mission.ts`) supports:
-
-- Types: encounter, boss, side-quest, daily, review, interview
-- Status: pending, active, completed, failed
-- `questionIds[]`, `currentQuestionIndex`, `score`
-
-The `MissionSelector` prioritises: overdue reviews → weak concepts → new concepts → fallback.
-
-The `StartMissionUseCase` loads player, subject, mastery, reviews, builds a prerequisite graph, selects a mission plan, provides questions, and creates the mission.
-
-### Quests
-
-The `Quest` entity (`src/modules/missions/domain/quest.ts`) supports:
-
-- Daily and weekly quests
-- `requiredCount`, `rewardXp`, `rewardTitle`
-- Player quest progress tracking
-
-### Boss Encounters
-
-The `bossEncounters` and `bossProgress` tables exist in the schema. The `BossEncounter` entity supports:
-
-- Multi-phase encounters
-- `requiredDifficulty`, `requiredConceptIds`
-- `rewardTitle`, `rewardAchievementId`
-- Cooldown days
+1. **Do not break existing tests** — 378 tests and 11 E2E must remain green.
+2. **Do not duplicate the world map again** — unify into one canonical component.
+3. **Do not use hardcoded player IDs** — always use authenticated session.
+4. **Do not add inline styles** — all new styling must be SCSS modules.
+5. **Do not remove existing game loops** — add, don't replace.
+6. **Do not call AI during gameplay** — Encounter Forge remains manual.
+7. **Preserve accessibility** — reduced-motion alternatives for all animations.
+8. **Preserve the clean architecture** — no business logic in components.
 
 ---
 
-## 4. Existing Reusable Components
+## 7. Verification Gates
 
-### Presentation Components
+Before/after each phase:
 
-| Component          | Path                                                        | Notes                          |
-| ------------------ | ----------------------------------------------------------- | ------------------------------ |
-| `AuthProvider`     | `src/modules/authentication/presentation/auth-provider.tsx` | Session provider               |
-| `ToastProvider`    | `src/components/toast-provider.tsx`                         | Used by play and profile pages |
-| `OnboardingFlow`   | `src/components/onboarding-flow.tsx`                        | Used by world map              |
-| `StoryProgression` | `src/components/story-banner.tsx`                           | Used by world map              |
+```bash
+npm run format:check
+npm run lint
+npm run type-check
+npm run depcruise
+npm run test
+npm run test:e2e
+```
 
-### Pages
+Final acceptance:
 
-| Page              | Path                              | Notes                                                 |
-| ----------------- | --------------------------------- | ----------------------------------------------------- |
-| `/`               | `src/app/page.tsx`                | Landing page — to be replaced                         |
-| `/play`           | `src/app/play/page.tsx`           | Mission encounter UI with phase state machine         |
-| `/world-map`      | `src/app/world-map/page.tsx`      | Region grid with particles, connections, detail panel |
-| `/profile`        | `src/app/profile/page.tsx`        | Player stats, achievements, titles, themes            |
-| `/subjects`       | `src/app/subjects/page.tsx`       | Subject selection grid                                |
-| `/boss-encounter` | `src/app/boss-encounter/page.tsx` | Boss battle UI with phase state machine               |
-| `/collections`    | `src/app/collections/page.tsx`    | Collection viewing                                    |
-| `/settings`       | `src/app/settings/page.tsx`       | Settings                                              |
-| `/login`          | `src/app/login/page.tsx`          | Login                                                 |
-| `/register`       | `src/app/register/page.tsx`       | Registration                                          |
+```bash
+npm run verify:full
+```
 
-### Server Actions
-
-| Action                | Path                           | Purpose                      |
-| --------------------- | ------------------------------ | ---------------------------- |
-| `startMission`        | `src/app/actions/missions.ts`  | Creates a new mission        |
-| `submitAnswer`        | `src/app/actions/missions.ts`  | Evaluates and records answer |
-| `getWorldMap`         | `src/app/actions/world-map.ts` | Returns world map state      |
-| `getPlayerProfile`    | `src/app/actions/profile.ts`   | Returns player profile data  |
-| `getSubjectSummaries` | `src/app/actions/subjects.ts`  | Returns subject list         |
-
----
-
-## 5. Missing Gameplay State
-
-| State                     | Status     | Notes                                                         |
-| ------------------------- | ---------- | ------------------------------------------------------------- |
-| Game HUD                  | ❌ Missing | No persistent XP/level/mastery display across routes          |
-| Current quest             | ❌ Missing | No "active quest" display on home                             |
-| Campaign rail             | ❌ Missing | No subject-level campaign path                                |
-| Interactive world stage   | ❌ Missing | World map exists but is a separate page                       |
-| Quest inspector           | ❌ Missing | No contextual right-side panel                                |
-| Action dock               | ❌ Missing | No contextual action bar                                      |
-| First-time guidance       | ⚠️ Partial | OnboardingFlow exists but is disconnected from command centre |
-| Reward feedback           | ⚠️ Partial | Toast-based XP display in play page                           |
-| Subject-level progression | ❌ Missing | Player has level but subject does not                         |
-| Question inventory health | ❌ Missing | No monitoring or display                                      |
-| Generation status         | ❌ Missing | No generation infrastructure at all                           |
-| Level-up gates            | ❌ Missing | Subject advancement requires only basic gates                 |
-| Subject boss              | ❌ Missing | Per-subject boss system not implemented                       |
-| Player identity in HUD    | ❌ Missing | Name/level/title not shown persistently                       |
-| Notification state        | ❌ Missing | No review-ready, reward, or unlock indicators                 |
-
----
-
-## 6. Accessibility Concerns
-
-| Concern                       | Detail                                                                                                                |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Inline styles**             | Home page, play page, and world map use inline `<style>` blocks or `React.CSSProperties` — not accessible CSS modules |
-| **Colour-only communication** | Locked region opacity, status colours — no text equivalents                                                           |
-| **Keyboard navigation**       | World map cards have `role="button"` and `tabIndex` but no arrow-key navigation                                       |
-| **Reduced motion**            | No `prefers-reduced-motion` support for animations                                                                    |
-| **Screen reader labels**      | Feature grid cards on home page lack `aria-label`                                                                     |
-| **Focus indicators**          | Inline-styled buttons may lack visible focus rings                                                                    |
-| **Colour contrast**           | Small grey text (#64748b, #94a3b8) on dark background (#1e293b) may fail WCAG AA                                      |
-
----
-
-## 7. Architecture Concerns
-
-| Concern                      | Detail                                                                                                                                         |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No AI gateway**            | The artificial-intelligence module is referenced but not built. Zero AI integration exists.                                                    |
-| **No question generation**   | All questions are hard-coded seed definitions. A game with 4 questions is not viable.                                                          |
-| **No subject-level model**   | `SubjectLevel` is a string enum on concepts (foundation/intermediate/advanced/senior), not a numeric per-subject progression with levels 1-10. |
-| **Command centre module**    | No `command-centre` module exists. No view models for game HUD, current quest, world stage.                                                    |
-| **E2E testing**              | No Playwright configuration or E2E tests exist.                                                                                                |
-| **Presentation layer**       | Most pages use inline styles rather than SCSS modules per architecture rules.                                                                  |
-| **Player identity coupling** | Server actions use hard-coded `"default-player"` and `"player-1"` — not yet connected to real authentication.                                  |
-| **View models**              | No typed view models for game-state display — components fetch raw domain data.                                                                |
-
----
-
-## 8. Proposed Migration Path
-
-### What stays
-
-- All domain entities (Player, Mission, ConceptMastery, Region, etc.)
-- All existing use cases (StartMissionUseCase, SubmitAnswerUseCase)
-- All existing repositories (Drizzle-backed — working, tested)
-- World map service logic (unlock calculation, progress)
-- Progression calculation (xpToLevel, addXp)
-- Achievement system
-- Quest system
-- Boss encounter system
-- Mission selector logic
-- Question provider logic (will be extended for subject-level filtering)
-- SCSS module infrastructure
-
-### What gets redesigned
-
-- Home page (`/`) → Command Centre
-- Layout (`layout.tsx`) → persistent game HUD
-- Navigation → persistent HUD icons with tooltips
-- Profile → detail page (command centre shows essential summary)
-- World map → integrated into command centre world stage
-- Question supply → batch generation through Big Pickle
-
-### What gets added
-
-- `command-centre` module (application + presentation)
-- `question-generation` application services
-- `artificial-intelligence` module (gateway + batch generation)
-- `subject-progression` domain model (subject levels, requirements, gates)
-- `encounter-forge` interface
-- Typed view models (GameHudViewModel, CurrentQuestViewModel, WorldNodeViewModel, CommandCentreViewModel)
-- Development fixtures for typed view models (replaceable provider)
-- E2E test infrastructure (Playwright)
-- Subject-level campaign definitions in subject files
-
----
-
-## 9. Initial Verification Status
-
-| Check                        | Result                                                                          |
-| ---------------------------- | ------------------------------------------------------------------------------- |
-| `npm run format:check`       | ⚠️ 3 files failing (src/app/layout.tsx, src/proxy.ts, tests/unit/proxy.test.ts) |
-| `npm run lint`               | ✅ Passes                                                                       |
-| `npm run type-check`         | ✅ Passes                                                                       |
-| `npm run depcruise`          | ✅ Passes (no architecture violations)                                          |
-| `npm run audit:production`   | ✅ Passes                                                                       |
-| `npm run audit:dependencies` | ✅ Passes                                                                       |
-| `npm run build`              | ✅ Passes                                                                       |
-| `npm run test`               | ✅ 241 tests pass across 24 files                                               |
-
-_This audit was produced on 2026-06-18 as Phase A of the Command Centre redesign._
+Plus manual browser inspection of every changed page to confirm the game-feel transformation.
