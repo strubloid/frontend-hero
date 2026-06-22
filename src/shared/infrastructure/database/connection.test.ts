@@ -16,15 +16,19 @@ const REQUIRED_TABLES = [
   "missions",
   "playerAchievements",
   "playerProgression",
+  "playerRegionProgress",
   "playerSubjectProgress",
   "players",
   "questProgress",
   "questions",
   "quests",
+  "regionAdjacency",
+  "regionTasks",
   "reviewSchedules",
   "session",
   "subjects",
   "verificationToken",
+  "worldRegions",
 ];
 
 describe("database connection bootstrap", () => {

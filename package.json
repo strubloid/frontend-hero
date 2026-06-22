@@ -22,6 +22,7 @@
     "depcruise": "depcruise --config .dependency-cruiser.cjs src --output-type err-long",
     "verify": "npm run format:check && npm run lint && npm run type-check && npm run depcruise && npm run audit:production && npm run audit:dependencies && npm run build",
     "verify:full": "npm run verify && npm run test",
+    "verify:production": "npm run verify:full && npm run docker:verify",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --headed",
     "docker:build": "docker build -t frontend-realms .",

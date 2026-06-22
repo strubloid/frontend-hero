@@ -269,6 +269,60 @@ export function createApplicationTables(sqlite: Database.Database): void {
       completedAt TEXT,
       updatedAt TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS worldRegions (
+      id TEXT PRIMARY KEY,
+      subjectId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL,
+      narrative TEXT NOT NULL,
+      domainName TEXT NOT NULL,
+      icon TEXT NOT NULL,
+      "order" INTEGER NOT NULL,
+      totalTasks INTEGER DEFAULT 10 NOT NULL,
+      unlockThresholdPercent INTEGER DEFAULT 80 NOT NULL,
+      hasBoss INTEGER DEFAULT 1 NOT NULL,
+      bossEncounterId TEXT,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS regionTasks (
+      id TEXT PRIMARY KEY,
+      regionId TEXT NOT NULL,
+      "order" INTEGER NOT NULL,
+      conceptId TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      difficulty INTEGER NOT NULL,
+      xpReward INTEGER DEFAULT 25 NOT NULL,
+      required INTEGER DEFAULT 1 NOT NULL,
+      subjectLevel INTEGER NOT NULL,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS regionAdjacency (
+      id TEXT PRIMARY KEY,
+      fromRegionId TEXT NOT NULL,
+      toRegionId TEXT NOT NULL,
+      bidirectional INTEGER DEFAULT 1 NOT NULL,
+      requiredProgressPercent INTEGER DEFAULT 80 NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS playerRegionProgress (
+      id TEXT PRIMARY KEY,
+      playerId TEXT NOT NULL,
+      regionId TEXT NOT NULL,
+      completedTaskCount INTEGER DEFAULT 0 NOT NULL,
+      totalTaskCount INTEGER NOT NULL,
+      completedTaskIds TEXT DEFAULT '[]' NOT NULL,
+      bossDefeated INTEGER DEFAULT 0 NOT NULL,
+      unlocked INTEGER DEFAULT 0 NOT NULL,
+      completed INTEGER DEFAULT 0 NOT NULL,
+      enteredAt TEXT,
+      updatedAt TEXT NOT NULL
+    );
   `);
 
   // Columns added after initial table creation

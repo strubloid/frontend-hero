@@ -292,6 +292,62 @@ export const playerSubjectProgress = sqliteTable("playerSubjectProgress", {
   updatedAt: text("updatedAt").notNull(),
 });
 
+// ─── World Regions ────────────────────────────────────────────────────────────
+
+export const worldRegions = sqliteTable("worldRegions", {
+  id: text("id").primaryKey(),
+  subjectId: text("subjectId").notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  narrative: text("narrative").notNull(),
+  domainName: text("domainName").notNull(),
+  icon: text("icon").notNull(),
+  order: integer("order").notNull(),
+  totalTasks: integer("totalTasks").default(10).notNull(),
+  unlockThresholdPercent: integer("unlockThresholdPercent").default(80).notNull(),
+  hasBoss: integer("hasBoss", { mode: "boolean" }).default(true).notNull(),
+  bossEncounterId: text("bossEncounterId"),
+  createdAt: text("createdAt").notNull(),
+  updatedAt: text("updatedAt").notNull(),
+});
+
+export const regionTasks = sqliteTable("regionTasks", {
+  id: text("id").primaryKey(),
+  regionId: text("regionId").notNull(),
+  order: integer("order").notNull(),
+  conceptId: text("conceptId").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  difficulty: integer("difficulty").notNull(),
+  xpReward: integer("xpReward").default(25).notNull(),
+  required: integer("required", { mode: "boolean" }).default(true).notNull(),
+  subjectLevel: integer("subjectLevel").notNull(),
+  createdAt: text("createdAt").notNull(),
+  updatedAt: text("updatedAt").notNull(),
+});
+
+export const regionAdjacency = sqliteTable("regionAdjacency", {
+  id: text("id").primaryKey(),
+  fromRegionId: text("fromRegionId").notNull(),
+  toRegionId: text("toRegionId").notNull(),
+  bidirectional: integer("bidirectional", { mode: "boolean" }).default(true).notNull(),
+  requiredProgressPercent: integer("requiredProgressPercent").default(80).notNull(),
+});
+
+export const playerRegionProgress = sqliteTable("playerRegionProgress", {
+  id: text("id").primaryKey(),
+  playerId: text("playerId").notNull(),
+  regionId: text("regionId").notNull(),
+  completedTaskCount: integer("completedTaskCount").default(0).notNull(),
+  totalTaskCount: integer("totalTaskCount").notNull(),
+  completedTaskIds: text("completedTaskIds").default("[]").notNull(),
+  bossDefeated: integer("bossDefeated", { mode: "boolean" }).default(false).notNull(),
+  unlocked: integer("unlocked", { mode: "boolean" }).default(false).notNull(),
+  completed: integer("completed", { mode: "boolean" }).default(false).notNull(),
+  enteredAt: text("enteredAt"),
+  updatedAt: text("updatedAt").notNull(),
+});
+
 // ─── NextAuth Tables ─────────────────────────────────────────────────────────
 
 export const accounts = sqliteTable(

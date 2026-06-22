@@ -1,0 +1,526 @@
+// ─── Pixel World Map ─────────────────────────────────────────────────────────
+// Retro RPG-style world map with pixel-art borders and region cards
+// ---------------------------------------------------------------------------
+
+.worldMap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(180deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+  border: 2px solid #2a2a4a;
+  border-radius: 12px;
+  font-family: "Courier New", "Menlo", "Consolas", monospace;
+  position: relative;
+  min-height: 400px;
+
+  // Pixel grid background
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    border-radius: 10px;
+  }
+}
+
+// ─── Player HUD ────────────────────────────────────────────────────────────
+
+.playerHud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.playerLevel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(180deg, #1a1a3a 0%, #0d0d2b 100%);
+  border: 2px solid #4a4a8a;
+  border-radius: 4px;
+}
+
+.levelLabel {
+  font-size: 10px;
+  color: #8a8acc;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.levelValue {
+  font-size: 20px;
+  font-weight: bold;
+  color: #c4b5fd;
+  text-shadow: 0 0 8px rgba(196, 181, 253, 0.5);
+}
+
+.xpBarContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xpBarTrack {
+  flex: 1;
+  height: 12px;
+  background: #1a1a3a;
+  border: 1px solid #3a3a5a;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.xpBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.6);
+}
+
+.xpText {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.progressSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 12px;
+  border-left: 1px solid #2a2a4a;
+}
+
+.progressStat {
+  font-size: 12px;
+  color: #9ca3af;
+
+  strong {
+    color: #e5e7eb;
+    font-size: 14px;
+  }
+}
+
+// ─── Subject Title ──────────────────────────────────────────────────────────
+
+.subjectTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #8a8acc;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1a1a3a;
+}
+
+.titleIcon {
+  font-size: 16px;
+}
+
+// ─── Region Grid ────────────────────────────────────────────────────────────
+
+.regionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+
+// ─── Region Card ────────────────────────────────────────────────────────────
+
+.regionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: transform 0.15s ease;
+
+  &:focus-visible {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.02);
+    z-index: 10;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+// Status classes
+.statusAvailable {
+  .regionCard {
+  }
+}
+
+.statusLocked {
+  .cardBody {
+    filter: grayscale(0.9);
+    opacity: 0.6;
+  }
+}
+
+.statusInProgress {
+  .cardBody {
+    border-color: #6366f1;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+  }
+}
+
+.statusCompleted {
+  .cardBody {
+    border-color: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.15);
+  }
+}
+
+// Connector lines between regions
+.connector {
+  display: flex;
+  justify-content: center;
+  height: 24px;
+  width: 100%;
+  position: relative;
+
+  &::after {
+    content: "↓";
+    position: absolute;
+    bottom: -2px;
+    font-size: 16px;
+    color: #4a4a6a;
+  }
+}
+
+.connectorLine {
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #4a4a6a, transparent);
+}
+
+.connectorBottom {
+  display: flex;
+  justify-content: center;
+  height: 16px;
+  width: 100%;
+
+  &::after {
+    content: "";
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, #4a4a6a, transparent);
+  }
+}
+
+// Card Body
+.cardBody {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(20, 20, 45, 0.95));
+  border: 2px solid #2a2a4a;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+
+  // Pixel corner decorations
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #4a4a7a;
+  }
+  &::before {
+    top: 4px;
+    left: 4px;
+    border-right: none;
+    border-bottom: none;
+  }
+  &::after {
+    bottom: 4px;
+    right: 4px;
+    border-left: none;
+    border-top: none;
+  }
+}
+
+// Region icon
+.cardIcon {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #3a3a5a;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.bossIcon {
+  font-size: 28px;
+  animation: bossPulse 2s ease-in-out infinite;
+}
+
+@keyframes bossPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.completedIcon {
+  font-size: 24px;
+}
+
+// Card info
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lockIcon {
+  font-size: 12px;
+}
+
+.bossDefeatedIcon {
+  font-size: 14px;
+}
+
+.cardDescription {
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.3;
+}
+
+// Progress section
+.progressSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.progressBarTrack {
+  width: 80px;
+  height: 8px;
+  background: #1a1a3a;
+  border: 1px solid #3a3a5a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  transition: width 0.4s ease;
+  border-radius: 1px;
+
+  &[data-status="completed"] {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
+  }
+
+  &[data-status="in-progress"] {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    box-shadow: 0 0 4px rgba(99, 102, 241, 0.4);
+  }
+
+  &[data-status="available"] {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+  }
+
+  &[data-status="locked"] {
+    background: #4b5563;
+  }
+}
+
+.progressText {
+  font-size: 12px;
+  font-weight: bold;
+  color: #9ca3af;
+  min-width: 36px;
+  text-align: right;
+}
+
+// Order badge
+.orderBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  color: #4a4a6a;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #3a3a5a;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+}
+
+// ─── Map Legend ────────────────────────────────────────────────────────────
+
+.mapLegend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #1a1a3a;
+  border-radius: 8px;
+  margin-top: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+
+  &[data-status="unlocked"] {
+    background: #f59e0b;
+  }
+  &[data-status="progress"] {
+    background: #6366f1;
+  }
+  &[data-status="completed"] {
+    background: #22c55e;
+  }
+  &[data-status="locked"] {
+    background: #4b5563;
+  }
+}
+
+.legendBoss {
+  font-size: 14px;
+}
+
+// ─── Enter Button ──────────────────────────────────────────────────────────
+
+.enterBtn {
+  width: 100%;
+  padding: 8px 16px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: 2px solid #a78bfa;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.enterBtn:hover {
+  background: linear-gradient(135deg, #818cf8, #a78bfa);
+  border-color: #c4b5fd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.enterBtn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+// ─── Responsive ─────────────────────────────────────────────────────────────
+
+@media (max-width: 640px) {
+  .worldMap {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .playerHud {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .cardBody {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  .cardIcon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .progressSection {
+    min-width: 100%;
+    justify-content: flex-end;
+  }
+
+  .progressBarTrack {
+    width: 60px;
+  }
+
+  .mapLegend {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+}

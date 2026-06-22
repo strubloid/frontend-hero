@@ -34,3 +34,18 @@ jobs:
 
       - name: Format, lint, type-check, build, and test
         run: npm run verify:full
+
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker build and container verification
+        run: npm run docker:verify

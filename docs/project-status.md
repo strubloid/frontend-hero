@@ -2,7 +2,7 @@
 
 |> **Living document**. Update after completing each phase.
 
-> Current Phase: **Phase 13 — E2E Testing & Production Validation (In Progress)**
+> Current Phase: **Phase 13 — E2E Testing & Production Validation (Complete)**
 
 ---
 
@@ -27,23 +27,23 @@
 
 ## Phase Overview
 
-| Phase        | Name                                    | Status         |
-| ------------ | --------------------------------------- | -------------- |
-| Phase 0      | Research and Product Definition         | ✅ Complete    |
-| Phase 1      | Walking Skeleton                        | ✅ Complete    |
-| Phase 2      | Subject Engine                          | ✅ Complete    |
-| Phase 3      | Learning Engine                         | ✅ Complete    |
-| Phase 4      | Game Foundation                         | ✅ Complete    |
-| Phase 5      | Polish & Narrative                      | ✅ Complete    |
-| Phase 6      | Experience & Integration                | ✅ Complete    |
-| Phase 7      | Advanced Game Experience                | ✅ Complete    |
-| Phase 8      | Production Readiness                    | ✅ Complete    |
-| Post-launch  | Durable Persistence Hardening           | ✅ Complete    |
-| Phase 9      | Command Centre & Question Supply        | ✅ Complete    |
-| Phase 10     | Subject Campaign Progression            | ✅ Complete    |
-| Phase 11     | Encounter Forge & Batch Generation      | ✅ Complete    |
-| Phase 12     | Subject Boss & Campaign Completion      | ✅ Complete    |
-| **Phase 13** | **E2E Testing & Production Validation** | 🚧 In Progress |
+| Phase        | Name                                    | Status      |
+| ------------ | --------------------------------------- | ----------- |
+| Phase 0      | Research and Product Definition         | ✅ Complete |
+| Phase 1      | Walking Skeleton                        | ✅ Complete |
+| Phase 2      | Subject Engine                          | ✅ Complete |
+| Phase 3      | Learning Engine                         | ✅ Complete |
+| Phase 4      | Game Foundation                         | ✅ Complete |
+| Phase 5      | Polish & Narrative                      | ✅ Complete |
+| Phase 6      | Experience & Integration                | ✅ Complete |
+| Phase 7      | Advanced Game Experience                | ✅ Complete |
+| Phase 8      | Production Readiness                    | ✅ Complete |
+| Post-launch  | Durable Persistence Hardening           | ✅ Complete |
+| Phase 9      | Command Centre & Question Supply        | ✅ Complete |
+| Phase 10     | Subject Campaign Progression            | ✅ Complete |
+| Phase 11     | Encounter Forge & Batch Generation      | ✅ Complete |
+| Phase 12     | Subject Boss & Campaign Completion      | ✅ Complete |
+| **Phase 13** | **E2E Testing & Production Validation** | ✅ Complete |
 
 ---
 
@@ -82,7 +82,7 @@
 - ✅ **Command centre integration** — Campaign rail linked to boss encounter via dynamic subject ID extraction
 - ✅ **Tests** — 18 new tests across boss-service and boss-encounter-service (337 total)
 
-### Phase 13 — E2E Testing & Production Validation (In Progress)
+### Phase 13 — E2E Testing & Production Validation (Complete)
 
 **Goal**: Replace shallow browser checks with production-like E2E verification that proves gameplay, XP/level persistence, question generation, and page flows work through real HTTP/UI paths.
 
@@ -110,11 +110,9 @@
 - ✅ **Generated question validation** — `GeneratedQuestionValidator` rejects questions missing required fields, with inconsistent correct answers, duplicate options, invalid concept IDs, or empty explanations; `GeneratedQuestionDeduper` prevents duplicate content via normalized stem hashing
 - ✅ **Question rotation E2E test** — `tests/e2e/question-rotation.spec.ts` proves question IDs change between consecutive missions
 - ✅ **Negative-path E2E tests** — `tests/e2e/negative-tests.spec.ts` covers unauthenticated access, invalid API calls, and error states
-
-#### Remaining Phase 13 work
-
-1. Re-run `npm run verify:full` before marking Phase 13 complete.
-2. Add Docker build + container verification to full suite.
+- ✅ **Docker build verification** — `scripts/verify-docker-image.mjs` builds the Docker image, starts a container, confirms health endpoint returns 200/ok, confirms main page loads, then cleans up
+- ✅ **Docker wiring in CI** — `.github/workflows/ci.yml` runs Docker build + container verification as a separate job alongside verify:full
+- ✅ **Production verification script** — `npm run verify:production` runs verify:full then Docker verification
 
 ### Phase 9 — Command Centre & Question Supply (Complete)
 
@@ -214,6 +212,9 @@ npm run verify
 # Full verification (verify + tests)
 npm run verify:full
 
+# Production verification (verify:full + Docker build + container test)
+npm run verify:production
+
 # Browser E2E verification
 npm run test:e2e
 ```
@@ -222,4 +223,4 @@ Phase acceptance requires `npm run verify:full` to pass. Phase 13 also requires 
 
 ---
 
-_Last updated: 2026-06-19 (Phase 13 — all gameplay connections enabled; reward screen, quests, boss unlock, rotations, validation, and expanded E2E complete)_
+_Last updated: 2026-06-22 (Phase 13 — all gameplay connections wired, Docker verification added, E2E coverage expanded)_

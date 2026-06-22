@@ -57,9 +57,9 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 13 — E2E Testing & Production Validation (Finalizing)**
+**Current Phase: Phase 13 — E2E Testing & Production Validation (Complete)** ✅
 
-Phase 13 has transformed Frontend Realms from a 3-question XP demo into a connected game loop. All core gameplay connections are now wired end-to-end:
+Phase 13 has transformed Frontend Realms from a 3-question XP demo into a connected game loop. All core gameplay connections are now wired end-to-end, with Docker build verification and CI integration:
 
 - ✅ Subject selection & progress creation on first login
 - ✅ Question consumption tracking (`timesShown`, `lastShownAt` update, rotation prevention)
@@ -72,30 +72,31 @@ Phase 13 has transformed Frontend Realms from a 3-question XP demo into a connec
 - ✅ Generated question validation & deduplication
 - ✅ Per-level inventory health gate prevents empty-level mission starts
 - ✅ E2E coverage: play flow, question rotation, negative paths
+- ✅ Docker build + container health verification in CI
+- ✅ `npm run verify:production` for full + Docker verification
+- ✅ 380 tests passing, 3 E2E specs passing
 
-**Current repair plan:** `plan.md` is the active implementation plan. The remaining work is Phase B (subject content coverage — fill in 33 Next.js concept bodies), Phase L (challenge type variety renderers), and final production verification.
-
-**Next Phase: Production readiness**
+**Next Phase: Phase 14 — Player Identity Decoupling & Quality**
 
 ### Phase Overview
 
-| Phase       | Name                                | Status         |
-| ----------- | ----------------------------------- | -------------- |
-| Phase 0     | Research and Product Definition     | ✅ Complete    |
-| Phase 1     | Walking Skeleton                    | ✅ Complete    |
-| Phase 2     | Subject Engine                      | ✅ Complete    |
-| Phase 3     | Learning Engine                     | ✅ Complete    |
-| Phase 4     | Game Foundation                     | ✅ Complete    |
-| Phase 5     | Polish & Narrative                  | ✅ Complete    |
-| Phase 6     | Experience & Integration            | ✅ Complete    |
-| Phase 7     | Advanced Game Experience            | ✅ Complete    |
-| Phase 8     | Production Readiness                | ✅ Complete    |
-| Post-launch | Durable Persistence Hardening       | ✅ Complete    |
-| Phase 9     | Command Centre & Question Supply    | ✅ Complete    |
-| Phase 10    | Subject Campaign Progression        | ✅ Complete    |
-| Phase 11    | Encounter Forge & Batch Generation  | ✅ Complete    |
-| Phase 12    | Subject Boss & Campaign Completion  | ✅ Complete    |
-| Phase 13    | E2E Testing & Production Validation | 🚧 In Progress |
+| Phase       | Name                                | Status      |
+| ----------- | ----------------------------------- | ----------- |
+| Phase 0     | Research and Product Definition     | ✅ Complete |
+| Phase 1     | Walking Skeleton                    | ✅ Complete |
+| Phase 2     | Subject Engine                      | ✅ Complete |
+| Phase 3     | Learning Engine                     | ✅ Complete |
+| Phase 4     | Game Foundation                     | ✅ Complete |
+| Phase 5     | Polish & Narrative                  | ✅ Complete |
+| Phase 6     | Experience & Integration            | ✅ Complete |
+| Phase 7     | Advanced Game Experience            | ✅ Complete |
+| Phase 8     | Production Readiness                | ✅ Complete |
+| Post-launch | Durable Persistence Hardening       | ✅ Complete |
+| Phase 9     | Command Centre & Question Supply    | ✅ Complete |
+| Phase 10    | Subject Campaign Progression        | ✅ Complete |
+| Phase 11    | Encounter Forge & Batch Generation  | ✅ Complete |
+| Phase 12    | Subject Boss & Campaign Completion  | ✅ Complete |
+| Phase 13    | E2E Testing & Production Validation | ✅ Complete |
 
 ---
 
@@ -543,7 +544,7 @@ See `docs/architecture/extension-points.md` for the complete Drag-and-Drop examp
 
 ### Current Limitations
 
-1. **Next.js subject content incomplete** — `subjects/nextjs.md` declares a 10-level progression with 33 concept IDs but currently defines only 3 concept bodies with hand-written seeds. The campaign cannot actually progress through all declared levels until Phase B fills this in.
+1. **Player identity coupling** — Server actions use hard-coded player IDs instead of the authenticated user's ID. Planned for Phase 14.
 2. **Challenge type variety limited** — The game currently uses only multiple-choice questions. Code-prediction, bug-hunt, and other types defined in the extension point system are not yet implemented.
 3. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
 4. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
