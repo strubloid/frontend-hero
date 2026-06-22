@@ -1,0 +1,329 @@
+// ============================================================================
+// Home Page — Game Entry Portal
+// ============================================================================
+
+// -----------------------------------------------------------------------
+// Entrance animation
+// -----------------------------------------------------------------------
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// -----------------------------------------------------------------------
+// Title glow pulse
+// -----------------------------------------------------------------------
+@keyframes titleGlow {
+  0% {
+    text-shadow:
+      0 0 20px rgba(108, 92, 231, 0.4),
+      0 0 40px rgba(108, 92, 231, 0.15);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(108, 92, 231, 0.7),
+      0 0 60px rgba(168, 85, 247, 0.3);
+  }
+  100% {
+    text-shadow:
+      0 0 20px rgba(108, 92, 231, 0.4),
+      0 0 40px rgba(108, 92, 231, 0.15);
+  }
+}
+
+// -----------------------------------------------------------------------
+// Emblem ring rotation
+// -----------------------------------------------------------------------
+@keyframes ringSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+}
+
+// -----------------------------------------------------------------------
+// Floating particles
+// -----------------------------------------------------------------------
+@keyframes float {
+  0% {
+    transform: translateY(100vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(120px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+//============================================================================
+// Page layout
+//============================================================================
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #080818 0%, #12122e 35%, #1a1040 65%, #080818 100%);
+  padding: 2rem;
+}
+
+// -----------------------------------------------------------------------
+// Particles
+// -----------------------------------------------------------------------
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: float 12s cubic-bezier(0.25, 0.1, 0.5, 1) infinite;
+  animation-delay: calc(var(--i) * -2.5s);
+  left: calc(var(--i) * 3.3%);
+  opacity: 0;
+
+  &:nth-child(3n + 1) {
+    background: rgba(108, 92, 231, 0.5);
+    width: 3px;
+    height: 3px;
+    animation-duration: 14s;
+  }
+  &:nth-child(3n + 2) {
+    background: rgba(168, 85, 247, 0.4);
+    width: 5px;
+    height: 5px;
+    animation-duration: 10s;
+  }
+  &:nth-child(3n + 3) {
+    background: rgba(74, 158, 255, 0.3);
+    width: 2px;
+    height: 2px;
+    animation-duration: 16s;
+  }
+}
+
+// -----------------------------------------------------------------------
+// Entry card
+// -----------------------------------------------------------------------
+.entryCard {
+  position: relative;
+  z-index: 1;
+  background: rgba(15, 15, 35, 0.82);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(120, 120, 255, 0.12);
+  border-radius: 1.25rem;
+  padding: 3rem 2.5rem 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  animation: fadeSlideUp 0.8s ease-out;
+  box-shadow:
+    0 0 30px rgba(108, 92, 231, 0.06),
+    0 0 60px rgba(108, 92, 231, 0.03);
+
+  // Decorative corner brackets
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 40px;
+    height: 40px;
+    border-top: 2px solid rgba(168, 85, 247, 0.35);
+    border-left: 2px solid rgba(168, 85, 247, 0.35);
+    border-radius: 1.25rem 0 0 0;
+    pointer-events: none;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 40px;
+    height: 40px;
+    border-bottom: 2px solid rgba(168, 85, 247, 0.35);
+    border-right: 2px solid rgba(168, 85, 247, 0.35);
+    border-radius: 0 0 1.25rem 0;
+    pointer-events: none;
+  }
+}
+
+// -----------------------------------------------------------------------
+// Emblem / Portal
+// -----------------------------------------------------------------------
+.emblem {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emblemRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(168, 85, 247, 0.25);
+  animation: ringSpin 6s linear infinite;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(108, 92, 231, 0.12);
+    animation: ringSpin 8s linear infinite reverse;
+  }
+}
+
+.emblemGlow {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108, 92, 231, 0.2), transparent 70%);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+
+.emblemIcon {
+  position: relative;
+  z-index: 1;
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+}
+
+// -----------------------------------------------------------------------
+// Title
+// -----------------------------------------------------------------------
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  background: linear-gradient(135deg, #c4b5fd, #a855f7, #818cf8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: titleGlow 3s ease-in-out infinite;
+  letter-spacing: 0.02em;
+}
+
+// -----------------------------------------------------------------------
+// Tagline
+// -----------------------------------------------------------------------
+.tagline {
+  color: #8888c8;
+  font-size: 0.95rem;
+  margin: 0 0 2rem;
+  line-height: 1.5;
+  animation: fadeSlideUp 0.8s ease-out 0.2s both;
+}
+
+// -----------------------------------------------------------------------
+// Auth buttons
+// -----------------------------------------------------------------------
+.authButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: fadeSlideUp 0.8s ease-out 0.3s both;
+}
+
+.signInBtn,
+.registerBtn {
+  display: block;
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    box-shadow 0.3s,
+    transform 0.2s,
+    background 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.signInBtn {
+  background: linear-gradient(135deg, #6c5ce7, #a855f7);
+  color: #fff;
+  border: none;
+  box-shadow: 0 0 12px rgba(108, 92, 231, 0.25);
+
+  &:hover {
+    box-shadow:
+      0 0 24px rgba(108, 92, 231, 0.5),
+      0 0 48px rgba(168, 85, 247, 0.2);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 8px rgba(108, 92, 231, 0.3);
+  }
+}
+
+.registerBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #c0c0e0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+// -----------------------------------------------------------------------
+// Footer text
+// -----------------------------------------------------------------------
+.footerText {
+  color: #555580;
+  font-size: 0.8rem;
+  margin: 1.5rem 0 0;
+  animation: fadeSlideUp 0.8s ease-out 0.4s both;
+}

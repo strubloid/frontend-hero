@@ -17,6 +17,8 @@ function openSqliteDatabase(path: string): Database.Database {
 
   const sqlite = new Database(path);
   sqlite.pragma("journal_mode = WAL");
+  sqlite.pragma("wal_autocheckpoint = 250"); // checkpoint every ~1MB instead of default ~4MB
+  sqlite.pragma("busy_timeout = 5000"); // wait 5s instead of failing immediately
   sqlite.pragma("foreign_keys = ON");
   createApplicationTables(sqlite);
   return sqlite;

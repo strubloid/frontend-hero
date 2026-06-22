@@ -6,6 +6,7 @@ export interface QuestionRepository {
   getByConceptId(conceptId: string): Promise<Question[]>;
   getRandomBySubjectId(subjectId: string, limit: number): Promise<Question[]>;
   getBySeedAndSubject(seedId: string, subjectId: string): Promise<Question | null>;
+  getByIds(ids: string[]): Promise<Question[]>;
   markShown?(questionId: string, shownAt: Date): Promise<void>;
   getRecentlyShownByPlayer?(playerId: string, limit: number): Promise<string[]>;
 }

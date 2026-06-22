@@ -1,89 +1,52 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { loadCommandCentreForCurrentUser } from "@/app/actions/command-centre";
 import CommandCentrePage from "@/modules/command-centre/presentation/components/command-centre-page/command-centre-page";
+import styles from "./home.module.scss";
 
 export default async function HomePage() {
   const commandCentre = await loadCommandCentreForCurrentUser();
 
-  // No session — show login prompt instead of dev fixture
+  // No session — show game entry portal
   if (!commandCentre) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          padding: "2rem",
-          background: "linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%)",
-        }}
-      >
-        <div
-          style={{
-            background: "rgba(20, 20, 50, 0.9)",
-            border: "1px solid rgba(120, 120, 255, 0.15)",
-            borderRadius: "1rem",
-            padding: "2.5rem",
-            width: "100%",
-            maxWidth: 420,
-            textAlign: "center",
-          }}
-        >
-          <h1
-            style={{ fontSize: "1.75rem", fontWeight: 700, color: "#e8e8ff", margin: "0 0 0.5rem" }}
-          >
-            Frontend Realms
-          </h1>
-          <p style={{ color: "#8888b8", margin: "0 0 1.5rem", fontSize: "0.95rem" }}>
-            Sign in to continue your journey
-          </p>
-          <Link
-            href="/login"
-            style={{
-              display: "inline-block",
-              background: "linear-gradient(135deg, #6c5ce7, #a855f7)",
-              color: "white",
-              border: "none",
-              borderRadius: "0.5rem",
-              padding: "0.75rem 2rem",
-              fontSize: "1rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              textDecoration: "none",
-              marginBottom: "0.75rem",
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          >
-            Sign In
-          </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
-            <span style={{ flex: 1, height: 1, background: "rgba(100, 100, 200, 0.15)" }} />
-            <span style={{ color: "#555580", fontSize: "0.85rem", whiteSpace: "nowrap" }}>or</span>
-            <span style={{ flex: 1, height: 1, background: "rgba(100, 100, 200, 0.15)" }} />
+      <div className={styles.page}>
+        {/* Floating particles (CSS-only) */}
+        <div className={styles.particles} aria-hidden="true">
+          {[...Array(30)].map((_, i) => (
+            <div key={i} className={styles.particle} style={{ "--i": i } as React.CSSProperties} />
+          ))}
+        </div>
+
+        <div className={styles.entryCard}>
+          {/* Decorative emblem */}
+          <div className={styles.emblem} aria-hidden="true">
+            <div className={styles.emblemRing} />
+            <div className={styles.emblemGlow} />
+            <div className={styles.emblemIcon}>⚔</div>
           </div>
-          <Link
-            href="/register"
-            style={{
-              display: "inline-block",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
-              borderRadius: "0.5rem",
-              padding: "0.75rem 2rem",
-              color: "#d0d0f0",
-              fontSize: "0.95rem",
-              fontWeight: 500,
-              cursor: "pointer",
-              textDecoration: "none",
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          >
-            Create an Account
-          </Link>
+
+          <h1 className={styles.title}>Frontend Realms</h1>
+          <p className={styles.tagline}>Master Frontend Engineering Through Battle</p>
+
+          <div className={styles.authButtons}>
+            <Link href="/login" className={styles.signInBtn}>
+              Sign In
+            </Link>
+            <Link href="/register" className={styles.registerBtn}>
+              Create Account
+            </Link>
+          </div>
+
+          <p className={styles.footerText}>Become a senior engineer. One quest at a time.</p>
         </div>
       </div>
     );
+  }
+
+  // Fresh users without a subject selected are routed to subject selection
+  if (commandCentre.playerState === "NEW_PLAYER") {
+    redirect("/subjects");
   }
 
   return <CommandCentrePage vm={commandCentre} />;

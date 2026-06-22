@@ -51,21 +51,8 @@ function RegisterFormInner() {
           <h1 className={styles.title}>Begin Your Quest</h1>
           <p className={styles.subtitle}>Create an account and enter the realms</p>
 
-          <div
-            className={styles.form}
-            style={{ display: "flex", justifyContent: "center", padding: "2rem 0" }}
-          >
-            <div
-              style={{
-                width: 24,
-                height: 24,
-                border: "3px solid #334155",
-                borderTopColor: "#3b82f6",
-                borderRadius: "50%",
-                animation: "spin 0.6s linear infinite",
-              }}
-            />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <div className={`${styles.form} ${styles.loadingFlex}`}>
+            <div className={styles.spinner} />
           </div>
         </div>
       </div>

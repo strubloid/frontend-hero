@@ -2,7 +2,7 @@
 
 |> **Living document**. Update after completing each phase.
 
-> Current Phase: **Phase 16 — SCSS Module Migration & Presentation Polish (Complete)**
+> Current Phase: **Phase K — Encounter Forge production safety**
 
 ---
 
@@ -27,26 +27,34 @@
 
 ## Phase Overview
 
-| Phase        | Name                                            | Status      |
-| ------------ | ----------------------------------------------- | ----------- |
-| Phase 0      | Research and Product Definition                 | ✅ Complete |
-| Phase 1      | Walking Skeleton                                | ✅ Complete |
-| Phase 2      | Subject Engine                                  | ✅ Complete |
-| Phase 3      | Learning Engine                                 | ✅ Complete |
-| Phase 4      | Game Foundation                                 | ✅ Complete |
-| Phase 5      | Polish & Narrative                              | ✅ Complete |
-| Phase 6      | Experience & Integration                        | ✅ Complete |
-| Phase 7      | Advanced Game Experience                        | ✅ Complete |
-| Phase 8      | Production Readiness                            | ✅ Complete |
-| Post-launch  | Durable Persistence Hardening                   | ✅ Complete |
-| Phase 9      | Command Centre & Question Supply                | ✅ Complete |
-| Phase 10     | Subject Campaign Progression                    | ✅ Complete |
-| Phase 11     | Encounter Forge & Batch Generation              | ✅ Complete |
-| Phase 12     | Subject Boss & Campaign Completion              | ✅ Complete |
-| Phase 13     | E2E Testing & Production Validation             | ✅ Complete |
-| **Phase 14** | **Player Identity Decoupling**                  | ✅ Complete |
-| **Phase 15** | **Challenge Type Expansion & Variety**          | ✅ Complete |
-| **Phase 16** | **SCSS Module Migration & Presentation Polish** | ✅ Complete |
+| Phase        | Name                                                    | Status          |
+| ------------ | ------------------------------------------------------- | --------------- |
+| Phase 0      | Research and Product Definition                         | ✅ Complete     |
+| Phase 1      | Walking Skeleton                                        | ✅ Complete     |
+| Phase 2      | Subject Engine                                          | ✅ Complete     |
+| Phase 3      | Learning Engine                                         | ✅ Complete     |
+| Phase 4      | Game Foundation                                         | ✅ Complete     |
+| Phase 5      | Polish & Narrative                                      | ✅ Complete     |
+| Phase 6      | Experience & Integration                                | ✅ Complete     |
+| Phase 7      | Advanced Game Experience                                | ✅ Complete     |
+| Phase 8      | Production Readiness                                    | ✅ Complete     |
+| Post-launch  | Durable Persistence Hardening                           | ✅ Complete     |
+| Phase 9      | Command Centre & Question Supply                        | ✅ Complete     |
+| Phase 10     | Subject Campaign Progression                            | ✅ Complete     |
+| Phase 11     | Encounter Forge & Batch Generation                      | ✅ Complete     |
+| Phase 12     | Subject Boss & Campaign Completion                      | ✅ Complete     |
+| Phase 13     | E2E Testing & Production Validation                     | ✅ Complete     |
+| **Phase 14** | **Player Identity Decoupling**                          | ✅ Complete     |
+| **Phase 15** | **Challenge Type Expansion & Variety**                  | ✅ Complete     |
+| **Phase 16** | **SCSS Module Migration & Presentation Polish**         | ✅ Complete     |
+| **Phase 17** | **Remaining SCSS Migration (All Pages)**                | ✅ **Complete** |
+| **Phase 18** | **Game-Loop Connection: Inventory Gates + Consumption** | ✅ **Complete** |
+| **Phase 19** | **Subject Selection Flow**                              | ✅ **Complete** |
+| **Phase F**  | **Mission → Subject-Level Progression**                 | ✅ **Complete** |
+| **Phase G**  | **Mastery Gates (review scheduling, prereq gating)**    | ✅ **Complete** |
+| **Phase H**  | **Post-Mission Reward Screen**                          | ✅ **Complete** |
+| **Phase I**  | **Quests / Chains / Achievements**                      | ✅ **Complete** |
+| **Phase J**  | **Boss Unlock & Completion**                            | ✅ **Complete** |
 
 ---
 
@@ -116,6 +124,66 @@
 - ✅ **Docker build verification** — `scripts/verify-docker-image.mjs` builds the Docker image, starts a container, confirms health endpoint returns 200/ok, confirms main page loads, then cleans up
 - ✅ **Docker wiring in CI** — `.github/workflows/ci.yml` runs Docker build + container verification as a separate job alongside verify:full
 - ✅ **Production verification script** — `npm run verify:production` runs verify:full then Docker verification
+
+### Phase 17 — Remaining SCSS Migration (All Pages) (Complete)
+
+- ✅ **Home page** (`/page.tsx`) — 10 inline styles → `home.module.scss`, file reduced from 90→33 lines
+- ✅ **Boss-encounter page** (`/boss-encounter/page.tsx`) — removed 168-line `<style>` block + 9 inline styles → `boss-encounter.module.scss`
+- ✅ **Settings page** (`/settings/page.tsx`) — removed 166-line `<style>` block + 2 inline styles → `settings.module.scss`, file reduced from 303→134 lines
+- ✅ **Profile page** (`/profile/page.tsx`) — removed 542-line template string → `profile.module.scss`, file reduced from 999→442 lines
+- ✅ **Collections page** (`/collections/page.tsx`) — removed 218-line template string → `collections.module.scss`, file reduced from 348→127 lines
+- ✅ **Login page** (`/login/page.tsx`) — 2 lingering inline styles → `auth.module.scss` spinner classes
+- ✅ **Register page** (`/register/page.tsx`) — 2 lingering inline styles + keyframes → `auth.module.scss`
+- ✅ **Remaining inline count:** 32→7 (only dynamic values like progress %, health bar, dynamic colors)
+- ✅ **7 new SCSS module files** created
+- ✅ **380 tests passing**, format, lint, type-check, build all clean
+- ✅ **Boss page polish** — 8 animations added (slide-up, shake, pulse-glow, victory-glow, health flash, shimmer, bounce, fade-in), health bar smooth transitions, low-HP critical glow, phase dot enhancements, victory/defeat splash
+- ✅ **E2E coverage expansion** — 3 new tests: level progression, boss completion, persistence after reload
+- ✅ **Home page → game entry shell** — animated particle background, glowing title, emblem logo with ring spin, corner-bracketed splash card, fade-in entrance animations
+
+### Phase 18 — Game-Loop Connection: Inventory Gates + Consumption (Complete)
+
+**Goal**: Wire the question inventory health check into mission start (was implemented but never injected), and populate `recentConceptIds` from real mission history (was hardcoded to empty array).
+
+- ✅ **InventoryService wired** — `QuestionInventoryService` now injected into `StartMissionUseCase` via `missions.ts` wiring. Mission start fails with typed `insufficient_question_supply` result when a level has zero usable questions. UI already handles display of this error.
+- ✅ **recentConceptIds populated** — `StartMissionUseCase.getRecentConceptIds()` queries last 3 completed missions, looks up question → concept mapping via new `QuestionRepository.getByIds()` method, and returns unique concept IDs. No longer hardcoded empty.
+- ✅ **QuestionRepository.getByIds()** — New interface method and `DrizzleQuestionRepository` implementation using `inArray()`. All 5 fake/mock repositories in tests updated.
+- ✅ **State tracking** — `timesShown` and `lastShownAt` already update on mission creation; recent question IDs already passed to `QuestionProvider` for repetition avoidance.
+- ✅ **All checks pass** — `npm run verify` passes (format, lint, type-check, depcruise, audit, build), 380 tests.
+
+### Enhance existing columns for better question consumption tracking
+
+**Status:** Already complete — `QuestionProvider` handles `markShown()`, `getRecentlyShownByPlayer()`, `timesShown ≤ 2` cap per concept, and recent-question-ID avoidance.
+
+### Phase 19 — Subject Selection Flow (Complete)
+
+**Goal**: Route fresh (and existing) users without a selected subject to the `/subjects` picker, ensuring the game never silently defaults to the first subject.
+
+- ✅ **Home page redirect for NEW_PLAYER state** — `page.tsx` now checks `commandCentre.playerState === "NEW_PLAYER"` and redirects to `/subjects` using `next/navigation.redirect()`. Fresh users no longer land on an empty command centre.
+- ✅ **Play page redirect (existing)** — `/play` already redirected to `/subjects` when `currentSubjectId` is null. Verified in audit.
+- ✅ **E2E tests** — 3 new Playwright tests in `tests/e2e/subject-selection-flow.spec.ts`:
+  1. Fresh user signs in → redirected to `/subjects` → selects subject → lands on `/play?subject=nextjs` with "Start Mission" visible
+  2. Fresh user visits `/` directly after login → redirected to `/subjects`
+  3. Fresh user hits `/play` unauthenticated → login → redirected to `/subjects`
+- ✅ **All checks pass** — `npm run verify` passes (format, lint, type-check, build), including architecture validation.
+
+**Next Phase: Phase F — Mission Completion → Subject-Level Progression**
+
+---
+
+### Phase F — Wire mission completion into subject-level progression (Complete)
+
+**Goal**: Ensure completed encounters actually advance the subject campaign.
+
+- ✅ **RecordSubjectEncounterUseCase** already wired into `SubmitAnswerUseCase` via `missions.ts` — automatically called when a mission transitions from active → completed
+- ✅ Calls `AdvanceSubjectLevelUseCase` after recording the encounter
+- ✅ Returns `subjectProgress` result with `levelAdvanced`, `newLevel`, `bossUnlocked`
+- ✅ Duplicate-submission protected: only fires when `missionBefore.status !== "completed"` and `missionAfter.status === "completed"`
+- ✅ Phase verified as complete in audit — no code changes needed
+
+**Next Phase: Phase K — Make Encounter Forge production-safe**
+
+---
 
 ### Phase 16 — SCSS Module Migration & Presentation Polish (Complete)
 
@@ -220,8 +288,9 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 ## Known Gaps
 
 | Gap | Impact | Planned Phase |
-| Inline styles in pages | Some pages violate SCSS module architecture pattern compared to the command-centre components | Phase 16 |
-| Challenge type variety | Most question types registered; `refactoring` and `architecture-decision` not yet in the `QuestionType` union | Complete |
+| AI question generation | Demo/template generation unless real provider is configured | Phase 13 |
+| Challenge type variety | More types desirable (`code-prediction`, `bug-hunt`, `explain-it`, `short-answer` are not yet registered)| Phase 15 |
+| E2E coverage | Full level progression, boss completion, and persistence-after-restart E2E flows on the roadmap | Next Phase |
 | AI question generation | Demo/template generation unless real AI provider is configured | Phase 13 |
 | Player identity coupling | Server actions use hard-coded player IDs | Phase 14 |
 
@@ -256,4 +325,4 @@ Phase acceptance requires `npm run verify:full` to pass. Phase 13 also requires 
 
 ---
 
-_Last updated: 2026-06-22 (Phase 16 — all question renderer components and play page migrated from inline styles to SCSS modules)_
+_Last updated: 2026-06-22 (Phase 19 — fresh user subject selection routing)_

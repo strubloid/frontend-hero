@@ -10,6 +10,7 @@ import {
   DrizzleMissionRepository,
 } from "@/modules/missions/infrastructure/drizzle-mission-repository";
 import { DrizzleQuestionRepository } from "@/modules/questions/infrastructure/drizzle-question-repository";
+import { QuestionInventoryService } from "@/modules/questions/application/question-inventory-service";
 import { DrizzleQuestRepository } from "@/modules/missions/infrastructure/drizzle-quest-repository";
 import { QuestService } from "@/modules/missions/application/quest-service";
 import { RecordSubjectEncounterUseCase } from "@/modules/subjects/application/record-subject-encounter/record-subject-encounter.use-case";
@@ -63,6 +64,7 @@ async function wireDependencies(): Promise<MissionActionWiring> {
     const graphBuilder = new PrerequisiteGraphBuilder();
     const missionSelector = new MissionSelector();
     const answerEvaluator = new AnswerEvaluator(createDefaultQuestionTypeRegistry());
+    const inventoryService = new QuestionInventoryService(questionRepository);
     const questionProvider = new QuestionProvider(
       questionRepository,
       3,
@@ -98,6 +100,7 @@ async function wireDependencies(): Promise<MissionActionWiring> {
       missionRepository,
       questionRepository,
       questionProvider,
+      inventoryService,
       startMissionUseCase: new StartMissionUseCase(
         playerRepository,
         subjectRepository,
@@ -107,6 +110,8 @@ async function wireDependencies(): Promise<MissionActionWiring> {
         graphBuilder,
         masteryRepository,
         reviewRepository,
+        inventoryService,
+        questionRepository,
       ),
       submitAnswerUseCase: new SubmitAnswerUseCase(
         playerRepository,

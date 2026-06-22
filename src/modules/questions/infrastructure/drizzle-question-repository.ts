@@ -1,4 +1,4 @@
-import { desc, eq, and, sql } from "drizzle-orm";
+import { desc, eq, and, inArray, sql } from "drizzle-orm";
 import * as schema from "@/shared/infrastructure/database/schema";
 import type { QuestionRepository } from "@/modules/questions/domain/question-repository";
 import type { Question } from "@/modules/questions/domain/question";
@@ -66,6 +66,15 @@ export class DrizzleQuestionRepository implements QuestionRepository {
     }
 
     return this.toDomain(rows[0]);
+  }
+
+  async getByIds(ids: string[]): Promise<Question[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.db
+      .select()
+      .from(schema.questions)
+      .where(inArray(schema.questions.id, ids));
+    return rows.map((row) => this.toDomain(row));
   }
 
   async markShown(questionId: string, shownAt: Date): Promise<void> {

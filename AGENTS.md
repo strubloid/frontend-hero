@@ -57,7 +57,26 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 16 — SCSS Module Migration & Presentation Polish (Complete)** ✅
+**Current Phase: Phase 17 — Remaining SCSS Migration (Complete)** ✅
+
+Phase 17 completed the SCSS migration that Phase 16 started — moving all remaining inline styles and embedded `<style>` tags across every remaining app page into `.module.scss` files. The entire app now uses SCSS modules for styling.
+
+- ✅ **Home page** (`/page.tsx`) — 10 inline styles → `home.module.scss` (9 classes), file reduced from 90→33 lines
+- ✅ **Boss-encounter page** (`/boss-encounter/page.tsx`) — removed 168-line `<style>` block + 9 inline styles → `boss-encounter.module.scss`
+- ✅ **Settings page** (`/settings/page.tsx`) — removed 166-line `<style>` block + 2 inline styles → `settings.module.scss`, file reduced from 303→134 lines
+- ✅ **Profile page** (`/profile/page.tsx`) — removed 542-line template string → `profile.module.scss`, file reduced from 999→442 lines
+- ✅ **Collections page** (`/collections/page.tsx`) — removed 218-line template string → `collections.module.scss`, file reduced from 348→127 lines
+- ✅ **Login page** (`/login/page.tsx`) — 2 lingering inline styles → `auth.module.scss` spinner classes
+- ✅ **Register page** (`/register/page.tsx`) — 2 lingering inline styles + keyframes → `auth.module.scss`
+- ✅ **Remaining inline count:** 32→7 (only dynamic values like progress %, health bar, dynamic colors)
+- ✅ **7 new SCSS module files** created
+- ✅ **380 tests passing**, format, lint, type-check, build all clean
+
+**Boss page polish (Phase 17-B):** 8 CSS animations (slide-up, shake, pulse-glow, victory-glow, health flash, shimmer, bounce, fade-in), health bar smooth transitions with shimmer sweep, low-HP critical glow on boss bar, phase dot active-pulse + done-checkmark ✓ overlay, correct/wrong feedback shake/glow, victory bounce-in crown + pulsing green glow
+**E2E coverage (Phase 17-C):** 3 new Playwright tests covering full level progression, boss encounter completion, and persistence-after-reload
+**Home page entry shell (Phase 17-D):** Animated particle background, glowing gradient title, emblem with rotating ring, corner-bracketed splash card with fade-in entrance, game-ready auth buttons
+
+**Next Phase: Phase 18 — TBD**
 
 Phase 16 replaced all inline `style={{} }` blocks across all 9 question renderer components and the play page with proper SCSS module classes. This eliminates violation of the SCSS module architecture direction and gives the game a consistent, maintainable styling foundation.
 
@@ -70,26 +89,34 @@ Phase 16 replaced all inline `style={{} }` blocks across all 9 question renderer
 
 ### Phase Overview
 
-| Phase        | Name                                            | Status          |
-| ------------ | ----------------------------------------------- | --------------- |
-| Phase 0      | Research and Product Definition                 | ✅ Complete     |
-| Phase 1      | Walking Skeleton                                | ✅ Complete     |
-| Phase 2      | Subject Engine                                  | ✅ Complete     |
-| Phase 3      | Learning Engine                                 | ✅ Complete     |
-| Phase 4      | Game Foundation                                 | ✅ Complete     |
-| Phase 5      | Polish & Narrative                              | ✅ Complete     |
-| Phase 6      | Experience & Integration                        | ✅ Complete     |
-| Phase 7      | Advanced Game Experience                        | ✅ Complete     |
-| Phase 8      | Production Readiness                            | ✅ Complete     |
-| Post-launch  | Durable Persistence Hardening                   | ✅ Complete     |
-| Phase 9      | Command Centre & Question Supply                | ✅ Complete     |
-| Phase 10     | Subject Campaign Progression                    | ✅ Complete     |
-| Phase 11     | Encounter Forge & Batch Generation              | ✅ Complete     |
-| Phase 12     | Subject Boss & Campaign Completion              | ✅ Complete     |
-| Phase 13     | E2E Testing & Production Validation             | ✅ Complete     |
-| **Phase 14** | **Player Identity Decoupling**                  | ✅ **Complete** |
-| **Phase 15** | **Challenge Type Expansion & Variety**          | ✅ **Complete** |
-| **Phase 16** | **SCSS Module Migration & Presentation Polish** | ✅ **Complete** |
+| Phase        | Name                                                    | Status          |
+| ------------ | ------------------------------------------------------- | --------------- |
+| Phase 0      | Research and Product Definition                         | ✅ Complete     |
+| Phase 1      | Walking Skeleton                                        | ✅ Complete     |
+| Phase 2      | Subject Engine                                          | ✅ Complete     |
+| Phase 3      | Learning Engine                                         | ✅ Complete     |
+| Phase 4      | Game Foundation                                         | ✅ Complete     |
+| Phase 5      | Polish & Narrative                                      | ✅ Complete     |
+| Phase 6      | Experience & Integration                                | ✅ Complete     |
+| Phase 7      | Advanced Game Experience                                | ✅ Complete     |
+| Phase 8      | Production Readiness                                    | ✅ Complete     |
+| Post-launch  | Durable Persistence Hardening                           | ✅ Complete     |
+| Phase 9      | Command Centre & Question Supply                        | ✅ Complete     |
+| Phase 10     | Subject Campaign Progression                            | ✅ Complete     |
+| Phase 11     | Encounter Forge & Batch Generation                      | ✅ Complete     |
+| Phase 12     | Subject Boss & Campaign Completion                      | ✅ Complete     |
+| Phase 13     | E2E Testing & Production Validation                     | ✅ Complete     |
+| **Phase 14** | **Player Identity Decoupling**                          | ✅ **Complete** |
+| **Phase 15** | **Challenge Type Expansion & Variety**                  | ✅ **Complete** |
+| **Phase 16** | **SCSS Module Migration & Presentation Polish**         | ✅ **Complete** |
+| **Phase 17** | **Remaining SCSS Migration (All Pages)**                | ✅ **Complete** |
+| **Phase 18** | **Game-Loop Connection: Inventory Gates + Consumption** | ✅ **Complete** |
+| **Phase 19** | **Subject Selection Flow**                              | ✅ **Complete** |
+| **Phase F**  | **Mission → Subject-Level Progression**                 | ✅ **Complete** |
+| **Phase G**  | **Mastery Gates (review scheduling, prereq gating)**    | ✅ **Complete** |
+| **Phase H**  | **Post-Mission Reward Screen**                          | ✅ **Complete** |
+| **Phase I**  | **Quests / Chains / Achievements**                      | ✅ **Complete** |
+| **Phase J**  | **Boss Unlock & Completion**                            | ✅ **Complete** |
 
 ---
 

@@ -182,6 +182,10 @@ class MockQuestionRepository implements QuestionRepository {
       ) ?? null
     );
   }
+
+  async getByIds(ids: string[]): Promise<Question[]> {
+    return ids.map((id) => this.store.get(id)).filter((q): q is Question => q !== undefined);
+  }
 }
 
 class MockMasteryRepository implements MasteryRepository {

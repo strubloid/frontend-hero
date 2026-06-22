@@ -51,18 +51,8 @@ function LoginForm() {
   if (!mounted) {
     return (
       <div className={styles.container}>
-        <div className={styles.card} style={{ textAlign: "center", padding: "3rem 0" }}>
-          <div
-            style={{
-              width: 24,
-              height: 24,
-              border: "3px solid #334155",
-              borderTopColor: "#3b82f6",
-              borderRadius: "50%",
-              animation: "spin 0.6s linear infinite",
-              margin: "0 auto",
-            }}
-          />
+        <div className={`${styles.card} ${styles.loadingCentered}`}>
+          <div className={styles.spinner} />
         </div>
       </div>
     );

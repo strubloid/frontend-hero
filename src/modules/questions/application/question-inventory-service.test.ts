@@ -31,6 +31,12 @@ class FakeQuestionRepository implements QuestionRepository {
       ) ?? null
     );
   }
+
+  async getByIds(ids: string[]): Promise<Question[]> {
+    return ids
+      .map((id) => this.questions.find((question) => question.id === id))
+      .filter((q): q is Question => q !== undefined);
+  }
 }
 
 function question(overrides: Partial<Question>): Question {

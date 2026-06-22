@@ -1,0 +1,596 @@
+// -----------------------------------------------------------------------
+// Animation keyframes (global)
+// -----------------------------------------------------------------------
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+}
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
+  }
+}
+@keyframes victoryGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(46, 204, 113, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+  }
+}
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes healthFlash {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+@keyframes bounce {
+  0% {
+    transform: scale(0) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+// -----------------------------------------------------------------------
+// Global classes — used by sub-components (BossHeader, HealthBars,
+// PhaseIndicators) that reference raw className strings
+// -----------------------------------------------------------------------
+
+// Animation utility classes
+:global(.animateSlideUp) {
+  animation: slideUp 0.5s ease-out;
+}
+:global(.animateShake) {
+  animation: shake 0.5s ease-out;
+}
+:global(.animateFadeInScale) {
+  animation: fadeInScale 0.4s ease-out;
+}
+:global(.animatePulseGlow) {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+:global(.animateVictoryGlow) {
+  animation: victoryGlow 2s ease-in-out infinite;
+}
+:global(.animateHealthFlash) {
+  animation: healthFlash 0.3s ease-out;
+}
+
+// Page
+:global(.boss-page) {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+  color: #e0e0e0;
+  background: #121212;
+  min-height: 100vh;
+}
+
+// Header
+:global(.boss-header) {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+:global(.boss-back-btn) {
+  background: none;
+  border: 1px solid #333;
+  color: #888;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+:global(.boss-back-btn:hover) {
+  border-color: #555;
+  color: #ccc;
+}
+
+:global(.boss-title) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+// Health bars
+:global(.health-section) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+:global(.health-row) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+:global(.health-label) {
+  width: 60px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: right;
+}
+
+:global(.health-bar-bg) {
+  flex: 1;
+  height: 20px;
+  background: #1e1e1e;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+:global(.health-bar-fill) {
+  height: 100%;
+  border-radius: 10px;
+  transition:
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+:global(.health-bar-fill)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+:global(.health-text) {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  min-width: 40px;
+  text-align: center;
+}
+
+:global(.healthCritical) {
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+// Phase indicators
+:global(.phase-indicators) {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+:global(.phase-dot) {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 2px solid #333;
+  background: #1e1e1e;
+  color: #64748b;
+  transition: all 0.3s;
+}
+
+:global(.phase-dot.done) {
+  border-color: #2ecc71;
+  background: #0d2818;
+  color: #2ecc71;
+  transform: scale(1);
+}
+
+:global(.phase-dot.done)::after {
+  content: "✓";
+  position: absolute;
+  font-size: 0.6rem;
+  top: -2px;
+  right: -2px;
+  color: #2ecc71;
+}
+
+:global(.phase-dot.active) {
+  border-color: #4a9eff;
+  background: #1a2a40;
+  color: #4a9eff;
+  transform: scale(1.15);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+// Intro card
+:global(.boss-intro-card) {
+  animation: slideUp 0.6s ease-out;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+:global(.boss-intro-icon) {
+  font-size: 4rem;
+}
+
+:global(.boss-intro-narrative) {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+:global(.boss-phase-prompt) {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+:global(.boss-phase-prompt strong) {
+  color: #e2e8f0;
+}
+
+// Question
+:global(.boss-question-card) {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+:global(.boss-question-stem) {
+  font-size: 1.05rem;
+  color: #fff;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+:global(.boss-option) {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border 0.15s,
+    background 0.15s;
+}
+
+:global(.boss-option:hover) {
+  border-color: #555;
+}
+
+:global(.boss-option.selected) {
+  border-color: #4a9eff;
+  background: #1a2a40;
+}
+
+// Feedback
+:global(.boss-feedback-card) {
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  animation: slideUp 0.4s ease-out;
+}
+
+:global(.boss-feedback-card.correct) {
+  background: #0d2818;
+  border: 1px solid #2ecc71;
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+}
+
+:global(.boss-feedback-card.wrong) {
+  background: #2a0d0d;
+  border: 1px solid #e74c3c;
+  animation: shake 0.5s ease-out;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+}
+
+:global(.boss-feedback-label) {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+:global(.boss-feedback-text) {
+  color: #cbd5e1;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+// Victory / Defeat
+:global(.boss-result-card) {
+  text-align: center;
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeInScale 0.5s ease-out;
+}
+
+:global(.boss-result-card.victory) {
+  background: #0d2818;
+  border: 2px solid #2ecc71;
+  animation:
+    victoryGlow 2s ease-in-out infinite,
+    fadeInScale 0.5s ease-out;
+}
+
+:global(.boss-result-card.victory) :global(.boss-result-icon) {
+  animation: bounce 1s ease-out;
+}
+
+:global(.boss-result-card.defeat) {
+  background: #2a0d0d;
+  border: 2px solid #e74c3c;
+}
+
+:global(.boss-result-icon) {
+  font-size: 4rem;
+}
+
+:global(.boss-result-title) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+:global(.boss-result-title.victory) {
+  color: #2ecc71;
+}
+
+:global(.boss-result-title.defeat) {
+  color: #e74c3c;
+}
+
+:global(.boss-result-desc) {
+  color: #94a3b8;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+// Buttons
+:global(.boss-btn) {
+  padding: 0.65rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  transition: opacity 0.15s;
+}
+
+:global(.boss-btn.primary) {
+  background: #4a9eff;
+}
+
+:global(.boss-btn.primary:hover) {
+  opacity: 0.85;
+}
+
+:global(.boss-btn.danger) {
+  background: #e74c3c;
+}
+
+:global(.boss-btn.danger:hover) {
+  opacity: 0.85;
+}
+
+:global(.boss-btn.success) {
+  background: #2ecc71;
+}
+
+:global(.boss-btn.success:hover) {
+  opacity: 0.85;
+}
+
+:global(.boss-btn:disabled) {
+  opacity: 0.4;
+  cursor: default;
+}
+
+:global(.boss-actions) {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+// Media queries
+@media (max-width: 768px) {
+  :global(.boss-page) {
+    padding: 1.25rem 0.9rem 2rem;
+  }
+  :global(.boss-header) {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  :global(.boss-title) {
+    font-size: 1.3rem;
+  }
+  :global(.health-row) {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  :global(.health-label) {
+    width: auto;
+    min-width: 48px;
+    text-align: left;
+  }
+  :global(.health-bar-bg) {
+    min-width: 0;
+    width: 100%;
+  }
+  :global(.phase-indicators) {
+    flex-wrap: wrap;
+  }
+  :global(.boss-intro-card),
+  :global(.boss-question-card),
+  :global(.boss-feedback-card),
+  :global(.boss-result-card) {
+    padding: 1.25rem;
+  }
+  :global(.boss-actions) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :global(.boss-btn) {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  :global(.boss-page) {
+    padding-inline: 0.75rem;
+  }
+  :global(.boss-intro-icon),
+  :global(.boss-result-icon) {
+    font-size: 3rem;
+  }
+  :global(.boss-actions) {
+    grid-template-columns: 1fr;
+  }
+  :global(.phase-dot) {
+    width: 28px;
+    height: 28px;
+    font-size: 0.65rem;
+  }
+}
+
+// -----------------------------------------------------------------------
+// Local module classes — for inline style replacements
+// -----------------------------------------------------------------------
+
+.loadingText {
+  color: #888;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.bossName {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.bossSubtitle {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.phaseCount {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.retreatOutline {
+  background: transparent;
+  border: 1px solid #555 !important;
+  color: #888;
+}
+
+.victoryScore {
+  color: #f1c40f;
+  font-size: 0.9rem;
+}
+
+.errorContainer {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.errorMessage {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}

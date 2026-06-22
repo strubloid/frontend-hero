@@ -9,6 +9,7 @@ import { ReviewRepository } from "@/modules/reviews/domain/review-repository";
 import { PrerequisiteGraphBuilder } from "@/modules/subjects/application/prerequisite-graph-builder";
 import { StartMissionInput, Mission } from "@/modules/missions/domain/mission";
 import type { QuestionInventoryService } from "@/modules/questions/domain/question-inventory-service";
+import type { QuestionRepository } from "@/modules/questions/domain/question-repository";
 import { getLevelDefinition, SubjectProgression } from "@/modules/subjects/domain/subject-level";
 
 export type StartMissionResult =
@@ -33,6 +34,7 @@ export class StartMissionUseCase {
     private readonly masteryRepository?: MasteryRepository,
     private readonly reviewRepository?: ReviewRepository,
     private readonly inventoryService?: QuestionInventoryService,
+    private readonly questionRepository?: QuestionRepository,
   ) {}
 
   async execute(input: StartMissionInput): Promise<StartMissionResult> {
@@ -64,12 +66,13 @@ export class StartMissionUseCase {
     );
     const availableConceptIds = graph.getAvailableConcepts(masteredConceptIds);
     const recentQuestionIds = await this.getRecentQuestionIds(input.playerId);
+    const recentConceptIds = await this.getRecentConceptIds(input.playerId);
 
     const missionPlan: MissionPlan = this.missionSelector.select({
       subject,
       masteries,
       schedules,
-      recentConceptIds: [], // concept history is derived from mastery/review state for now
+      recentConceptIds,
       availableConceptIds,
     });
 
@@ -149,5 +152,15 @@ export class StartMissionUseCase {
     const missionQuestionIds = recentMissions.flatMap((mission) => mission.questionIds);
 
     return [...new Set([...attemptedQuestionIds, ...missionQuestionIds])];
+  }
+
+  private async getRecentConceptIds(playerId: string): Promise<string[]> {
+    const recentMissions = (await this.missionRepository.getCompletedByPlayer(playerId)).slice(-3);
+    const questionIds = recentMissions.flatMap((mission) => mission.questionIds);
+    if (questionIds.length === 0 || !this.questionRepository) return [];
+
+    const questions = await this.questionRepository.getByIds(questionIds);
+    const conceptIds = [...new Set(questions.map((q) => q.conceptId).filter(Boolean))];
+    return conceptIds;
   }
 }

@@ -41,6 +41,10 @@ class LocalQuestionRepository implements QuestionRepository {
       ) ?? null
     );
   }
+
+  async getByIds(ids: string[]) {
+    return ids.map((id) => this.store.get(id)).filter(Boolean);
+  }
 }
 
 class LocalPlayerRepo {

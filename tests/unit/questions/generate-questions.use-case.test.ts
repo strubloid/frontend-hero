@@ -109,6 +109,10 @@ class FakeQuestionRepository implements QuestionRepository {
   async getBySeedAndSubject(): Promise<Question | null> {
     return null;
   }
+
+  async getByIds(ids: string[]): Promise<Question[]> {
+    return ids.map((id) => this.store.get(id)).filter((q): q is Question => q !== undefined);
+  }
 }
 
 function buildSubjectsWithConcepts(
