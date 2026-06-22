@@ -57,41 +57,40 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 14 — Player Identity Decoupling (Complete)** ✅
+**Current Phase: Phase 15 — Challenge Type Expansion & Variety (In Progress)** ✅
 
-Phase 14 has decoupled all API routes from hard-coded player IDs. All server-side data access now goes through the authenticated user's session:
+Phase 15 adds 3 new question types that existed in the `QuestionType` union type but had no evaluator, validator, module, or React component registered:
 
-- ✅ 7 API routes (boss state/answer/start/retreat, missions current/start/answer, player) now use `auth()` to extract the player ID from the NextAuth session
-- ✅ API routes return 401 when no session exists, replacing the old `"default-player"` fallback
-- ✅ New `getAuthenticatedPlayerId()` server action provides a clean, architecture-compliant auth wrapper for server-side code
-- ✅ Play page no longer passes `playerId` as a query parameter to API routes
-- ✅ `getPlayerForApi()` simplified — removed dead `default-player` special case
-- ✅ E2E tests updated to match new auth-required behavior
-- ✅ Architecture validation passes (0 errors)
+- ✅ `fill-blank` — Stem shows `___` blank, user picks correct word/phrase from options
+- ✅ `ordering` — "What comes next?" sequence question, user picks the correct next step
+- ✅ `matching` — Reference item displayed, user selects matching option from choices
+- ✅ All 3 registered in `create-default-registry.ts` and wired in `question-renderer-router.tsx`
+- ✅ All 3 use the existing `selectedIndex === correctIndex` evaluation pipeline (no architecture changes)
 - ✅ 380 tests passing, build clean
 
-**Next Phase: Phase 15 — Challenge Type Expansion & Variety**
+**Next Phase: Phase 16 — TBD**
 
 ### Phase Overview
 
-| Phase        | Name                                | Status          |
-| ------------ | ----------------------------------- | --------------- |
-| Phase 0      | Research and Product Definition     | ✅ Complete     |
-| Phase 1      | Walking Skeleton                    | ✅ Complete     |
-| Phase 2      | Subject Engine                      | ✅ Complete     |
-| Phase 3      | Learning Engine                     | ✅ Complete     |
-| Phase 4      | Game Foundation                     | ✅ Complete     |
-| Phase 5      | Polish & Narrative                  | ✅ Complete     |
-| Phase 6      | Experience & Integration            | ✅ Complete     |
-| Phase 7      | Advanced Game Experience            | ✅ Complete     |
-| Phase 8      | Production Readiness                | ✅ Complete     |
-| Post-launch  | Durable Persistence Hardening       | ✅ Complete     |
-| Phase 9      | Command Centre & Question Supply    | ✅ Complete     |
-| Phase 10     | Subject Campaign Progression        | ✅ Complete     |
-| Phase 11     | Encounter Forge & Batch Generation  | ✅ Complete     |
-| Phase 12     | Subject Boss & Campaign Completion  | ✅ Complete     |
-| Phase 13     | E2E Testing & Production Validation | ✅ Complete     |
-| **Phase 14** | **Player Identity Decoupling**      | ✅ **Complete** |
+| Phase        | Name                                   | Status          |
+| ------------ | -------------------------------------- | --------------- |
+| Phase 0      | Research and Product Definition        | ✅ Complete     |
+| Phase 1      | Walking Skeleton                       | ✅ Complete     |
+| Phase 2      | Subject Engine                         | ✅ Complete     |
+| Phase 3      | Learning Engine                        | ✅ Complete     |
+| Phase 4      | Game Foundation                        | ✅ Complete     |
+| Phase 5      | Polish & Narrative                     | ✅ Complete     |
+| Phase 6      | Experience & Integration               | ✅ Complete     |
+| Phase 7      | Advanced Game Experience               | ✅ Complete     |
+| Phase 8      | Production Readiness                   | ✅ Complete     |
+| Post-launch  | Durable Persistence Hardening          | ✅ Complete     |
+| Phase 9      | Command Centre & Question Supply       | ✅ Complete     |
+| Phase 10     | Subject Campaign Progression           | ✅ Complete     |
+| Phase 11     | Encounter Forge & Batch Generation     | ✅ Complete     |
+| Phase 12     | Subject Boss & Campaign Completion     | ✅ Complete     |
+| Phase 13     | E2E Testing & Production Validation    | ✅ Complete     |
+| **Phase 14** | **Player Identity Decoupling**         | ✅ **Complete** |
+| **Phase 15** | **Challenge Type Expansion & Variety** | ✅ **Complete** |
 
 ---
 
@@ -539,7 +538,7 @@ See `docs/architecture/extension-points.md` for the complete Drag-and-Drop examp
 
 ### Current Limitations
 
-1. **Challenge type variety limited** — The game currently uses only multiple-choice questions. Code-prediction, bug-hunt, and other types defined in the extension point system are not yet implemented. Planned for Phase 15.
+1. **Challenge type variety limited** — The game previously used only multiple-choice questions. Phase 15 added `fill-blank`, `ordering`, and `matching` types. Code-prediction, bug-hunt, and other types defined in the extension point system are now available, though some remain unimplemented (`refactoring`, `architecture-decision` — not yet in the `QuestionType` union).
 2. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
 3. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
 4. **Inline styles and presentation polish remain** — Some pages still violate the SCSS module architecture direction and the game loop needs more narrative/feedback polish to feel like a premium game.

@@ -2,21 +2,21 @@
 
 |> **Living document**. Update after completing each phase.
 
-> Current Phase: **Phase 14 — Player Identity Decoupling (Complete)**
+> Current Phase: **Phase 15 — Challenge Type Expansion & Variety (Complete)**
 
 ---
 
 ## Quick Summary
 
 | Aspect       | Status                                                                                                   |
-| ------------ | -------------------------------------------------------------------------------------------------------- |
+| ------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | Product      | Gamified frontend engineering learning platform                                                          |
 | Architecture | Modular monolith — Domain / Application / Infrastructure / Presentation                                  |
 | Framework    | Next.js 16.2.9 (App Router)                                                                              |
 | Language     | TypeScript (strict)                                                                                      |
 | Database     | SQLite (dev/test), PostgreSQL (production target)                                                        |
 | ORM          | Drizzle ORM v7                                                                                           |
-| Testing      | Vitest (378 unit/integration/architecture tests passing)                                                 |
+|              | Testing                                                                                                  | Vitest (380 unit/integration/architecture tests passing) |
 | E2E          | Playwright configured; 6 tests passing across 3 spec files: play flow, question rotation, negative paths |
 | CI/CD        | GitHub Actions + Docker + Fly.io                                                                         |
 | AI Provider  | Big Pickle-style gateway path integrated (demo/template generation unless real provider set)             |
@@ -27,24 +27,25 @@
 
 ## Phase Overview
 
-| Phase        | Name                                | Status      |
-| ------------ | ----------------------------------- | ----------- |
-| Phase 0      | Research and Product Definition     | ✅ Complete |
-| Phase 1      | Walking Skeleton                    | ✅ Complete |
-| Phase 2      | Subject Engine                      | ✅ Complete |
-| Phase 3      | Learning Engine                     | ✅ Complete |
-| Phase 4      | Game Foundation                     | ✅ Complete |
-| Phase 5      | Polish & Narrative                  | ✅ Complete |
-| Phase 6      | Experience & Integration            | ✅ Complete |
-| Phase 7      | Advanced Game Experience            | ✅ Complete |
-| Phase 8      | Production Readiness                | ✅ Complete |
-| Post-launch  | Durable Persistence Hardening       | ✅ Complete |
-| Phase 9      | Command Centre & Question Supply    | ✅ Complete |
-| Phase 10     | Subject Campaign Progression        | ✅ Complete |
-| Phase 11     | Encounter Forge & Batch Generation  | ✅ Complete |
-| Phase 12     | Subject Boss & Campaign Completion  | ✅ Complete |
-| Phase 13     | E2E Testing & Production Validation | ✅ Complete |
-| **Phase 14** | **Player Identity Decoupling**      | ✅ Complete |
+| Phase        | Name                                   | Status      |
+| ------------ | -------------------------------------- | ----------- |
+| Phase 0      | Research and Product Definition        | ✅ Complete |
+| Phase 1      | Walking Skeleton                       | ✅ Complete |
+| Phase 2      | Subject Engine                         | ✅ Complete |
+| Phase 3      | Learning Engine                        | ✅ Complete |
+| Phase 4      | Game Foundation                        | ✅ Complete |
+| Phase 5      | Polish & Narrative                     | ✅ Complete |
+| Phase 6      | Experience & Integration               | ✅ Complete |
+| Phase 7      | Advanced Game Experience               | ✅ Complete |
+| Phase 8      | Production Readiness                   | ✅ Complete |
+| Post-launch  | Durable Persistence Hardening          | ✅ Complete |
+| Phase 9      | Command Centre & Question Supply       | ✅ Complete |
+| Phase 10     | Subject Campaign Progression           | ✅ Complete |
+| Phase 11     | Encounter Forge & Batch Generation     | ✅ Complete |
+| Phase 12     | Subject Boss & Campaign Completion     | ✅ Complete |
+| Phase 13     | E2E Testing & Production Validation    | ✅ Complete |
+| **Phase 14** | **Player Identity Decoupling**         | ✅ Complete |
+| **Phase 15** | **Challenge Type Expansion & Variety** | ✅ Complete |
 
 ---
 
@@ -114,6 +115,26 @@
 - ✅ **Docker build verification** — `scripts/verify-docker-image.mjs` builds the Docker image, starts a container, confirms health endpoint returns 200/ok, confirms main page loads, then cleans up
 - ✅ **Docker wiring in CI** — `.github/workflows/ci.yml` runs Docker build + container verification as a separate job alongside verify:full
 - ✅ **Production verification script** — `npm run verify:production` runs verify:full then Docker verification
+
+### Phase 15 — Challenge Type Expansion & Variety (Complete)
+
+- ✅ **fill-blank** — New question type with evaluator, validator, module, and React component. Stem shows `___` blank; player picks the correct word/phrase from options.
+- ✅ **ordering** — "What comes next?" sequence question. Player picks the correct next step from options.
+- ✅ **matching** — Reference item displayed in a highlighted box; player selects the matching option from choices.
+- ✅ All 3 types registered in `create-default-registry.ts` and wired in `question-renderer-router.tsx`.
+- ✅ All 3 types use the existing `selectedIndex === correctIndex` selection-based evaluation pipeline — no architecture or pipeline changes needed.
+- ✅ 380 unit/integration/architecture tests passing, build clean.
+
+### Phase 14 — Player Identity Decoupling (Complete)
+
+- ✅ All 7 API routes (boss state/answer/start/retreat, missions current/start/answer, player) now use `auth()` to extract the player ID from the NextAuth session.
+- ✅ API routes return 401 when no session exists, replacing the old `"default-player"` fallback.
+- ✅ New `getAuthenticatedPlayerId()` server action provides a clean, architecture-compliant auth wrapper for server-side code.
+- ✅ Play page no longer passes `playerId` as a query parameter to API routes.
+- ✅ `getPlayerForApi()` simplified — removed dead `default-player` special case.
+- ✅ E2E tests updated to match new auth-required behavior.
+- ✅ Architecture validation passes (0 errors).
+- ✅ 380 tests passing, build clean.
 
 ### Phase 9 — Command Centre & Question Supply (Complete)
 
@@ -186,21 +207,20 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 
 ## Known Gaps
 
-| Gap                      | Impact                                                                                                  | Planned Phase |
-| ------------------------ | ------------------------------------------------------------------------------------------------------- | ------------- |
-| AI question generation   | Demo/template generation unless real provider is configured                                             | Phase 13      |
-| Player identity coupling | Server actions use hard-coded player IDs                                                                | Phase 14      |
-| Inline styles in pages   | Violates SCSS module architecture pattern                                                               | Phase 14      |
-| Challenge type variety   | All current questions are multiple-choice; code-prediction, bug-hunt, and explain-it types still needed | Phase 14      |
+| Gap                    | Impact                                                                                                                        | Planned Phase |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| AI question generation | Demo/template generation unless real provider is configured                                                                   | Phase 13      |
+| Inline styles in pages | Violates SCSS module architecture pattern                                                                                     | Phase 14      |
+| Challenge type variety | All question types are now registered; refactoring and architecture-decision types are still unlisted in `QuestionType` union | Phase 16      |
 
 ---
 
 ## Testing Status
 
-| Suite                 | Files | Tests | Status                              |
-| --------------------- | ----- | ----- | ----------------------------------- |
-| Unit/integration/arch | 35    | 378   | ✅ All passing (`npx vitest run`)   |
-| E2E (Playwright)      | 3     | 6     | ✅ All passing (`npm run test:e2e`) |
+| Suite            | Files                 | Tests | Status                              |
+| ---------------- | --------------------- | ----- | ----------------------------------- | --------------------------------- |
+|                  | Unit/integration/arch | 35    | 380                                 | ✅ All passing (`npx vitest run`) |
+| E2E (Playwright) | 3                     | 6     | ✅ All passing (`npm run test:e2e`) |
 
 ---
 
@@ -224,4 +244,4 @@ Phase acceptance requires `npm run verify:full` to pass. Phase 13 also requires 
 
 ---
 
-_Last updated: 2026-06-22 (Phase 13 — all gameplay connections wired, Docker verification added, E2E coverage expanded)_
+_Last updated: 2026-06-22 (Phase 15 — fill-blank, ordering, and matching question types added)_

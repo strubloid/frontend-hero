@@ -5,6 +5,9 @@ import { CodePredictionQuestionTypeModule } from "@/modules/questions/infrastruc
 import { BugHuntQuestionTypeModule } from "@/modules/questions/infrastructure/question-types/bug-hunt-module";
 import { ExplainItQuestionTypeModule } from "@/modules/questions/infrastructure/question-types/explain-it-module";
 import { MultipleSelectQuestionTypeModule } from "@/modules/questions/infrastructure/question-types/multiple-select-module";
+import { FillBlankQuestionTypeModule } from "@/modules/questions/infrastructure/question-types/fill-blank-module";
+import { OrderingQuestionTypeModule } from "@/modules/questions/infrastructure/question-types/ordering-module";
+import { MatchingQuestionTypeModule } from "@/modules/questions/infrastructure/question-types/matching-module";
 
 /**
  * Create a QuestionTypeRegistry with all default question type modules registered.
@@ -17,5 +20,8 @@ export function createDefaultQuestionTypeRegistry(): QuestionTypeRegistry {
   registry.register(new BugHuntQuestionTypeModule());
   registry.register(new ExplainItQuestionTypeModule());
   registry.register(new MultipleSelectQuestionTypeModule());
+  registry.register(new FillBlankQuestionTypeModule());
+  registry.register(new OrderingQuestionTypeModule());
+  registry.register(new MatchingQuestionTypeModule());
   return registry;
 }

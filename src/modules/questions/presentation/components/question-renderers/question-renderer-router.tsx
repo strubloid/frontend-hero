@@ -6,6 +6,9 @@ import { CodePredictionQuestion } from "./code-prediction-question";
 import { BugHuntQuestion } from "./bug-hunt-question";
 import { ExplainItQuestion } from "./explain-it-question";
 import { MultipleSelectQuestion } from "./multiple-select-question";
+import { FillBlankQuestion } from "./fill-blank-question";
+import { OrderingQuestion } from "./ordering-question";
+import { MatchingQuestion } from "./matching-question";
 
 interface QuestionRendererRouterProps extends QuestionRendererProps {
   type: string;
@@ -18,6 +21,9 @@ const typeComponentMap: Record<string, React.FC<QuestionRendererProps>> = {
   "bug-hunt": BugHuntQuestion,
   "explain-it": ExplainItQuestion,
   "multiple-select": MultipleSelectQuestion,
+  "fill-blank": FillBlankQuestion,
+  ordering: OrderingQuestion,
+  matching: MatchingQuestion,
 };
 
 export function QuestionRendererRouter(props: QuestionRendererRouterProps) {
