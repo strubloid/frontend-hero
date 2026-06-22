@@ -23,11 +23,12 @@ function ensureAuthenticatedTestUser() {
          masteryPoints, currentSubjectId, currentRegionId, lastActiveAt,
          lastReturnBonusClaimedAt, selectedTitle, selectedTheme, workshopTier,
          createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, NULL, NULL, 1, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 1, ?, ?)
+       VALUES (?, ?, ?, ?, NULL, NULL, 1, 0, 0, 'nextjs', NULL, NULL, NULL, NULL, NULL, 1, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
          name = excluded.name,
          email = excluded.email,
          passwordHash = excluded.passwordHash,
+         currentSubjectId = excluded.currentSubjectId,
          updatedAt = excluded.updatedAt`,
     )
     .run(TEST_PLAYER_ID, "E2E Player", TEST_EMAIL, passwordHash, now, now);
@@ -95,8 +96,7 @@ test.describe("Play flow — real verification", () => {
     await startButton.click();
 
     // Wait for a question to appear
-    await page.waitForSelector("h2", { timeout: 10000 });
-    await expect(page.getByText(/Question \d+ of/)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/Question \d+ of/)).toBeVisible({ timeout: 10000 });
 
     // ── 3. Select an answer option ─────────────────────────────────────────
     const options = page.getByRole("button").filter({ hasText: /.+/ });

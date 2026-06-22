@@ -1,11 +1,12 @@
 import type { QuestionType } from "@/modules/subjects/domain/subject";
 import type { QuestionTypeModule } from "@/modules/questions/domain/interfaces/question-type-module";
+import type { QuestionTypeRegistry as QuestionTypeRegistryInterface } from "@/modules/questions/domain/interfaces/question-type-registry";
 import {
   DuplicateQuestionTypeRegistrationError,
   UnsupportedQuestionTypeError,
 } from "@/modules/questions/domain/errors/question-type-errors";
 
-export class QuestionTypeRegistry {
+export class QuestionTypeRegistry implements QuestionTypeRegistryInterface {
   private readonly modules = new Map<QuestionType, QuestionTypeModule>();
 
   register(module: QuestionTypeModule): void {
@@ -17,11 +18,11 @@ export class QuestionTypeRegistry {
   }
 
   getModule(type: QuestionType): QuestionTypeModule {
-    const module = this.modules.get(type);
-    if (!module) {
+    const mod = this.modules.get(type);
+    if (!mod) {
       throw new UnsupportedQuestionTypeError(type);
     }
-    return module;
+    return mod;
   }
 
   getAllTypes(): QuestionType[] {

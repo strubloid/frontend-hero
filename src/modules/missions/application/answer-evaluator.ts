@@ -1,4 +1,4 @@
-import type { QuestionTypeRegistry } from "@/modules/questions/infrastructure/question-type-registry";
+import type { QuestionTypeRegistry } from "@/modules/questions/domain/interfaces/question-type-registry";
 
 export interface EvaluationResult {
   isCorrect: boolean;
@@ -17,8 +17,8 @@ export class AnswerEvaluator {
   ): EvaluationResult {
     // Try to use the registry-based evaluator for the question type
     if (this.registry && this.registry.hasModule(questionType)) {
-      const module = this.registry.getModule(questionType);
-      const evaluator = module.createEvaluator();
+      const mod = this.registry.getModule(questionType);
+      const evaluator = mod.createEvaluator();
       const result = evaluator.evaluate(
         {
           id: "",

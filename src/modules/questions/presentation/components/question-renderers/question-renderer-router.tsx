@@ -4,6 +4,8 @@ import { MultipleChoiceQuestion } from "./multiple-choice-question";
 import { TrueFalseQuestion } from "./true-false-question";
 import { CodePredictionQuestion } from "./code-prediction-question";
 import { BugHuntQuestion } from "./bug-hunt-question";
+import { ExplainItQuestion } from "./explain-it-question";
+import { MultipleSelectQuestion } from "./multiple-select-question";
 
 interface QuestionRendererRouterProps extends QuestionRendererProps {
   type: string;
@@ -14,6 +16,8 @@ const typeComponentMap: Record<string, React.FC<QuestionRendererProps>> = {
   "true-false": TrueFalseQuestion,
   "code-prediction": CodePredictionQuestion,
   "bug-hunt": BugHuntQuestion,
+  "explain-it": ExplainItQuestion,
+  "multiple-select": MultipleSelectQuestion,
 };
 
 export function QuestionRendererRouter(props: QuestionRendererRouterProps) {

@@ -23,11 +23,12 @@ function ensureAuthenticatedTestUser() {
          masteryPoints, currentSubjectId, currentRegionId, lastActiveAt,
          lastReturnBonusClaimedAt, selectedTitle, selectedTheme, workshopTier,
          createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, NULL, NULL, 1, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 1, ?, ?)
+       VALUES (?, ?, ?, ?, NULL, NULL, 1, 0, 0, 'nextjs', NULL, NULL, NULL, NULL, NULL, 1, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
          name = excluded.name,
          email = excluded.email,
          passwordHash = excluded.passwordHash,
+         currentSubjectId = excluded.currentSubjectId,
          updatedAt = excluded.updatedAt`,
     )
     .run(TEST_PLAYER_ID, "E2E Rotation", TEST_EMAIL, passwordHash, now, now);
@@ -64,11 +65,17 @@ async function signInForProtectedRoutes(page: import("@playwright/test").Page) {
  */
 async function answerCurrentQuestion(page: import("@playwright/test").Page): Promise<string> {
   // Wait for question to appear
-  await page.waitForSelector("h2", { timeout: 10000 });
-  await expect(page.getByText(/Question \d+ of/)).toBeVisible({ timeout: 5000 });
+  await expect(page.getByText(/Question \d+ of/)).toBeVisible({ timeout: 10000 });
 
-  // Capture the question stem
-  const stem = await page.textContent("h2");
+  // Capture the question stem — it's the first <p> with substantial text
+  const stem = await page.evaluate(() => {
+    const paragraphs = Array.from(document.querySelectorAll("p"));
+    for (const p of paragraphs) {
+      const text = p.textContent?.trim();
+      if (text && text.length > 10) return text;
+    }
+    return null;
+  });
   expect(stem).toBeTruthy();
 
   // Select an answer option (pick the first one)
