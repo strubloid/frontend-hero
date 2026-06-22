@@ -57,46 +57,41 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 13 — E2E Testing & Production Validation (Complete)** ✅
+**Current Phase: Phase 14 — Player Identity Decoupling (Complete)** ✅
 
-Phase 13 has transformed Frontend Realms from a 3-question XP demo into a connected game loop. All core gameplay connections are now wired end-to-end, with Docker build verification and CI integration:
+Phase 14 has decoupled all API routes from hard-coded player IDs. All server-side data access now goes through the authenticated user's session:
 
-- ✅ Subject selection & progress creation on first login
-- ✅ Question consumption tracking (`timesShown`, `lastShownAt` update, rotation prevention)
-- ✅ Mission completion drives subject level advancement
-- ✅ Boss unlock & completion connected to subject progression
-- ✅ Quest/achievement progress awarded on mission completion
-- ✅ Review scheduling affects mission selection
-- ✅ Encounter Forge shows per-level inventory health with supply gates
-- ✅ Post-mission reward screen shows real persisted state changes
-- ✅ Generated question validation & deduplication
-- ✅ Per-level inventory health gate prevents empty-level mission starts
-- ✅ E2E coverage: play flow, question rotation, negative paths
-- ✅ Docker build + container health verification in CI
-- ✅ `npm run verify:production` for full + Docker verification
-- ✅ 380 tests passing, 3 E2E specs passing
+- ✅ 7 API routes (boss state/answer/start/retreat, missions current/start/answer, player) now use `auth()` to extract the player ID from the NextAuth session
+- ✅ API routes return 401 when no session exists, replacing the old `"default-player"` fallback
+- ✅ New `getAuthenticatedPlayerId()` server action provides a clean, architecture-compliant auth wrapper for server-side code
+- ✅ Play page no longer passes `playerId` as a query parameter to API routes
+- ✅ `getPlayerForApi()` simplified — removed dead `default-player` special case
+- ✅ E2E tests updated to match new auth-required behavior
+- ✅ Architecture validation passes (0 errors)
+- ✅ 380 tests passing, build clean
 
-**Next Phase: Phase 14 — Player Identity Decoupling & Quality**
+**Next Phase: Phase 15 — Challenge Type Expansion & Variety**
 
 ### Phase Overview
 
-| Phase       | Name                                | Status      |
-| ----------- | ----------------------------------- | ----------- |
-| Phase 0     | Research and Product Definition     | ✅ Complete |
-| Phase 1     | Walking Skeleton                    | ✅ Complete |
-| Phase 2     | Subject Engine                      | ✅ Complete |
-| Phase 3     | Learning Engine                     | ✅ Complete |
-| Phase 4     | Game Foundation                     | ✅ Complete |
-| Phase 5     | Polish & Narrative                  | ✅ Complete |
-| Phase 6     | Experience & Integration            | ✅ Complete |
-| Phase 7     | Advanced Game Experience            | ✅ Complete |
-| Phase 8     | Production Readiness                | ✅ Complete |
-| Post-launch | Durable Persistence Hardening       | ✅ Complete |
-| Phase 9     | Command Centre & Question Supply    | ✅ Complete |
-| Phase 10    | Subject Campaign Progression        | ✅ Complete |
-| Phase 11    | Encounter Forge & Batch Generation  | ✅ Complete |
-| Phase 12    | Subject Boss & Campaign Completion  | ✅ Complete |
-| Phase 13    | E2E Testing & Production Validation | ✅ Complete |
+| Phase        | Name                                | Status          |
+| ------------ | ----------------------------------- | --------------- |
+| Phase 0      | Research and Product Definition     | ✅ Complete     |
+| Phase 1      | Walking Skeleton                    | ✅ Complete     |
+| Phase 2      | Subject Engine                      | ✅ Complete     |
+| Phase 3      | Learning Engine                     | ✅ Complete     |
+| Phase 4      | Game Foundation                     | ✅ Complete     |
+| Phase 5      | Polish & Narrative                  | ✅ Complete     |
+| Phase 6      | Experience & Integration            | ✅ Complete     |
+| Phase 7      | Advanced Game Experience            | ✅ Complete     |
+| Phase 8      | Production Readiness                | ✅ Complete     |
+| Post-launch  | Durable Persistence Hardening       | ✅ Complete     |
+| Phase 9      | Command Centre & Question Supply    | ✅ Complete     |
+| Phase 10     | Subject Campaign Progression        | ✅ Complete     |
+| Phase 11     | Encounter Forge & Batch Generation  | ✅ Complete     |
+| Phase 12     | Subject Boss & Campaign Completion  | ✅ Complete     |
+| Phase 13     | E2E Testing & Production Validation | ✅ Complete     |
+| **Phase 14** | **Player Identity Decoupling**      | ✅ **Complete** |
 
 ---
 
@@ -544,11 +539,10 @@ See `docs/architecture/extension-points.md` for the complete Drag-and-Drop examp
 
 ### Current Limitations
 
-1. **Player identity coupling** — Server actions use hard-coded player IDs instead of the authenticated user's ID. Planned for Phase 14.
-2. **Challenge type variety limited** — The game currently uses only multiple-choice questions. Code-prediction, bug-hunt, and other types defined in the extension point system are not yet implemented.
-3. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
-4. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
-5. **Inline styles and presentation polish remain** — Some pages still violate the SCSS module architecture direction and the game loop needs more narrative/feedback polish to feel like a premium game.
+1. **Challenge type variety limited** — The game currently uses only multiple-choice questions. Code-prediction, bug-hunt, and other types defined in the extension point system are not yet implemented. Planned for Phase 15.
+2. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
+3. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
+4. **Inline styles and presentation polish remain** — Some pages still violate the SCSS module architecture direction and the game loop needs more narrative/feedback polish to feel like a premium game.
 
 ### Architectural Limitations (by Design)
 

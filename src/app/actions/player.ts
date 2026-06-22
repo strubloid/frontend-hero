@@ -1,6 +1,5 @@
 "use server";
 
-import { getDefaultPlayerId } from "@/app/actions/missions";
 import { DrizzlePlayerRepository } from "@/modules/players/infrastructure/drizzle-player-repository";
 import { getSqliteConnection } from "@/shared/infrastructure/database/connection";
 import type { Player } from "@/modules/players/domain/player";
@@ -44,10 +43,6 @@ function serializePlayer(player: Player): PlayerApiDto {
 }
 
 export async function getPlayerForApi(playerId: string): Promise<PlayerApiDto | null> {
-  if (playerId === "default-player") {
-    await getDefaultPlayerId();
-  }
-
   const playerRepository = new DrizzlePlayerRepository(getSqliteConnection());
   const player = await playerRepository.getById(playerId);
 

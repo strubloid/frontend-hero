@@ -174,8 +174,12 @@ test.describe("Play flow — real verification", () => {
     ).toBeVisible();
   });
 
-  test("API returns player data with level and XP when player exists", async ({ page }) => {
-    // Verify the player API endpoint works at all
+  test("API returns player data with level and XP after signing in", async ({ page }) => {
+    // Sign in first so the API call is authenticated
+    await signInForProtectedRoutes(page);
+    await page.waitForLoadState("networkidle");
+
+    // Verify the player API endpoint works for the authenticated user
     const res = await page.request.get(`/api/player?playerId=${TEST_PLAYER_ID}`);
     expect(res.ok()).toBeTruthy();
 

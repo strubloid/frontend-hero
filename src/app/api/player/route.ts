@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedPlayerId } from "@/app/actions/auth-helpers";
 import { getPlayerForApi } from "@/app/actions/player";
-import { getCurrentPlayerId } from "@/app/actions/missions";
 
 export async function GET(request: NextRequest) {
   try {
-    const requestedPlayerId =
-      request.nextUrl.searchParams.get("playerId") ?? (await getCurrentPlayerId());
-    const player = await getPlayerForApi(requestedPlayerId);
+    const playerId = await getAuthenticatedPlayerId();
+    if (!playerId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const player = await getPlayerForApi(playerId);
 
     if (!player) {
       return NextResponse.json({ error: "Player not found" }, { status: 404 });

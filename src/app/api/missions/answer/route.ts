@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedPlayerId } from "@/app/actions/auth-helpers";
 import { submitAnswer, getActiveMission } from "@/app/actions/missions";
 
 export async function POST(request: NextRequest) {
   try {
+    const playerId = await getAuthenticatedPlayerId();
+    if (!playerId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const result = await submitAnswer({
       missionId: body.missionId,
-      playerId: body.playerId ?? "default-player",
+      playerId,
       questionId: body.questionId,
       selectedIndex: body.selectedIndex,
       timeSpentSeconds: body.timeSpentSeconds ?? 0,
@@ -29,7 +35,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const playerId = request.nextUrl.searchParams.get("playerId") ?? "default-player";
+    const playerId = await getAuthenticatedPlayerId();
+    if (!playerId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const mission = await getActiveMission(playerId);
 
     if (!mission) {

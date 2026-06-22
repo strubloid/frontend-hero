@@ -95,9 +95,7 @@ function PlayPageInner() {
         setSubjectId(currentSubject.subjectId);
       }
 
-      const res = await fetch(
-        `/api/missions/current?playerId=${encodeURIComponent(currentPlayerId)}`,
-      );
+      const res = await fetch(`/api/missions/current`);
       if (!res.ok) {
         setPhase({ state: "error", message: "Failed to reach server" });
         return;
@@ -162,9 +160,7 @@ function PlayPageInner() {
       });
 
       // Fetch the next question
-      const res = await fetch(
-        `/api/missions/current?playerId=${encodeURIComponent(currentPlayerId)}`,
-      );
+      const res = await fetch(`/api/missions/current`);
       const data = await res.json();
 
       if (result.success) {
@@ -235,9 +231,7 @@ function PlayPageInner() {
       const currentPlayerId = playerId ?? (await getCurrentPlayerId());
       setPlayerId(currentPlayerId);
 
-      const res = await fetch(
-        `/api/missions/current?playerId=${encodeURIComponent(currentPlayerId)}`,
-      );
+      const res = await fetch(`/api/missions/current`);
       const data = await res.json();
 
       if (data.mission?.status === "completed") {

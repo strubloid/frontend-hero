@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedPlayerId } from "@/app/actions/auth-helpers";
 import {
   getActiveMission,
   getLastMission,
@@ -22,7 +23,11 @@ function serializeDates<T>(obj: T): T {
 
 export async function GET(request: NextRequest) {
   try {
-    const playerId = request.nextUrl.searchParams.get("playerId") ?? "default-player";
+    const playerId = await getAuthenticatedPlayerId();
+    if (!playerId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const mission = await getActiveMission(playerId);
     const subject = await getDefaultSubject();
 

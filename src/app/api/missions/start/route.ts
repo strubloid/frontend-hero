@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedPlayerId } from "@/app/actions/auth-helpers";
 import { startMission as startMissionAction } from "@/app/actions/missions";
 
 export async function POST(request: NextRequest) {
   try {
+    const playerId = await getAuthenticatedPlayerId();
+    if (!playerId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const result = await startMissionAction({
-      playerId: body.playerId ?? "default-player",
+      playerId,
       subjectId: body.subjectId ?? "nextjs",
       type: body.type ?? "encounter",
     });
