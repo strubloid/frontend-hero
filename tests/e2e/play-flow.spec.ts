@@ -41,6 +41,7 @@ function resetTestPlayerGameplayState() {
   sqlite.prepare("DELETE FROM missionAttempts WHERE playerId = ?").run(TEST_PLAYER_ID);
   sqlite.prepare("DELETE FROM missions WHERE playerId = ?").run(TEST_PLAYER_ID);
   sqlite.prepare("DELETE FROM conceptMastery WHERE playerId = ?").run(TEST_PLAYER_ID);
+  sqlite.prepare("DELETE FROM playerSubjectProgress WHERE playerId = ?").run(TEST_PLAYER_ID);
   sqlite
     .prepare(
       `UPDATE players

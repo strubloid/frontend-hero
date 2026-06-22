@@ -215,6 +215,8 @@ function isQuestionType(value: string): value is QuestionType {
     "code-prediction",
     "matching",
     "ordering",
+    "bug-hunt",
+    "explain-it",
   ];
   return (validTypes as readonly string[]).includes(value);
 }

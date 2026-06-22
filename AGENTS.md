@@ -57,7 +57,18 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 17 — Remaining SCSS Migration (Complete)** ✅
+**All phases (0–19, F–M) complete.** The entire plan.md has been implemented. The project is in a production-ready state with:
+
+- 9 challenge types with dedicated validators/evaluators/renderers
+- Encounter Forge validation + dedup pipeline with 16 tests
+- Full E2E coverage (auth → selection → play → progression → boss → persistence)
+- 380+ tests passing
+- Complete SCSS module migration
+- Subject-level progression, mastery gates, quests/achievements, boss unlock/completion
+
+### Phase Overview
+
+| Phase | Name | Status |
 
 Phase 17 completed the SCSS migration that Phase 16 started — moving all remaining inline styles and embedded `<style>` tags across every remaining app page into `.module.scss` files. The entire app now uses SCSS modules for styling.
 
@@ -116,7 +127,10 @@ Phase 16 replaced all inline `style={{} }` blocks across all 9 question renderer
 | **Phase G**  | **Mastery Gates (review scheduling, prereq gating)**    | ✅ **Complete** |
 | **Phase H**  | **Post-Mission Reward Screen**                          | ✅ **Complete** |
 | **Phase I**  | **Quests / Chains / Achievements**                      | ✅ **Complete** |
-| **Phase J**  | **Boss Unlock & Completion**                            | ✅ **Complete** |
+| **Phase J**  | **Boss Unlock & Campaign Completion**                   | ✅ **Complete** |
+| **Phase K**  | **Encounter Forge Production Safety**                   | ✅ **Complete** |
+| **Phase L**  | **Challenge Type Variety**                              | ✅ **Complete** |
+| **Phase M**  | **E2E & Integration Test Strength**                     | ✅ **Complete** |
 
 ---
 

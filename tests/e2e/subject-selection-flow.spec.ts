@@ -42,6 +42,20 @@ test.describe("Subject Selection Flow for fresh users", () => {
     ensureFreshTestUser();
   });
 
+  test.afterAll(() => {
+    // Clean up
+    const sqlite = openDatabase();
+    sqlite.prepare("UPDATE players SET currentSubjectId = NULL WHERE id = ?").run(FRESH_PLAYER_ID);
+    sqlite.close();
+  });
+
+  // Reset subject to null before every test so we start from "fresh" state
+  test.beforeEach(() => {
+    const sqlite = openDatabase();
+    sqlite.prepare("UPDATE players SET currentSubjectId = NULL WHERE id = ?").run(FRESH_PLAYER_ID);
+    sqlite.close();
+  });
+
   test("fresh user gets redirected from home to subject selection, then can start playing", async ({
     page,
   }) => {
@@ -58,10 +72,10 @@ test.describe("Subject Selection Flow for fresh users", () => {
 
     // ── 3. Verify subjects page shows available subjects ────────────────────
     await expect(page.getByRole("heading", { name: "Next.js" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Study Next\\.js/i })).toBeVisible();
+    await page.getByText("Begin Study").waitFor({ state: "visible", timeout: 10000 });
 
     // ── 4. Select a subject ─────────────────────────────────────────────────
-    await page.getByRole("button", { name: /Study Next\\.js/i }).click();
+    await page.getByText("Begin Study").click();
 
     // ── 5. Should redirect to /play with the subject id ─────────────────────
     await page.waitForURL(/\/play/, { timeout: 10000 });

@@ -59,6 +59,7 @@ function resetTestPlayerGameplayState(): void {
   sqlite.prepare("DELETE FROM missions WHERE playerId = ?").run(TEST_PLAYER_ID);
   sqlite.prepare("DELETE FROM conceptMastery WHERE playerId = ?").run(TEST_PLAYER_ID);
   sqlite.prepare("DELETE FROM bossProgress WHERE playerId = ?").run(TEST_PLAYER_ID);
+  sqlite.prepare("DELETE FROM playerSubjectProgress WHERE playerId = ?").run(TEST_PLAYER_ID);
   sqlite
     .prepare(
       `UPDATE players
@@ -198,7 +199,7 @@ test.describe("Level progression, boss encounter, persistence", () => {
       }
 
       // Wait for the reward/completion screen
-      await expect(page.getByText(/Rewards Secured|Encounter Complete/)).toBeVisible({
+      await expect(page.getByText(/Encounter Complete/)).toBeVisible({
         timeout: 20000,
       });
 
