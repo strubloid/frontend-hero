@@ -1,0 +1,161 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 3rem) clamp(0.75rem, 3vw, 1rem);
+  font-family: system-ui, sans-serif;
+  color: #e0e0e0;
+  background: #121212;
+  min-height: 100vh;
+}
+
+.headerBar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.backButton {
+  background: none;
+  border: 1px solid #333;
+  color: #888;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.subjectTitle {
+  font-size: 1.75rem;
+  color: #fff;
+  margin: 0;
+}
+
+.loadingText,
+.submittingText {
+  color: #888;
+}
+
+.idleDescription {
+  margin-bottom: 1rem;
+  color: #aaa;
+}
+
+// Shared primary button
+.button {
+  padding: 0.65rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #4a9eff;
+  color: #fff;
+  transition: opacity 0.15s;
+  width: 100%;
+}
+
+.submitButton {
+  composes: button;
+  margin-top: 1.25rem;
+}
+
+.submitButtonDisabled {
+  opacity: 0.4;
+}
+
+.questionInfo {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.badgeRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.typeBadge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.feedbackBox {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.feedbackCorrect {
+  background: #0d2818;
+  border: 1px solid #2ecc71;
+}
+
+.feedbackIncorrect {
+  background: #2a0d0d;
+  border: 1px solid #e74c3c;
+}
+
+.feedbackHeader {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.feedbackHeaderCorrect {
+  color: #2ecc71;
+}
+
+.feedbackHeaderIncorrect {
+  color: #e74c3c;
+}
+
+.feedbackExplanation {
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.correctAnswerRow {
+  margin-bottom: 1rem;
+}
+
+.correctAnswerLabel {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.correctAnswerValue {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+.statsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #1a1a1a;
+  border-radius: 6px;
+}
+
+.statsItem {
+  color: #aaa;
+}
+
+.statsValue {
+  color: #f1c40f;
+}
+
+.errorText {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}

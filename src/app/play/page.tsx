@@ -13,6 +13,7 @@ import RewardResultScreen from "@/modules/missions/presentation/components/rewar
 import { QuestionRendererRouter } from "@/modules/questions/presentation/components/question-renderers/question-renderer-router";
 import type { SubmitAnswerResult } from "@/modules/missions/application/submit-answer.use-case";
 import { useToast } from "@/components/toast-provider";
+import styles from "./play.module.scss";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -261,44 +262,16 @@ function PlayPageInner() {
   // -----------------------------------------------------------------------
 
   return (
-    <main
-      style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "clamp(1.25rem, 4vw, 3rem) clamp(0.75rem, 3vw, 1rem)",
-        fontFamily: "system-ui, sans-serif",
-        color: "#e0e0e0",
-        background: "#121212",
-        minHeight: "100vh",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-          marginBottom: "1rem",
-          flexWrap: "wrap",
-        }}
-      >
+    <main className={styles.page}>
+      <div className={styles.headerBar}>
         <button
           onClick={() => router.push("/subjects")}
-          style={{
-            background: "none",
-            border: "1px solid #333",
-            color: "#888",
-            padding: "0.3rem 0.7rem",
-            borderRadius: 4,
-            cursor: "pointer",
-            fontSize: "0.8rem",
-          }}
+          className={styles.backButton}
           aria-label="Back to subjects"
         >
           &larr; Subjects
         </button>
-        <h1 style={{ fontSize: "1.75rem", color: "#fff", margin: 0 }}>
-          {subjectId === "nextjs" ? "Next.js" : subjectId}
-        </h1>
+        <h1 className={styles.subjectTitle}>{subjectId === "nextjs" ? "Next.js" : subjectId}</h1>
       </div>
 
       <PhaseRenderer
@@ -331,15 +304,15 @@ function PhaseRenderer(props: {
 
   switch (phase.state) {
     case "loading":
-      return <p style={{ color: "#888" }}>Loading…</p>;
+      return <p className={styles.loadingText}>Loading…</p>;
 
     case "idle":
       return (
         <div>
-          <p style={{ marginBottom: "1rem", color: "#aaa" }}>
+          <p className={styles.idleDescription}>
             No active mission. Start a new challenge to begin.
           </p>
-          <button onClick={props.onStart} style={buttonStyle}>
+          <button onClick={props.onStart} className={styles.button}>
             Start Mission
           </button>
         </div>
@@ -368,30 +341,14 @@ function PhaseRenderer(props: {
 
       return (
         <div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "0.35rem 0.75rem",
-              color: "#888",
-              fontSize: "0.85rem",
-              marginBottom: "0.5rem",
-            }}
-          >
+          <div className={styles.questionInfo}>
             <span>
               Question {q.index + 1} of {q.total}
             </span>
-            <span style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <span className={styles.badgeRow}>
               <span
-                style={{
-                  padding: "0.2rem 0.5rem",
-                  borderRadius: 6,
-                  background: typeColor.bg,
-                  color: typeColor.color,
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                }}
+                className={styles.typeBadge}
+                style={{ background: typeColor.bg, color: typeColor.color }}
               >
                 {typeLabel}
               </span>
@@ -411,11 +368,7 @@ function PhaseRenderer(props: {
           <button
             onClick={props.onSubmit}
             disabled={props.selectedIndex === null}
-            style={{
-              ...buttonStyle,
-              marginTop: "1.25rem",
-              opacity: props.selectedIndex === null ? 0.4 : 1,
-            }}
+            className={`${styles.submitButton} ${props.selectedIndex === null ? styles.submitButtonDisabled : ""}`}
           >
             Submit Answer
           </button>
@@ -424,66 +377,45 @@ function PhaseRenderer(props: {
     }
 
     case "submitting":
-      return <p style={{ color: "#888" }}>Evaluating…</p>;
+      return <p className={styles.submittingText}>Evaluating…</p>;
 
     case "feedback": {
       const { feedback, question } = phase;
       return (
         <div>
           <div
-            style={{
-              padding: "1rem",
-              borderRadius: 8,
-              background: feedback.isCorrect ? "#0d2818" : "#2a0d0d",
-              border: `1px solid ${feedback.isCorrect ? "#2ecc71" : "#e74c3c"}`,
-              marginBottom: "1rem",
-            }}
+            className={`${styles.feedbackBox} ${feedback.isCorrect ? styles.feedbackCorrect : styles.feedbackIncorrect}`}
           >
             <p
-              style={{
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                color: feedback.isCorrect ? "#2ecc71" : "#e74c3c",
-                marginBottom: "0.5rem",
-              }}
+              className={`${styles.feedbackHeader} ${feedback.isCorrect ? styles.feedbackHeaderCorrect : styles.feedbackHeaderIncorrect}`}
             >
               {feedback.isCorrect ? " Correct!" : " Incorrect"}
             </p>
-            <p style={{ color: "#ccc", lineHeight: 1.5 }}>{feedback.explanation}</p>
+            <p className={styles.feedbackExplanation}>{feedback.explanation}</p>
           </div>
 
-          <div style={{ marginBottom: "1rem" }}>
-            <p style={{ color: "#aaa", fontSize: "0.9rem" }}>
+          <div className={styles.correctAnswerRow}>
+            <p className={styles.correctAnswerLabel}>
               Correct answer:{" "}
-              <span style={{ color: "#2ecc71", fontWeight: 600 }}>
+              <span className={styles.correctAnswerValue}>
                 {question.options[feedback.correctIndex]}
               </span>
             </p>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "1.5rem",
-              marginBottom: "1rem",
-              padding: "0.75rem 1rem",
-              background: "#1a1a1a",
-              borderRadius: 6,
-            }}
-          >
-            <span style={{ color: "#aaa" }}>
-              XP: <span style={{ color: "#f1c40f" }}>+{feedback.xpAwarded}</span>
+          <div className={styles.statsBar}>
+            <span className={styles.statsItem}>
+              XP: <span className={styles.statsValue}>+{feedback.xpAwarded}</span>
             </span>
-            <span style={{ color: "#aaa" }}>
+            <span className={styles.statsItem}>
               Score: {feedback.score}/{feedback.maxScore}
             </span>
-            <span style={{ color: "#aaa" }}>
+            <span className={styles.statsItem}>
               Mastery: {Math.round(feedback.updatedMastery * 100)}%
             </span>
           </div>
 
-          <button onClick={props.onContinue} style={buttonStyle}>
+          <button onClick={props.onContinue} className={styles.button}>
             Continue
           </button>
         </div>
@@ -507,28 +439,11 @@ function PhaseRenderer(props: {
     case "error":
       return (
         <div>
-          <p style={{ color: "#e74c3c", marginBottom: "1rem" }}>Error: {phase.message}</p>
-          <button onClick={() => window.location.reload()} style={buttonStyle}>
+          <p className={styles.errorText}>Error: {phase.message}</p>
+          <button onClick={() => window.location.reload()} className={styles.button}>
             Retry
           </button>
         </div>
       );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Shared styles
-// ---------------------------------------------------------------------------
-
-const buttonStyle: React.CSSProperties = {
-  padding: "0.65rem 1.5rem",
-  fontSize: "1rem",
-  fontWeight: 500,
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-  background: "#4a9eff",
-  color: "#fff",
-  transition: "opacity 0.15s",
-  width: "100%",
-};

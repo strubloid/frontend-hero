@@ -1,0 +1,53 @@
+.container {
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  max-width: 700px;
+}
+
+.prompt {
+  color: #e0e0e0;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem;
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-top: 0.75rem;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+}
+
+.submitButton {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+
+  &:disabled {
+    background: #444;
+    cursor: not-allowed;
+  }
+}
+
+.feedbackMsg {
+  color: #86efac;
+  font-size: 0.85rem;
+}

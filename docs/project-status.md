@@ -2,7 +2,7 @@
 
 |> **Living document**. Update after completing each phase.
 
-> Current Phase: **Phase 15 — Challenge Type Expansion & Variety (Complete)**
+> Current Phase: **Phase 16 — SCSS Module Migration & Presentation Polish (Complete)**
 
 ---
 
@@ -27,25 +27,26 @@
 
 ## Phase Overview
 
-| Phase        | Name                                   | Status      |
-| ------------ | -------------------------------------- | ----------- |
-| Phase 0      | Research and Product Definition        | ✅ Complete |
-| Phase 1      | Walking Skeleton                       | ✅ Complete |
-| Phase 2      | Subject Engine                         | ✅ Complete |
-| Phase 3      | Learning Engine                        | ✅ Complete |
-| Phase 4      | Game Foundation                        | ✅ Complete |
-| Phase 5      | Polish & Narrative                     | ✅ Complete |
-| Phase 6      | Experience & Integration               | ✅ Complete |
-| Phase 7      | Advanced Game Experience               | ✅ Complete |
-| Phase 8      | Production Readiness                   | ✅ Complete |
-| Post-launch  | Durable Persistence Hardening          | ✅ Complete |
-| Phase 9      | Command Centre & Question Supply       | ✅ Complete |
-| Phase 10     | Subject Campaign Progression           | ✅ Complete |
-| Phase 11     | Encounter Forge & Batch Generation     | ✅ Complete |
-| Phase 12     | Subject Boss & Campaign Completion     | ✅ Complete |
-| Phase 13     | E2E Testing & Production Validation    | ✅ Complete |
-| **Phase 14** | **Player Identity Decoupling**         | ✅ Complete |
-| **Phase 15** | **Challenge Type Expansion & Variety** | ✅ Complete |
+| Phase        | Name                                            | Status      |
+| ------------ | ----------------------------------------------- | ----------- |
+| Phase 0      | Research and Product Definition                 | ✅ Complete |
+| Phase 1      | Walking Skeleton                                | ✅ Complete |
+| Phase 2      | Subject Engine                                  | ✅ Complete |
+| Phase 3      | Learning Engine                                 | ✅ Complete |
+| Phase 4      | Game Foundation                                 | ✅ Complete |
+| Phase 5      | Polish & Narrative                              | ✅ Complete |
+| Phase 6      | Experience & Integration                        | ✅ Complete |
+| Phase 7      | Advanced Game Experience                        | ✅ Complete |
+| Phase 8      | Production Readiness                            | ✅ Complete |
+| Post-launch  | Durable Persistence Hardening                   | ✅ Complete |
+| Phase 9      | Command Centre & Question Supply                | ✅ Complete |
+| Phase 10     | Subject Campaign Progression                    | ✅ Complete |
+| Phase 11     | Encounter Forge & Batch Generation              | ✅ Complete |
+| Phase 12     | Subject Boss & Campaign Completion              | ✅ Complete |
+| Phase 13     | E2E Testing & Production Validation             | ✅ Complete |
+| **Phase 14** | **Player Identity Decoupling**                  | ✅ Complete |
+| **Phase 15** | **Challenge Type Expansion & Variety**          | ✅ Complete |
+| **Phase 16** | **SCSS Module Migration & Presentation Polish** | ✅ Complete |
 
 ---
 
@@ -115,6 +116,17 @@
 - ✅ **Docker build verification** — `scripts/verify-docker-image.mjs` builds the Docker image, starts a container, confirms health endpoint returns 200/ok, confirms main page loads, then cleans up
 - ✅ **Docker wiring in CI** — `.github/workflows/ci.yml` runs Docker build + container verification as a separate job alongside verify:full
 - ✅ **Production verification script** — `npm run verify:production` runs verify:full then Docker verification
+
+### Phase 16 — SCSS Module Migration & Presentation Polish (Complete)
+
+- ✅ **All 9 question-renderer components** — `multiple-choice`, `true-false`, `code-prediction`, `bug-hunt`, `explain-it`, `multiple-select`, `fill-blank`, `ordering`, `matching` — fully migrated from inline `style={{} }` blocks to SCSS module classes
+- ✅ **Play page** (`src/app/play/page.tsx`) — >90% of inline styles replaced with `play.module.scss` classes; only dynamic type-badge background/color remains inline (from a runtime lookup map)
+- ✅ **Zero inline `style=` blocks** remaining in any question-renderer component
+- ✅ **`getOptionStyle()` removed** from all component files — the shared button-style utility function remains in `shared.ts` only for its type definition (no longer used by any component)
+- ✅ **9 new `.module.scss` files** created with consistent styling, hover/disabled states, and transitions
+- ✅ **Play page SCSS module**: 25+ classes covering the full game interaction surface (page layout, header, buttons, feedback box, stats bar, error states)
+- ✅ **Consistent visual tokens** across all question types: shared border-radius, font sizes, color palette, and transition timing
+- ✅ 380 tests passing, build clean
 
 ### Phase 15 — Challenge Type Expansion & Variety (Complete)
 
@@ -207,11 +219,11 @@ The full audit is in `docs/game-design/current-experience-audit.md`. Key finding
 
 ## Known Gaps
 
-| Gap                    | Impact                                                                                                                        | Planned Phase |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| AI question generation | Demo/template generation unless real provider is configured                                                                   | Phase 13      |
-| Inline styles in pages | Violates SCSS module architecture pattern                                                                                     | Phase 14      |
-| Challenge type variety | All question types are now registered; refactoring and architecture-decision types are still unlisted in `QuestionType` union | Phase 16      |
+| Gap | Impact | Planned Phase |
+| Inline styles in pages | Some pages violate SCSS module architecture pattern compared to the command-centre components | Phase 16 |
+| Challenge type variety | Most question types registered; `refactoring` and `architecture-decision` not yet in the `QuestionType` union | Complete |
+| AI question generation | Demo/template generation unless real AI provider is configured | Phase 13 |
+| Player identity coupling | Server actions use hard-coded player IDs | Phase 14 |
 
 ---
 
@@ -244,4 +256,4 @@ Phase acceptance requires `npm run verify:full` to pass. Phase 13 also requires 
 
 ---
 
-_Last updated: 2026-06-22 (Phase 15 — fill-blank, ordering, and matching question types added)_
+_Last updated: 2026-06-22 (Phase 16 — all question renderer components and play page migrated from inline styles to SCSS modules)_

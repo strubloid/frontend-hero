@@ -1,0 +1,89 @@
+.container {
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  max-width: 700px;
+}
+
+.prompt {
+  margin: 0 0 1rem 0;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
+.instructions {
+  color: #888;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.optionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #333;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.optionSelected {
+  background: rgba(102, 126, 234, 0.15);
+  border: 1px solid #667eea;
+}
+
+.optionText {
+  color: #e0e0e0;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.checkboxChecked {
+  border: 2px solid #667eea;
+  background: #667eea;
+}
+
+.submitButton {
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+
+  &:disabled {
+    background: #444;
+    cursor: not-allowed;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.feedbackMsg {
+  color: #86efac;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}

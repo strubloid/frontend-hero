@@ -1,0 +1,86 @@
+.container {
+  // root wrapper — no extra styles needed, just a semantic container
+}
+
+.typeBadge {
+  background: rgba(74, 158, 255, 0.08);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.typeLabel {
+  color: #4a9eff;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stem {
+  color: #fff;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  white-space: pre-wrap;
+}
+
+.blank {
+  display: inline-block;
+  min-width: 5rem;
+  margin: 0 0.25rem;
+  font-weight: 700;
+  padding: 0 0.25rem;
+  border-bottom: 2px solid #666;
+  color: #666;
+}
+
+.blankFilled {
+  border-bottom-color: #4a9eff;
+  color: #4a9eff;
+}
+
+.instruction {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.optionLabel {
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #4a9eff;
+}
+
+.optionButton {
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e0e0e0;
+  transition:
+    border 0.15s,
+    background 0.15s;
+  width: 100%;
+  border: 2px solid #333;
+  background: #1e1e1e;
+  font-weight: 400;
+  font-family: inherit;
+}
+
+.optionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.optionSelected {
+  border-color: #4a9eff;
+  background: #1a2a40;
+}

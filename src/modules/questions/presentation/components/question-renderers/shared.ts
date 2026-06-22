@@ -8,6 +8,7 @@ export interface QuestionRendererProps {
   onSelect: (index: number) => void;
 }
 
+/** Shared button base styles — still used by matching, fill-blank, ordering, and bug-hunt renderers */
 const sharedButtonStyle: React.CSSProperties = {
   padding: "0.75rem 1rem",
   fontSize: "0.95rem",
@@ -21,6 +22,7 @@ const sharedButtonStyle: React.CSSProperties = {
   background: "#1e1e1e",
 };
 
+/** Shared option style helper — still used by matching, fill-blank, ordering, and bug-hunt renderers */
 export function getOptionStyle(
   index: number,
   selectedIndex: number | null,

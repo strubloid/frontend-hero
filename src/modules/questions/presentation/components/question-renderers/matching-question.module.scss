@@ -1,0 +1,82 @@
+.container {
+  // root wrapper
+}
+
+.typeBadge {
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.typeLabel {
+  color: #a855f7;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.referenceBox {
+  background: rgba(168, 85, 247, 0.05);
+  border: 1px dashed rgba(168, 85, 247, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.referenceLabel {
+  color: #a855f7;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.referenceValue {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.instruction {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.optionLabel {
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #a855f7;
+}
+
+.optionButton {
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e0e0e0;
+  transition:
+    border 0.15s,
+    background 0.15s;
+  width: 100%;
+  border: 2px solid #333;
+  background: #1e1e1e;
+  font-weight: 400;
+  font-family: inherit;
+}
+
+.optionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.optionSelected {
+  border-color: #a855f7;
+  background: #1a2a40;
+}

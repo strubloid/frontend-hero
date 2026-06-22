@@ -1,0 +1,71 @@
+.stem {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.codeBlock {
+  background: #0d1117;
+  color: #c9d1d9;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border: 1px solid #30363d;
+  margin: 0.75rem 0;
+}
+
+.inlineText {
+  color: #fff;
+}
+
+.prompt {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.optionButton {
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e0e0e0;
+  transition:
+    border 0.15s,
+    background 0.15s;
+  width: 100%;
+  border: 2px solid #333;
+  background: #1e1e1e;
+  font-family: inherit;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.optionSelected {
+  border: 2px solid #c084fc;
+  background: #1a2a40;
+}
+
+.optionLetter {
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #c084fc;
+}
+
+.optionCode {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}

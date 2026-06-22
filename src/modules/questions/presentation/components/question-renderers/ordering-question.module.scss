@@ -1,0 +1,71 @@
+.container {
+  // root wrapper
+}
+
+.typeBadge {
+  background: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.typeLabel {
+  color: #eab308;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stem {
+  color: #fff;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  white-space: pre-wrap;
+}
+
+.instruction {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.optionLabel {
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #eab308;
+}
+
+.optionButton {
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e0e0e0;
+  transition:
+    border 0.15s,
+    background 0.15s;
+  width: 100%;
+  border: 2px solid #333;
+  background: #1e1e1e;
+  font-weight: 400;
+  font-family: inherit;
+}
+
+.optionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.optionSelected {
+  border-color: #eab308;
+  background: #1a2a40;
+}

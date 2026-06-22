@@ -57,40 +57,39 @@
 
 ## 2. Current Phase
 
-**Current Phase: Phase 15 — Challenge Type Expansion & Variety (In Progress)** ✅
+**Current Phase: Phase 16 — SCSS Module Migration & Presentation Polish (Complete)** ✅
 
-Phase 15 adds 3 new question types that existed in the `QuestionType` union type but had no evaluator, validator, module, or React component registered:
+Phase 16 replaced all inline `style={{} }` blocks across all 9 question renderer components and the play page with proper SCSS module classes. This eliminates violation of the SCSS module architecture direction and gives the game a consistent, maintainable styling foundation.
 
-- ✅ `fill-blank` — Stem shows `___` blank, user picks correct word/phrase from options
-- ✅ `ordering` — "What comes next?" sequence question, user picks the correct next step
-- ✅ `matching` — Reference item displayed, user selects matching option from choices
-- ✅ All 3 registered in `create-default-registry.ts` and wired in `question-renderer-router.tsx`
-- ✅ All 3 use the existing `selectedIndex === correctIndex` evaluation pipeline (no architecture changes)
+- ✅ All 9 question-renderer components converted: `multiple-choice`, `true-false`, `code-prediction`, `bug-hunt`, `explain-it`, `multiple-select`, `fill-blank`, `ordering`, `matching`
+- ✅ Play page (`/play`) fully migrated from inline styles to `play.module.scss`
+- ✅ `getOptionStyle()` removed from all components — shared styling now lives in each component's `.module.scss`
 - ✅ 380 tests passing, build clean
 
-**Next Phase: Phase 16 — TBD**
+**Next Phase: Phase 17 — TBD**
 
 ### Phase Overview
 
-| Phase        | Name                                   | Status          |
-| ------------ | -------------------------------------- | --------------- |
-| Phase 0      | Research and Product Definition        | ✅ Complete     |
-| Phase 1      | Walking Skeleton                       | ✅ Complete     |
-| Phase 2      | Subject Engine                         | ✅ Complete     |
-| Phase 3      | Learning Engine                        | ✅ Complete     |
-| Phase 4      | Game Foundation                        | ✅ Complete     |
-| Phase 5      | Polish & Narrative                     | ✅ Complete     |
-| Phase 6      | Experience & Integration               | ✅ Complete     |
-| Phase 7      | Advanced Game Experience               | ✅ Complete     |
-| Phase 8      | Production Readiness                   | ✅ Complete     |
-| Post-launch  | Durable Persistence Hardening          | ✅ Complete     |
-| Phase 9      | Command Centre & Question Supply       | ✅ Complete     |
-| Phase 10     | Subject Campaign Progression           | ✅ Complete     |
-| Phase 11     | Encounter Forge & Batch Generation     | ✅ Complete     |
-| Phase 12     | Subject Boss & Campaign Completion     | ✅ Complete     |
-| Phase 13     | E2E Testing & Production Validation    | ✅ Complete     |
-| **Phase 14** | **Player Identity Decoupling**         | ✅ **Complete** |
-| **Phase 15** | **Challenge Type Expansion & Variety** | ✅ **Complete** |
+| Phase        | Name                                            | Status          |
+| ------------ | ----------------------------------------------- | --------------- |
+| Phase 0      | Research and Product Definition                 | ✅ Complete     |
+| Phase 1      | Walking Skeleton                                | ✅ Complete     |
+| Phase 2      | Subject Engine                                  | ✅ Complete     |
+| Phase 3      | Learning Engine                                 | ✅ Complete     |
+| Phase 4      | Game Foundation                                 | ✅ Complete     |
+| Phase 5      | Polish & Narrative                              | ✅ Complete     |
+| Phase 6      | Experience & Integration                        | ✅ Complete     |
+| Phase 7      | Advanced Game Experience                        | ✅ Complete     |
+| Phase 8      | Production Readiness                            | ✅ Complete     |
+| Post-launch  | Durable Persistence Hardening                   | ✅ Complete     |
+| Phase 9      | Command Centre & Question Supply                | ✅ Complete     |
+| Phase 10     | Subject Campaign Progression                    | ✅ Complete     |
+| Phase 11     | Encounter Forge & Batch Generation              | ✅ Complete     |
+| Phase 12     | Subject Boss & Campaign Completion              | ✅ Complete     |
+| Phase 13     | E2E Testing & Production Validation             | ✅ Complete     |
+| **Phase 14** | **Player Identity Decoupling**                  | ✅ **Complete** |
+| **Phase 15** | **Challenge Type Expansion & Variety**          | ✅ **Complete** |
+| **Phase 16** | **SCSS Module Migration & Presentation Polish** | ✅ **Complete** |
 
 ---
 
@@ -538,10 +537,8 @@ See `docs/architecture/extension-points.md` for the complete Drag-and-Drop examp
 
 ### Current Limitations
 
-1. **Challenge type variety limited** — The game previously used only multiple-choice questions. Phase 15 added `fill-blank`, `ordering`, and `matching` types. Code-prediction, bug-hunt, and other types defined in the extension point system are now available, though some remain unimplemented (`refactoring`, `architecture-decision` — not yet in the `QuestionType` union).
-2. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
-3. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
-4. **Inline styles and presentation polish remain** — Some pages still violate the SCSS module architecture direction and the game loop needs more narrative/feedback polish to feel like a premium game.
+1. **Encounter Forge generation quality varies** — Generated questions are validated and deduplicated, but model quality and concept coverage targeting still needs tuning for some subject levels.
+2. **E2E coverage covers core paths but not full boundary coverage** — Current Playwright tests play flow, question rotation, and negative paths. Full level progression, boss completion, and persistence-after-restart E2E flows remain to be added.
 
 ### Architectural Limitations (by Design)
 

@@ -1,6 +1,6 @@
 import type React from "react";
 import type { QuestionRendererProps } from "./shared";
-import { getOptionStyle } from "./shared";
+import styles from "./true-false-question.module.scss";
 
 export function TrueFalseQuestion({
   stem,
@@ -11,26 +11,24 @@ export function TrueFalseQuestion({
 }: QuestionRendererProps) {
   return (
     <div>
-      <p style={{ color: "#fff", fontSize: "1.15rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
-        {stem}
-      </p>
-      <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
-        {options.map((opt, idx) => (
-          <button
-            key={idx}
-            onClick={() => onSelect(idx)}
-            disabled={disabled}
-            style={{
-              ...getOptionStyle(idx, selectedIndex, true),
-              flex: 1,
-              maxWidth: 200,
-              padding: "1.25rem 1rem",
-              fontSize: "1.1rem",
-            }}
-          >
-            {opt}
-          </button>
-        ))}
+      <p className={styles.stem}>{stem}</p>
+      <div className={styles.optionsList}>
+        {options.map((opt, idx) => {
+          let selectedClass = "";
+          if (selectedIndex === idx) {
+            selectedClass = idx === 0 ? styles.optionSelectedTrue : styles.optionSelectedFalse;
+          }
+          return (
+            <button
+              key={idx}
+              onClick={() => onSelect(idx)}
+              disabled={disabled}
+              className={`${styles.optionButton} ${selectedClass}`}
+            >
+              {opt}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

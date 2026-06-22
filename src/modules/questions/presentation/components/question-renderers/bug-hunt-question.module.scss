@@ -1,0 +1,79 @@
+.typeBadge {
+  background: rgba(255, 107, 53, 0.08);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.typeBadgeText {
+  color: #ff6b35;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stem {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.stemText {
+  color: #fff;
+}
+
+.codeBlock {
+  background: #1a0e0a;
+  color: #ffb08e;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  margin: 0.75rem 0;
+}
+
+.prompt {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.optionButton {
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e0e0e0;
+  transition:
+    border 0.15s,
+    background 0.15s;
+  width: 100%;
+  border: 2px solid #333;
+  background: #1e1e1e;
+  font-family: inherit;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.optionSelected {
+  border: 2px solid #4a9eff;
+  background: #1a2a40;
+}
+
+.optionLabel {
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #ff6b35;
+}
